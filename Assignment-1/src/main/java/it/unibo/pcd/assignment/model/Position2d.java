@@ -1,15 +1,15 @@
 package it.unibo.pcd.assignment.model;
 
-public class P2d {
+public class Position2d {
 
     private double x, y;
 
-    public P2d(double x,double y){
+    public Position2d(double x, double y){
         this.x = x;
         this.y = y;
     }
 
-    public P2d sum(V2d v) {
+    public Position2d sum(Velocity2d v) {
     	x += v.x;
     	y += v.y;
     	return this;

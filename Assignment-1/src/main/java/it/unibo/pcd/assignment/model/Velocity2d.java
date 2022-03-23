@@ -17,38 +17,38 @@ import it.unibo.pcd.assignment.NullVectorException;
  * objects are completely state-less
  *
  */
-public class V2d  {
+public class Velocity2d {
 
     public double x,y;
 
-    public V2d(double x, double y){
+    public Velocity2d(double x, double y){
         this.x = x;
         this.y = y;
     }
 
-    public V2d(V2d v){
+    public Velocity2d(Velocity2d v){
         this.x = v.x;
         this.y = v.y;
     }
 
-    public V2d(P2d from, P2d to){
+    public Velocity2d(Position2d from, Position2d to){
         this.x = to.getX() - from.getX();
         this.y = to.getY() - from.getY();
     }
 
-    public V2d scalarMul(double k) {
+    public Velocity2d scalarMul(double k) {
     	x *= k;
     	y *= k;
     	return this;
     }
     
-    public V2d sum(V2d v) {
+    public Velocity2d sum(Velocity2d v) {
     	x += v.x;
     	y += v.y;
     	return this;
     }
     
-    public V2d normalize() throws NullVectorException {
+    public Velocity2d normalize() throws NullVectorException {
     	double mod =  Math.sqrt(x*x + y*y);
     	if (mod > 0) {
     		x /= mod;
@@ -59,7 +59,7 @@ public class V2d  {
     	}
 
     }
-    public V2d change(double x, double y) {
+    public Velocity2d change(double x, double y) {
     	this.x = x;
     	this.y = y;
     	return this;

@@ -1,6 +1,6 @@
 package it.unibo.pcd.assignment.view;
 
-import it.unibo.pcd.assignment.model.P2d;
+import it.unibo.pcd.assignment.model.Position2d;
 import it.unibo.pcd.assignment.model.Body;
 import it.unibo.pcd.assignment.model.Boundary;
 
@@ -10,7 +10,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Simulation view
@@ -32,7 +32,7 @@ public class SimulationView {
     	frame = new VisualiserFrame(w,h);
     }
         
-    public void display(ArrayList<Body> bodies, double vt, long iter, Boundary bounds){
+    public void display(List<Body> bodies, double vt, long iter, Boundary bounds){
  	   frame.display(bodies, vt, iter, bounds); 
     }
     
@@ -57,7 +57,7 @@ public class SimulationView {
     		this.setVisible(true);
         }
         
-        public void display(ArrayList<Body> bodies, double vt, long iter, Boundary bounds){
+        public void display(List<Body> bodies, double vt, long iter, Boundary bounds){
         	try {
 	        	SwingUtilities.invokeAndWait(() -> {
 	        		panel.display(bodies, vt, iter, bounds);
@@ -73,7 +73,7 @@ public class SimulationView {
 
     public static class VisualiserPanel extends JPanel implements KeyListener {
         
-    	private ArrayList<Body> bodies;
+    	private List<Body> bodies;
     	private Boundary bounds;
     	
     	private long nIter;
@@ -113,7 +113,7 @@ public class SimulationView {
     			g2.drawRect(x0, y0 - ht, wd, ht);
     			
 	    		bodies.forEach( b -> {
-	    			P2d p = b.getPos();
+	    			Position2d p = b.getPos();
 			        int radius = (int) (10*scale);
 			        if (radius < 1) {
 			        	radius = 1;
@@ -133,7 +133,7 @@ public class SimulationView {
         	return (int)(dy - y*dy*scale);
         }
         
-        public void display(ArrayList<Body> bodies, double vt, long iter, Boundary bounds){
+        public void display(List<Body> bodies, double vt, long iter, Boundary bounds){
             this.bodies = bodies;
             this.bounds = bounds;
             this.vt = vt;
