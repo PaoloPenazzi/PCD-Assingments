@@ -1,5 +1,7 @@
-package it.unibo.pcd.assignment;
+package it.unibo.pcd.assignment.model;
 
+
+import it.unibo.pcd.assignment.InfiniteForceException;
 
 /*
  * This class represents a body

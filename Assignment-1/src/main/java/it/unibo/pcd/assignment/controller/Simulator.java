@@ -1,4 +1,10 @@
-package it.unibo.pcd.assignment;
+package it.unibo.pcd.assignment.controller;
+
+import it.unibo.pcd.assignment.model.P2d;
+import it.unibo.pcd.assignment.model.V2d;
+import it.unibo.pcd.assignment.model.Body;
+import it.unibo.pcd.assignment.model.Boundary;
+import it.unibo.pcd.assignment.view.SimulationView;
 
 import java.util.ArrayList;
 import java.util.Random;

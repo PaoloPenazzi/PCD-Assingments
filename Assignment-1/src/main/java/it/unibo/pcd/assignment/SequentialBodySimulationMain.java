@@ -1,5 +1,8 @@
 package it.unibo.pcd.assignment;
 
+import it.unibo.pcd.assignment.controller.Simulator;
+import it.unibo.pcd.assignment.view.SimulationView;
+
 /**
  * Bodies simulation - legacy code: sequential, unstructured
  * 

@@ -1,4 +1,4 @@
-package it.unibo.pcd.assignment;
+package it.unibo.pcd.assignment.model;
 
 /**
  * Boundary of the field where bodies move. 

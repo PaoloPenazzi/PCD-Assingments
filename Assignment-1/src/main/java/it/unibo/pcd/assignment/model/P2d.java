@@ -1,6 +1,6 @@
-package it.unibo.pcd.assignment;
+package it.unibo.pcd.assignment.model;
 
-public class P2d { 
+public class P2d {
 
     private double x, y;
 

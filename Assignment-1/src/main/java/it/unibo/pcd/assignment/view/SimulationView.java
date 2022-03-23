@@ -1,4 +1,8 @@
-package it.unibo.pcd.assignment;
+package it.unibo.pcd.assignment.view;
+
+import it.unibo.pcd.assignment.model.P2d;
+import it.unibo.pcd.assignment.model.Body;
+import it.unibo.pcd.assignment.model.Boundary;
 
 import javax.swing.*;
 import java.awt.*;
