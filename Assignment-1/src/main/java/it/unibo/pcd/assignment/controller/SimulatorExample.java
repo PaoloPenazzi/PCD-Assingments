@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class SimulatorExample {
 
-    private SimulationView viewer;
+    //private SimulationView viewer;
 
     /* bodies in the field */
     ArrayList<Body> bodies;
@@ -25,8 +25,8 @@ public class SimulatorExample {
     /* virtual time step */
     double dt;
 
-    public SimulatorExample(SimulationView viewer) {
-        this.viewer = viewer;
+    public SimulatorExample() {
+        //this.viewer = viewer;
 
         /* initializing boundary and bodies */
 
@@ -83,7 +83,7 @@ public class SimulatorExample {
 
             /* display current stage */
 
-            viewer.display(bodies, vt, iter, bounds);
+            //viewer.display(bodies, vt, iter, bounds);
 
         }
     }
@@ -141,7 +141,7 @@ public class SimulatorExample {
 
     private void testBodySet4_many_bodies() {
         bounds = new Boundary(-6.0, -6.0, 6.0, 6.0);
-        int nBodies = 1000;
+        int nBodies = 5000;
         Random rand = new Random(System.currentTimeMillis());
         bodies = new ArrayList<Body>();
         for (int i = 0; i < nBodies; i++) {

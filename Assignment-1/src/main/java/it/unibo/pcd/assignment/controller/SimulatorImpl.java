@@ -13,6 +13,9 @@ public class SimulatorImpl extends AbstractSimulator{
         double virtualTime = 0;
         long iteration = 0;
         while (iteration < numSteps) {
+            if(iteration % 500 == 0) {
+                System.out.println("Iterazione: " + iteration);
+            }
             super.computeBodiesVelocity();
             // Compute bodies' new position.
             for (Body b : super.getBodies()) {
