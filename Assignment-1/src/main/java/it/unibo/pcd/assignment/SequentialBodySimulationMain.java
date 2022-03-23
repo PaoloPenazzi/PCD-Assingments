@@ -1,8 +1,7 @@
 package it.unibo.pcd.assignment;
 
 import it.unibo.pcd.assignment.controller.Simulator;
-import it.unibo.pcd.assignment.controller.SimulatorExample;
-import it.unibo.pcd.assignment.controller.SimulatorWithGUI;
+import it.unibo.pcd.assignment.controller.SimulatorImplWithGUI;
 import it.unibo.pcd.assignment.view.SimulationView;
 
 /**
@@ -13,10 +12,10 @@ import it.unibo.pcd.assignment.view.SimulationView;
 public class SequentialBodySimulationMain {
 
     public static void main(String[] args) {
-                
-    	SimulationView viewer = new SimulationView(620,620);
 
-    	Simulator sim = new SimulatorWithGUI(1000, 4, viewer);
+
+    	SimulationView viewer = new SimulationView(620,620);
+    	Simulator sim = new SimulatorImplWithGUI(1000, 4, viewer);
         sim.execute(2000);
     }
 }

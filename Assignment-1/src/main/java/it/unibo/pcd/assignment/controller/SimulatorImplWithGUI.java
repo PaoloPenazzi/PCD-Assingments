@@ -3,10 +3,10 @@ package it.unibo.pcd.assignment.controller;
 import it.unibo.pcd.assignment.model.Body;
 import it.unibo.pcd.assignment.view.SimulationView;
 
-public class SimulatorWithGUI extends AbstractSimulator {
+public class SimulatorImplWithGUI extends AbstractSimulator {
     private final SimulationView viewer;
 
-    public SimulatorWithGUI(int numBodies, int sideLenght, SimulationView view) {
+    public SimulatorImplWithGUI(int numBodies, int sideLenght, SimulationView view) {
         super(numBodies, sideLenght);
         this.viewer = view;
     }
