@@ -103,7 +103,7 @@ public class SimulationView {
                 int ht = y0 - getYCoordinate(bounds.getY1());
                 g2.drawRect(x0, y0 - ht, wd, ht);
                 bodies.forEach(b -> {
-                    Position2d p = b.getPos();
+                    Position2d p = b.getPosition();
                     int radius = (int) (10 * scale);
                     if (radius < 1) {
                         radius = 1;
