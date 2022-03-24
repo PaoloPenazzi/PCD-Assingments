@@ -8,81 +8,80 @@ import it.unibo.pcd.assignment.InfiniteForceException;
  *
  */
 public class Body {
-
     private static final double REPULSIVE_CONST = 0.01;
     private static final double FRICTION_CONST = 1;
 
-    private final Position2d pos;
-    private final Velocity2d vel;
+    private final Position2d position;
+    private final Velocity2d velocity;
     private final double mass;
     private final int id;
 
-    public Body(int id, Position2d pos, Velocity2d vel, double mass) {
+    public Body(int id, Position2d position, Velocity2d velocity, double mass) {
         this.id = id;
-        this.pos = pos;
-        this.vel = vel;
+        this.position = position;
+        this.velocity = velocity;
         this.mass = mass;
     }
 
     /**
      * Check if two bodies are the same.
-     * @param b the target body.
+     * @param body the target body.
      * @return true if they're the same body, false otherwise.
      */
-    public boolean equals(Object b) {
-        return ((Body) b).id == id;
+    public boolean equals(Object body) {
+        return ((Body) body).id == id;
     }
 
     /**
      * Update the position, according to current velocity
-     * @param dt time elapsed
+     * @param deltaTime time elapsed
      */
-    public void updatePos(double dt) {
-        pos.sum(new Velocity2d(vel).scalarMul(dt));
+    public void updatePos(double deltaTime) {
+        position.sum(new Velocity2d(velocity).scalarMul(deltaTime));
     }
 
     /**
      * Update the velocity, given the instant acceleration
      *
-     * @param acc instant acceleration
-     * @param dt  time elapsed
+     * @param acceleration instant acceleration
+     * @param deltaTime  time elapsed
      */
-    public void updateVelocity(Velocity2d acc, double dt) {
-        vel.sum(new Velocity2d(acc).scalarMul(dt));
+    public void updateVelocity(Velocity2d acceleration, double deltaTime) {
+        velocity.sum(new Velocity2d(acceleration).scalarMul(deltaTime));
     }
 
     /**
      * Change the velocity
-     * @param vx velocity on x-axis.
-     * @param vy velocity on y-axis.
+     * @param xVelocity velocity on x-axis.
+     * @param yVelocity velocity on y-axis.
      */
-    public void changeVel(double vx, double vy) {
-        vel.change(vx, vy);
+    public void changeVel(double xVelocity, double yVelocity) {
+        velocity.change(xVelocity, yVelocity);
     }
 
     /**
      * Computes the distance from the specified body
-     * @param b the target body.
+     * @param body the target body.
      * @return the distance between bodies.
      */
-    public double getDistanceFrom(Body b) {
-        double dx = pos.getX() - b.getPos().getX();
-        double dy = pos.getY() - b.getPos().getY();
+    public double getDistanceFrom(Body body) {
+        double dx = position.getX() - body.getPosition().getX();
+        double dy = position.getY() - body.getPosition().getY();
         return Math.sqrt(dx * dx + dy * dy);
     }
 
     /**
      * Compute the repulsive force exerted by another body.
-     * @param b the body.
+     * @param body the body.
      * @return the velocity of the repulsive force.
      * @throws InfiniteForceException if the force is infinite (Bodies are overlapping).
      */
-    public Velocity2d computeRepulsiveForceBy(Body b) throws InfiniteForceException {
-        double dist = getDistanceFrom(b);
+    public Velocity2d computeRepulsiveForceBy(Body body) throws InfiniteForceException {
+        double dist = getDistanceFrom(body);
         try {
-            return new Velocity2d(b.getPos(), pos)
+            return new Velocity2d(body.getPosition(), position)
                     .normalize()
-                    .scalarMul(b.getMass() * REPULSIVE_CONST / (dist * dist));
+                    .scalarMul(body.getMass() * REPULSIVE_CONST / (dist * dist));
         } catch (Exception ex) {
             throw new InfiniteForceException();
         }
@@ -93,7 +92,7 @@ public class Body {
      * @return The new velocity.
      */
     public Velocity2d getCurrentFrictionForce() {
-        return new Velocity2d(vel).scalarMul(-FRICTION_CONST);
+        return new Velocity2d(velocity).scalarMul(-FRICTION_CONST);
     }
 
     /**
@@ -102,22 +101,22 @@ public class Body {
      * @param bounds the field's bound.
      */
     public void checkAndSolveBoundaryCollision(final Boundary bounds) {
-        double x = pos.getX();
-        double y = pos.getY();
+        double x = position.getX();
+        double y = position.getY();
 
         if (x > bounds.getX1()) {
-            pos.change(bounds.getX1(), pos.getY());
-            vel.change(-vel.getX(), vel.getY());
+            position.change(bounds.getX1(), position.getY());
+            velocity.change(-velocity.getX(), velocity.getY());
         } else if (x < bounds.getX0()) {
-            pos.change(bounds.getX0(), pos.getY());
-            vel.change(-vel.getX(), vel.getY());
+            position.change(bounds.getX0(), position.getY());
+            velocity.change(-velocity.getX(), velocity.getY());
         }
         if (y > bounds.getY1()) {
-            pos.change(pos.getX(), bounds.getY1());
-            vel.change(vel.getX(), -vel.getY());
+            position.change(position.getX(), bounds.getY1());
+            velocity.change(velocity.getX(), -velocity.getY());
         } else if (y < bounds.getY0()) {
-            pos.change(pos.getX(), bounds.getY0());
-            vel.change(vel.getX(), -vel.getY());
+            position.change(position.getX(), bounds.getY0());
+            velocity.change(velocity.getX(), -velocity.getY());
         }
     }
 
@@ -125,7 +124,7 @@ public class Body {
         return mass;
     }
 
-    public Position2d getPos() {
-        return pos;
+    public Position2d getPosition() {
+        return position;
     }
 }
