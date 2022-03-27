@@ -25,24 +25,17 @@ public class Worker extends Thread {
 
     @Override
     public void run() {
-        // computare la velocità
-
-        // barriera
         try {
+            // computing velocity
             computeBodiesVelocity();
-            printLog("Thread[" + indexFrom / 9 + "] Waiting for barrier..");
-            this.barrier.computeAndWaitAll();
-            printLog("Thread[" + indexFrom / 9 + "] Unlocked..");
+            printLog("Thread[" + indexFrom + "] Waiting for Velocity barrier..");
+            this.barrier.waitForVelocity();
+            printLog("Thread[" + indexFrom + "] Unlocked..");
+            // computing positions and collisions
             updatePositionAndCheckCollision();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        // computare posizione e collisioni
-
-    }
-
-    public List<Body> getBodies() {
-        return bodies;
     }
 
     private void computeBodiesVelocity() {
@@ -85,10 +78,6 @@ public class Worker extends Thread {
         }
     }
 
-    public Barrier getBarrier() {
-        return barrier;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -123,5 +112,13 @@ public class Worker extends Thread {
 
     public int getIndexTo() {
         return indexTo;
+    }
+
+    public List<Body> getBodies() {
+        return bodies;
+    }
+
+    public Barrier getBarrier() {
+        return barrier;
     }
 }

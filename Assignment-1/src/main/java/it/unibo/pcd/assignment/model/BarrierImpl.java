@@ -11,11 +11,10 @@ public class BarrierImpl implements Barrier {
     }
 
     @Override
-    public synchronized void computeAndWaitAll() throws InterruptedException {
+    public synchronized void waitForVelocity() throws InterruptedException {
         count++;
         if (count == nWorkers) {
             notifyAll();
-            resetCounter();
         } else {
             while (count < nWorkers) {
                 wait();

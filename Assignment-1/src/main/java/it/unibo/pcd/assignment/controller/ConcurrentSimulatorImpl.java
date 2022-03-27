@@ -2,10 +2,8 @@ package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Barrier;
 import it.unibo.pcd.assignment.model.BarrierImpl;
-import it.unibo.pcd.assignment.model.Body;
 import it.unibo.pcd.assignment.model.Worker;
 
-import java.util.List;
 
 public class ConcurrentSimulatorImpl extends AbstractSimulator{
     private final int nWorkers;
@@ -26,12 +24,20 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
     public void execute(int numSteps) {
         long iteration = 0;
 
-        //while (iteration < numSteps) {
+        while (iteration < numSteps) {
+            this.createWorkers();
             for (Worker worker : this.workers) {
                 worker.start();
             }
-          //  iteration++;
-        //}
+            for (Worker worker : this.workers) {
+                try {
+                    worker.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            iteration++;
+        }
     }
 
     public void createWorkers() {
