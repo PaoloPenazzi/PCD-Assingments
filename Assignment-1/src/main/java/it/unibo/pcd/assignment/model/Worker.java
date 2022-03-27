@@ -18,21 +18,26 @@ public class Worker extends Thread {
         this.boundary = boundary;
     }
 
+    private synchronized void printLog(String string) {
+        System.out.println(string);
+    }
+
     @Override
     public void run() {
-        super.run();
         // computare la velocità
-        computeBodiesVelocity();
 
         // barriera
         try {
+            computeBodiesVelocity();
+            printLog("Thread[" + indexFrom / 9 + "] Waiting for barrier..");
             this.barrier.computeAndWaitAll();
+            printLog("Thread[" + indexFrom / 9 + "] Unlocked..");
+            updatePositionAndCheckCollision();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-
         // computare posizione e collisioni
-        updatePositionAndCheckCollision();
+
     }
 
     public List<Body> getBodies() {

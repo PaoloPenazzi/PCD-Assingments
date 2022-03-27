@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ConcurrentSimulatorImpl extends AbstractSimulator{
     private final int nWorkers;
-
+    private final Barrier barrier;
     private final Worker[] workers;
 
     public ConcurrentSimulatorImpl(int numBodies, int sideLenght) {
@@ -18,31 +18,31 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
         this.nWorkers = Runtime.getRuntime().availableProcessors() + 1;
         System.out.println("Workers number: " + this.nWorkers);
         this.workers = new Worker[nWorkers];
+        this.barrier = new BarrierImpl(this.nWorkers);
         this.createWorkers();
     }
 
     @Override
     public void execute(int numSteps) {
-        double virtualTime = 0;
         long iteration = 0;
 
         while (iteration < numSteps) {
             for(Worker worker : this.workers) {
-                worker.run();
+                worker.start();
             }
+            iteration++;
         }
     }
 
     public void createWorkers() {
         int bodiesPerWorker = super.getBodies().size() / this.nWorkers;
-        Barrier barrier = new BarrierImpl(this.nWorkers);
         for(int i = 0; i < this.nWorkers; i++) {
             if (i == this.nWorkers - 1) {
                 this.workers[i] = new Worker(i * bodiesPerWorker, super.getBodies().size(), super.getBodies(),
-                        barrier, super.getBounds());
+                        this.barrier, super.getBounds());
             } else {
                 this.workers[i] = new Worker(i * bodiesPerWorker, ((i + 1) * bodiesPerWorker) - 1,
-                        super.getBodies(), barrier, super.getBounds());
+                        super.getBodies(), this.barrier, super.getBounds());
             }
         }
     }

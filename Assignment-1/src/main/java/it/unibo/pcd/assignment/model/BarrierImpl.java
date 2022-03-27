@@ -12,10 +12,18 @@ public class BarrierImpl implements Barrier {
 
     @Override
     public synchronized void computeAndWaitAll() throws InterruptedException {
-        this.count++;
-        while (this.count < this.nWorkers) {
-            wait();
+        count++;
+        if (count == nWorkers) {
+            notifyAll();
+            resetCounter();
+        } else {
+            while (count < nWorkers) {
+                wait();
+            }
         }
-        notifyAll();
+    }
+
+    public synchronized void resetCounter() {
+        this.count = 0;
     }
 }

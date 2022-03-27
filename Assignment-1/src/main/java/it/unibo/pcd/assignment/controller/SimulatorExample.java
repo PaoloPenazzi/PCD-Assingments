@@ -51,6 +51,10 @@ public class SimulatorExample {
 
             /* update bodies velocity */
 
+            if(iter % 500 == 0) {
+                System.out.println("Iterazione: " + iter);
+            }
+
             for (int i = 0; i < bodies.size(); i++) {
                 Body b = bodies.get(i);
 
