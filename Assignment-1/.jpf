@@ -1,4 +1,4 @@
-target = it.unibo.pcd.assignment.SequentialBodySimulationMain
+target = it.unibo.pcd.assignment.RunSimulation
 
 classpath = build/classes/java/main/
 

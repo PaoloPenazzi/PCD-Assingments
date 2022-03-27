@@ -8,15 +8,15 @@ import it.unibo.pcd.assignment.view.SimulationView;
  * 
  * @author aricci
  */
-public class SequentialBodySimulationMain {
+public class RunSimulation {
 
     public static void main(String[] args) {
     	// SimulationView viewer = new SimulationView(620,620);
         //SimulatorExample sim = new SimulatorExample();
         // Simulator sim = new SimulatorImplWithGUI(1000, 6, viewer);
-        Simulator sim = new SimulatorImpl(1000, 8);
+        Simulator sim = new ConcurrentSimulatorImpl(1000, 8);
         long startTime = System.currentTimeMillis();
-        sim.execute(10000);
+        sim.execute(50000);
         long finishTime = System.currentTimeMillis();
         System.out.println(finishTime - startTime + " ms");
     }
