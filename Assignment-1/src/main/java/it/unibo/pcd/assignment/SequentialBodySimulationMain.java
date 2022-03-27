@@ -14,7 +14,7 @@ public class SequentialBodySimulationMain {
     	// SimulationView viewer = new SimulationView(620,620);
         //SimulatorExample sim = new SimulatorExample();
         // Simulator sim = new SimulatorImplWithGUI(1000, 6, viewer);
-        Simulator sim = new ConcurrentSimulatorImpl(1000, 8);
+        Simulator sim = new SimulatorImpl(1000, 8);
         long startTime = System.currentTimeMillis();
         sim.execute(10000);
         long finishTime = System.currentTimeMillis();

@@ -1,6 +1,7 @@
 package it.unibo.pcd.assignment.model;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Worker extends Thread {
     private final List<Body> bodies;
@@ -82,5 +83,45 @@ public class Worker extends Thread {
             body.updatePos(DELTA_TIME);
             body.checkAndSolveBoundaryCollision(boundary);
         }
+    }
+
+    public Barrier getBarrier() {
+        return barrier;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Worker worker = (Worker) o;
+        return indexFrom == worker.indexFrom && indexTo == worker.indexTo && Objects.equals(bodies, worker.bodies) && Objects.equals(barrier, worker.barrier) && Objects.equals(boundary, worker.boundary);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(bodies, barrier, boundary, indexFrom, indexTo);
+    }
+
+    @Override
+    public String toString() {
+        return "Worker{" +
+                "bodies=" + bodies +
+                ", barrier=" + barrier +
+                ", boundary=" + boundary +
+                ", indexFrom=" + indexFrom +
+                ", indexTo=" + indexTo +
+                '}';
+    }
+
+    public Boundary getBoundary() {
+        return boundary;
+    }
+
+    public int getIndexFrom() {
+        return indexFrom;
+    }
+
+    public int getIndexTo() {
+        return indexTo;
     }
 }

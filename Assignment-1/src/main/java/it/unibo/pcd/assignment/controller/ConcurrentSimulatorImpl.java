@@ -26,12 +26,12 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
     public void execute(int numSteps) {
         long iteration = 0;
 
-        while (iteration < numSteps) {
-            for(Worker worker : this.workers) {
+        //while (iteration < numSteps) {
+            for (Worker worker : this.workers) {
                 worker.start();
             }
-            iteration++;
-        }
+          //  iteration++;
+        //}
     }
 
     public void createWorkers() {

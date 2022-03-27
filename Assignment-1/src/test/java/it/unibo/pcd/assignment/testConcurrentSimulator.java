@@ -12,7 +12,8 @@ public class testConcurrentSimulator {
         concurrentSimulator.createWorkers();
         Worker[] workers = concurrentSimulator.getWorkers();
         for (Worker worker : workers) {
-            System.out.println(worker.getBodies().size());
+            System.out.println(worker.getIndexFrom());
+            System.out.println(worker.getIndexTo());
         }
     }
 
