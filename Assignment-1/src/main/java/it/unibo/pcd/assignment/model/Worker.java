@@ -29,7 +29,7 @@ public class Worker extends Thread {
             // computing velocity
             computeBodiesVelocity();
             printLog("Thread[" + indexFrom + "] Waiting for Velocity barrier..");
-            this.barrier.waitForVelocity();
+            this.barrier.waitAndNotifyAll();
             printLog("Thread[" + indexFrom + "] Unlocked..");
             // computing positions and collisions
             updatePositionAndCheckCollision();

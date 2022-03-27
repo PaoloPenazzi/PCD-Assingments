@@ -11,7 +11,7 @@ public class BarrierImpl implements Barrier {
     }
 
     @Override
-    public synchronized void waitForVelocity() throws InterruptedException {
+    public synchronized void waitAndNotifyAll() throws InterruptedException {
         count++;
         if (count == nWorkers) {
             notifyAll();
@@ -20,9 +20,5 @@ public class BarrierImpl implements Barrier {
                 wait();
             }
         }
-    }
-
-    public synchronized void resetCounter() {
-        this.count = 0;
     }
 }
