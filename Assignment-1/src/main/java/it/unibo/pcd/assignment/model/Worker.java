@@ -10,16 +10,14 @@ public class Worker extends Thread {
     private final Boundary boundary;
     private final int indexFrom;
     private final int indexTo;
-    private final int name;
     protected static final double DELTA_TIME = 0.001;
 
-    public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary, int name) {
+    public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary) {
         this.indexFrom = indexFrom;
         this.indexTo = indexTo;
         this.bodies = bodies;
         this.barrier = barrier;
         this.boundary = boundary;
-        this.name = name;
         this.myBodies = bodies.subList(indexFrom, indexTo);
     }
 
@@ -30,10 +28,8 @@ public class Worker extends Thread {
     @Override
     public void run() {
         try {
-            // computing velocity
             this.computeBodiesVelocity();
             this.barrier.waitAndNotifyAll();
-            // computing positions and collisions
             updatePositionAndCheckCollision();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -42,11 +38,8 @@ public class Worker extends Thread {
 
     private void computeBodiesVelocity() {
         for (Body body : this.myBodies) {
-            /* compute total force on bodies */
             Velocity2d totalForce = computeTotalForceOnBody(body);
-            /* compute instant acceleration */
             Velocity2d acceleration = new Velocity2d(totalForce).scalarMul(1.0 / body.getMass());
-            /* update velocity */
             body.updateVelocity(acceleration, DELTA_TIME);
         }
 
@@ -54,7 +47,6 @@ public class Worker extends Thread {
 
     private Velocity2d computeTotalForceOnBody(Body b) {
         Velocity2d totalForce = new Velocity2d(0, 0);
-        /* compute total repulsive force */
         for (Body otherBody : this.bodies) {
             if (!b.equals(otherBody)) {
                 try {
@@ -65,7 +57,6 @@ public class Worker extends Thread {
                 }
             }
         }
-        /* add friction force */
         totalForce.sum(b.getCurrentFrictionForce());
         return totalForce;
     }

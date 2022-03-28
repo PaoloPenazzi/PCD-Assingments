@@ -4,7 +4,6 @@ import it.unibo.pcd.assignment.model.Barrier;
 import it.unibo.pcd.assignment.model.BarrierImpl;
 import it.unibo.pcd.assignment.model.Worker;
 
-
 public class ConcurrentSimulatorImpl extends AbstractSimulator{
     private final int nWorkers;
     private final Barrier barrier;
@@ -36,7 +35,7 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
                 }
             }
             iteration++;
-            if(iteration / 500 == 0) {
+            if(iteration % 500 == 0) {
                 System.out.println(iteration);
             }
         }
@@ -47,10 +46,10 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
         for(int i = 0; i < this.nWorkers; i++) {
             if (i == this.nWorkers - 1) {
                 this.workers[i] = new Worker(i * bodiesPerWorker, super.getBodies().size(), super.getBodies(),
-                        this.barrier, super.getBounds(), i);
+                        this.barrier, super.getBounds());
             } else {
                 this.workers[i] = new Worker(i * bodiesPerWorker, ((i + 1) * bodiesPerWorker),
-                        super.getBodies(), this.barrier, super.getBounds(), i);
+                        super.getBodies(), this.barrier, super.getBounds());
             }
         }
     }
