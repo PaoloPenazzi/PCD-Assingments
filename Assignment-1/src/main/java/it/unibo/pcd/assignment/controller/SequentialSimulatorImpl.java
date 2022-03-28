@@ -1,14 +1,11 @@
 package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Body;
-import it.unibo.pcd.assignment.view.SimulationView;
 
-public class SimulatorImplWithGUI extends AbstractSimulator {
-    private final SimulationView viewer;
+public class SequentialSimulatorImpl extends AbstractSequentialSimulator {
 
-    public SimulatorImplWithGUI(int numBodies, int sideLenght, SimulationView view) {
+    public SequentialSimulatorImpl(int numBodies, int sideLenght) {
         super(numBodies, sideLenght);
-        this.viewer = view;
     }
 
     @Override
@@ -30,7 +27,6 @@ public class SimulatorImplWithGUI extends AbstractSimulator {
             /* update virtual time */
             virtualTime = virtualTime + DELTA_TIME;
             iteration++;
-            this.viewer.display(getBodies(), virtualTime, iteration, getBounds());
         }
     }
 }

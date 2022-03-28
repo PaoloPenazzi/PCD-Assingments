@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AbstractSimulator implements Simulator{
+public abstract class AbstractSequentialSimulator implements Simulator{
     private Boundary bounds;
     private List<Body> bodies;
     protected static final double DELTA_TIME = 0.001;
 
-    public AbstractSimulator(int numBodies, int sideLenght) {
+    public AbstractSequentialSimulator(int numBodies, int sideLenght) {
         this.createField(sideLenght);
         this.spawnBodies(numBodies);
     }

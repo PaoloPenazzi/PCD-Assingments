@@ -9,7 +9,7 @@ import it.unibo.pcd.assignment.view.SimulationView;
 import java.util.ArrayList;
 import java.util.Random;
 
-public class SimulatorExample {
+public class BaseSimulator {
 
     //private SimulationView viewer;
 
@@ -25,7 +25,7 @@ public class SimulatorExample {
     /* virtual time step */
     double dt;
 
-    public SimulatorExample() {
+    public BaseSimulator() {
         //this.viewer = viewer;
 
         /* initializing boundary and bodies */

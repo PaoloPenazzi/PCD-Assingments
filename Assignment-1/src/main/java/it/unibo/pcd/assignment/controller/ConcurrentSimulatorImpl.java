@@ -4,7 +4,7 @@ import it.unibo.pcd.assignment.model.Barrier;
 import it.unibo.pcd.assignment.model.BarrierImpl;
 import it.unibo.pcd.assignment.model.Worker;
 
-public class ConcurrentSimulatorImpl extends AbstractSimulator{
+public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
     private final int nWorkers;
     private final Barrier barrier;
     private final Worker[] workers;
