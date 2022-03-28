@@ -12,7 +12,7 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
 
     public ConcurrentSimulatorImpl(int numBodies, int sideLenght) {
         super(numBodies, sideLenght);
-        // TODO testing some others number of workers
+        //this.nWorkers = 4;
         this.nWorkers = Runtime.getRuntime().availableProcessors() + 1;
         System.out.println("Workers number: " + this.nWorkers);
         this.workers = new Worker[nWorkers];
@@ -23,7 +23,6 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
     @Override
     public void execute(int numSteps) {
         long iteration = 0;
-
         while (iteration < numSteps) {
             this.createWorkers();
             for (Worker worker : this.workers) {
@@ -37,6 +36,9 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
                 }
             }
             iteration++;
+            if(iteration / 500 == 0) {
+                System.out.println(iteration);
+            }
         }
     }
 
@@ -45,10 +47,10 @@ public class ConcurrentSimulatorImpl extends AbstractSimulator{
         for(int i = 0; i < this.nWorkers; i++) {
             if (i == this.nWorkers - 1) {
                 this.workers[i] = new Worker(i * bodiesPerWorker, super.getBodies().size(), super.getBodies(),
-                        this.barrier, super.getBounds());
+                        this.barrier, super.getBounds(), i);
             } else {
-                this.workers[i] = new Worker(i * bodiesPerWorker, ((i + 1) * bodiesPerWorker) - 1,
-                        super.getBodies(), this.barrier, super.getBounds());
+                this.workers[i] = new Worker(i * bodiesPerWorker, ((i + 1) * bodiesPerWorker),
+                        super.getBodies(), this.barrier, super.getBounds(), i);
             }
         }
     }

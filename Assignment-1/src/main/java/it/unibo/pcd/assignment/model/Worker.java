@@ -5,18 +5,22 @@ import java.util.Objects;
 
 public class Worker extends Thread {
     private final List<Body> bodies;
+    private final List<Body> myBodies;
     private final Barrier barrier;
     private final Boundary boundary;
     private final int indexFrom;
     private final int indexTo;
+    private final int name;
     protected static final double DELTA_TIME = 0.001;
 
-    public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary) {
+    public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary, int name) {
         this.indexFrom = indexFrom;
         this.indexTo = indexTo;
         this.bodies = bodies;
         this.barrier = barrier;
         this.boundary = boundary;
+        this.name = name;
+        this.myBodies = bodies.subList(indexFrom, indexTo);
     }
 
     private synchronized void printLog(String string) {
@@ -27,10 +31,8 @@ public class Worker extends Thread {
     public void run() {
         try {
             // computing velocity
-            computeBodiesVelocity();
-            printLog("Thread[" + indexFrom + "] Waiting for Velocity barrier..");
+            this.computeBodiesVelocity();
             this.barrier.waitAndNotifyAll();
-            printLog("Thread[" + indexFrom + "] Unlocked..");
             // computing positions and collisions
             updatePositionAndCheckCollision();
         } catch (InterruptedException e) {
@@ -39,8 +41,7 @@ public class Worker extends Thread {
     }
 
     private void computeBodiesVelocity() {
-        for (int i = this.indexFrom; i == this.indexTo; i++) {
-            Body body = this.bodies.get(i);
+        for (Body body : this.myBodies) {
             /* compute total force on bodies */
             Velocity2d totalForce = computeTotalForceOnBody(body);
             /* compute instant acceleration */
@@ -48,7 +49,6 @@ public class Worker extends Thread {
             /* update velocity */
             body.updateVelocity(acceleration, DELTA_TIME);
         }
-
 
     }
 

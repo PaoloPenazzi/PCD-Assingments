@@ -14,9 +14,9 @@ public class RunSimulation {
     	// SimulationView viewer = new SimulationView(620,620);
         //SimulatorExample sim = new SimulatorExample();
         // Simulator sim = new SimulatorImplWithGUI(1000, 6, viewer);
-        Simulator sim = new ConcurrentSimulatorImpl(1000, 8);
+        Simulator sim = new ConcurrentSimulatorImpl(1000, 5);
         long startTime = System.currentTimeMillis();
-        sim.execute(50000);
+        sim.execute(1000);
         long finishTime = System.currentTimeMillis();
         System.out.println(finishTime - startTime + " ms");
     }
