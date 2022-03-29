@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class Worker extends Thread {
-    private final List<Body> bodies;
+    private final List<Body> allBodies;
     private final List<Body> myBodies;
     private final Barrier barrier;
     private final Boundary boundary;
@@ -15,14 +15,10 @@ public class Worker extends Thread {
     public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary) {
         this.indexFrom = indexFrom;
         this.indexTo = indexTo;
-        this.bodies = bodies;
+        this.allBodies = bodies;
         this.barrier = barrier;
         this.boundary = boundary;
         this.myBodies = bodies.subList(indexFrom, indexTo);
-    }
-
-    private synchronized void printLog(String string) {
-        System.out.println(string);
     }
 
     @Override
@@ -47,7 +43,7 @@ public class Worker extends Thread {
 
     private Velocity2d computeTotalForceOnBody(Body b) {
         Velocity2d totalForce = new Velocity2d(0, 0);
-        for (Body otherBody : this.bodies) {
+        for (Body otherBody : this.allBodies) {
             if (!b.equals(otherBody)) {
                 try {
                     Velocity2d forceByOtherBody = b.computeRepulsiveForceBy(otherBody);
@@ -63,7 +59,7 @@ public class Worker extends Thread {
 
     private void updatePositionAndCheckCollision() {
         for (int i = this.indexFrom; i == this.indexTo; i++) {
-            Body body = this.bodies.get(i);
+            Body body = this.allBodies.get(i);
             body.updatePos(DELTA_TIME);
             body.checkAndSolveBoundaryCollision(boundary);
         }
@@ -74,27 +70,23 @@ public class Worker extends Thread {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Worker worker = (Worker) o;
-        return indexFrom == worker.indexFrom && indexTo == worker.indexTo && Objects.equals(bodies, worker.bodies) && Objects.equals(barrier, worker.barrier) && Objects.equals(boundary, worker.boundary);
+        return indexFrom == worker.indexFrom && indexTo == worker.indexTo && Objects.equals(allBodies, worker.allBodies) && Objects.equals(barrier, worker.barrier) && Objects.equals(boundary, worker.boundary);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(bodies, barrier, boundary, indexFrom, indexTo);
+        return Objects.hash(allBodies, barrier, boundary, indexFrom, indexTo);
     }
 
     @Override
     public String toString() {
         return "Worker{" +
-                "bodies=" + bodies +
+                "bodies=" + allBodies +
                 ", barrier=" + barrier +
                 ", boundary=" + boundary +
                 ", indexFrom=" + indexFrom +
                 ", indexTo=" + indexTo +
                 '}';
-    }
-
-    public Boundary getBoundary() {
-        return boundary;
     }
 
     public int getIndexFrom() {
@@ -103,13 +95,5 @@ public class Worker extends Thread {
 
     public int getIndexTo() {
         return indexTo;
-    }
-
-    public List<Body> getBodies() {
-        return bodies;
-    }
-
-    public Barrier getBarrier() {
-        return barrier;
     }
 }
