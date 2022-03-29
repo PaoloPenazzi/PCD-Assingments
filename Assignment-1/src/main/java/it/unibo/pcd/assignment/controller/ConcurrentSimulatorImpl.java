@@ -53,10 +53,4 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
             }
         }
     }
-
-    public Worker[] getWorkers() {
-        return workers;
-    }
-
-
 }

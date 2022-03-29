@@ -6,7 +6,7 @@ import org.junit.Test;
 
 public class testConcurrentSimulator {
 
-    @Test
+    /*@Test
     public void testCreateSublist(){
         ConcurrentSimulatorImpl concurrentSimulator = new ConcurrentSimulatorImpl(1000, 5);
         concurrentSimulator.createWorkers();
@@ -15,6 +15,6 @@ public class testConcurrentSimulator {
             System.out.println(worker.getIndexFrom());
             System.out.println(worker.getIndexTo());
         }
-    }
+    }*/
 
 }
