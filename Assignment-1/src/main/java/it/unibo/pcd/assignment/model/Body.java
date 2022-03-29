@@ -127,4 +127,12 @@ public class Body {
     public Position2d getPosition() {
         return position;
     }
+
+    public Velocity2d getVelocity() {
+        return velocity;
+    }
+
+    public int getId() {
+        return this.id;
+    }
 }

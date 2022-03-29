@@ -2,6 +2,7 @@ package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Barrier;
 import it.unibo.pcd.assignment.model.BarrierImpl;
+import it.unibo.pcd.assignment.model.Body;
 import it.unibo.pcd.assignment.model.Worker;
 import it.unibo.pcd.assignment.view.SimulationView;
 
@@ -16,7 +17,15 @@ public class ConcurrentSimulatorImplWithGUI extends AbstractConcurrentSimulator 
         super(numBodies, sideLenght);
         this.view = view;
         this.nWorkers = Runtime.getRuntime().availableProcessors() + 1;
-        System.out.println("Workers number: " + this.nWorkers);
+        this.workers = new Worker[nWorkers];
+        this.barrier = new BarrierImpl(this.nWorkers);
+        this.createWorkers();
+    }
+
+    public ConcurrentSimulatorImplWithGUI(int numBodies, int sideLenght, SimulationView view, int numThread) {
+        super(numBodies, sideLenght);
+        this.view = view;
+        this.nWorkers = numThread;
         this.workers = new Worker[nWorkers];
         this.barrier = new BarrierImpl(this.nWorkers);
         this.createWorkers();

@@ -5,7 +5,6 @@ import java.util.Objects;
 
 public class Worker extends Thread {
     private final List<Body> allBodies;
-    private final List<Body> myBodies;
     private final Barrier barrier;
     private final Boundary boundary;
     private final int indexFrom;
@@ -18,7 +17,6 @@ public class Worker extends Thread {
         this.allBodies = bodies;
         this.barrier = barrier;
         this.boundary = boundary;
-        this.myBodies = bodies.subList(indexFrom, indexTo);
     }
 
     @Override
@@ -32,13 +30,18 @@ public class Worker extends Thread {
         }
     }
 
+    private void log(String message){
+        synchronized(System.out){
+            System.out.println("[Worker: " + message);
+        }
+    }
+
     private void computeBodiesVelocity() {
-        for (Body body : this.myBodies) {
+        for (Body body : this.allBodies.subList(indexFrom, indexTo)) {
             Velocity2d totalForce = computeTotalForceOnBody(body);
             Velocity2d acceleration = new Velocity2d(totalForce).scalarMul(1.0 / body.getMass());
             body.updateVelocity(acceleration, DELTA_TIME);
         }
-
     }
 
     private Velocity2d computeTotalForceOnBody(Body b) {
@@ -58,42 +61,9 @@ public class Worker extends Thread {
     }
 
     private void updatePositionAndCheckCollision() {
-        for (int i = this.indexFrom; i == this.indexTo; i++) {
-            Body body = this.allBodies.get(i);
+        for (Body body : this.allBodies.subList(indexFrom, indexTo)) {
             body.updatePos(DELTA_TIME);
             body.checkAndSolveBoundaryCollision(boundary);
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Worker worker = (Worker) o;
-        return indexFrom == worker.indexFrom && indexTo == worker.indexTo && Objects.equals(allBodies, worker.allBodies) && Objects.equals(barrier, worker.barrier) && Objects.equals(boundary, worker.boundary);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(allBodies, barrier, boundary, indexFrom, indexTo);
-    }
-
-    @Override
-    public String toString() {
-        return "Worker{" +
-                "bodies=" + allBodies +
-                ", barrier=" + barrier +
-                ", boundary=" + boundary +
-                ", indexFrom=" + indexFrom +
-                ", indexTo=" + indexTo +
-                '}';
-    }
-
-    public int getIndexFrom() {
-        return indexFrom;
-    }
-
-    public int getIndexTo() {
-        return indexTo;
     }
 }
