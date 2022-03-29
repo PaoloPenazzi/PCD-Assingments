@@ -13,8 +13,6 @@ import java.awt.event.WindowEvent;
 import java.util.List;
 
 /**
- * Simulation view
- *
  * @author aricci
  */
 public class SimulationView {
@@ -56,7 +54,7 @@ public class SimulationView {
 
         public void display(List<Body> bodies, double virtualTime, long iteration, Boundary bounds) {
             try {
-                SwingUtilities.invokeAndWait(() -> {
+                SwingUtilities.invokeLater(() -> {
                     panel.display(bodies, virtualTime, iteration, bounds);
                     repaint();
                 });
