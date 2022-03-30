@@ -1,50 +1,36 @@
 package it.unibo.pcd.assignment.controller;
 
-import it.unibo.pcd.assignment.model.Body;
-import it.unibo.pcd.assignment.model.Boundary;
-import it.unibo.pcd.assignment.model.Position2d;
-import it.unibo.pcd.assignment.model.Velocity2d;
+import it.unibo.pcd.assignment.model.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+public abstract class AbstractConcurrentSimulator extends AbstractSimulator{
+    private final Worker[] workers;
+    private final Barrier barrier;
 
-public abstract class AbstractConcurrentSimulator implements Simulator{
-    private Boundary bounds;
-    private List<Body> bodies;
-    public static final double DELTA_TIME = 0.001;
-    private final int numSteps;
-
-    public AbstractConcurrentSimulator(int numBodies, int sideLenght, int numSteps) {
-        this.numSteps = numSteps;
-        this.createField(sideLenght);
-        this.spawnBodies(numBodies);
+    protected AbstractConcurrentSimulator(int numBodies,int numSteps, int sideLenght, int nThreads) {
+        super(numBodies, numSteps, sideLenght);
+        this.barrier = new BarrierImpl(nThreads);
+        this.workers = new Worker[nThreads];
+        this.createWorkers(nThreads);
     }
 
-    private void createField(int sideLenght) {
-        this.bounds = new Boundary(-sideLenght, -sideLenght, sideLenght, sideLenght);
-    }
-
-    private void spawnBodies(int numBodies) {
-        Random rand = new Random(System.currentTimeMillis());
-        this.bodies = new ArrayList<>();
-        for (int i = 0; i < numBodies; i++) {
-            double x = bounds.getX0() * 0.25 + rand.nextDouble() * (bounds.getX1() - bounds.getX0()) * 0.25;
-            double y = bounds.getY0() * 0.25 + rand.nextDouble() * (bounds.getY1() - bounds.getY0()) * 0.25;
-            Body b = new Body(i, new Position2d(x, y), new Velocity2d(0, 0), 10);
-            bodies.add(b);
+    protected void createWorkers(int nThread) {
+        int bodiesPerWorker = super.getBodies().size() / nThread;
+        for(int i = 0; i < nThread; i++) {
+            if (i == nThread - 1) {
+                this.workers[i] = new Worker(i * bodiesPerWorker, super.getBodies().size(), super.getBodies(),
+                        this.barrier, super.getBounds());
+            } else {
+                this.workers[i] = new Worker(i * bodiesPerWorker, ((i + 1) * bodiesPerWorker),
+                        super.getBodies(), this.barrier, super.getBounds());
+            }
         }
     }
 
-    public List<Body> getBodies() {
-        return bodies;
+    public Worker[] getWorkers() {
+        return workers;
     }
 
-    public Boundary getBounds() {
-        return bounds;
-    }
-
-    public int getNumSteps() {
-        return numSteps;
+    public Barrier getBarrier() {
+        return barrier;
     }
 }

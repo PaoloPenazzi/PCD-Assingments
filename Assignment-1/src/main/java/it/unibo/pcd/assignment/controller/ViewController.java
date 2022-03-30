@@ -11,9 +11,9 @@ import java.util.List;
 public class ViewController {
     private final SimulationFrame frame;
     private boolean isRunning = true;
-    private final Simulator simulator;
+    private final Thread simulator;
 
-    public ViewController(int width, int height, Simulator simulator) {
+    public ViewController(int width, int height, Thread simulator) {
         this.frame = new SimulationFrame(width, height, this);
         this.simulator = simulator;
     }
@@ -28,7 +28,7 @@ public class ViewController {
             case "PLAY":
                 if(!this.isRunning) {
                     this.isRunning = true;
-                    this.simulator.execute();
+                    this.simulator.notifyAll();
                 }
                 break;
             case "PAUSE":

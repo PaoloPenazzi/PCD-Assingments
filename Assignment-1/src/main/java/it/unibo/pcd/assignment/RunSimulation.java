@@ -1,8 +1,7 @@
 package it.unibo.pcd.assignment;
 
 import it.unibo.pcd.assignment.controller.*;
-import it.unibo.pcd.assignment.view.BaseView;
-import it.unibo.pcd.assignment.view.SimulationFrame;
+import org.checkerframework.checker.units.qual.C;
 
 /**
  * @author aricci
@@ -10,10 +9,11 @@ import it.unibo.pcd.assignment.view.SimulationFrame;
 public class RunSimulation {
 
     public static void main(String[] args) {
-    	// BaseView viewer = new BaseView(620,620);
-        Simulator sim = new ConcurrentSimulatorImplWithGUI(1000, 8, 10000);
+        int nWorkers = Runtime.getRuntime().availableProcessors() + 1;
+        //Thread simulator = new ConcurrentSimulatorImplWithGUI(1000, 10000, 8, nWorkers);
+        Thread simulator = new ConcurrentSimulatorImplWithGUI(1000, 10000, 16, nWorkers);
         long startTime = System.currentTimeMillis();
-        sim.execute();
+        simulator.start();
         long finishTime = System.currentTimeMillis();
         System.out.println(finishTime - startTime + " ms");
     }

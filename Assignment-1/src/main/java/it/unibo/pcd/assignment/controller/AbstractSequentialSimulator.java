@@ -9,48 +9,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public abstract class AbstractSequentialSimulator implements Simulator{
-    private Boundary bounds;
-    private List<Body> bodies;
-    protected static final double DELTA_TIME = 0.001;
-    private final int numSteps;
+public abstract class AbstractSequentialSimulator extends AbstractSimulator {
 
-    public AbstractSequentialSimulator(int numBodies, int sideLenght, int numSteps) {
-        this.numSteps = numSteps;
-        this.createField(sideLenght);
-        this.spawnBodies(numBodies);
+    protected AbstractSequentialSimulator(int numBodies,int numSteps, int sideLenght) {
+        super(numBodies, numSteps, sideLenght);
     }
 
-    private void createField(int sideLenght) {
-        this.bounds = new Boundary(-sideLenght, -sideLenght, sideLenght, sideLenght);
+    protected void computeBodies() {
+        this.computeBodiesVelocity();
+        this.computeBodiesPosition();
+        this.computeBodiesCollision();
     }
 
-    private void spawnBodies(int numBodies) {
-        Random rand = new Random(System.currentTimeMillis());
-        this.bodies = new ArrayList<>();
-        for (int i = 0; i < numBodies; i++) {
-            double x = bounds.getX0() * 0.25 + rand.nextDouble() * (bounds.getX1() - bounds.getX0()) * 0.25;
-            double y = bounds.getY0() * 0.25 + rand.nextDouble() * (bounds.getY1() - bounds.getY0()) * 0.25;
-            Body b = new Body(i, new Position2d(x, y), new Velocity2d(0, 0), 10);
-            bodies.add(b);
-        }
-    }
-
-    protected void computeBodiesVelocity() {
-        for (Body b : bodies) {
-            /* compute total force on bodies */
+    private void computeBodiesVelocity() {
+        for (Body b : super.getBodies()) {
             Velocity2d totalForce = computeTotalForceOnBody(b);
-            /* compute instant acceleration */
             Velocity2d acceleration = new Velocity2d(totalForce).scalarMul(1.0 / b.getMass());
-            /* update velocity */
             b.updateVelocity(acceleration, DELTA_TIME);
         }
     }
 
-    protected Velocity2d computeTotalForceOnBody(Body b) {
+    private void computeBodiesPosition() {
+        for (Body b : super.getBodies()) {
+            b.updatePos(DELTA_TIME);
+        }
+    }
+
+    private void computeBodiesCollision() {
+        for (Body b : super.getBodies()) {
+            b.checkAndSolveBoundaryCollision(super.getBounds());
+        }
+    }
+
+    private Velocity2d computeTotalForceOnBody(Body b) {
         Velocity2d totalForce = new Velocity2d(0, 0);
-        /* compute total repulsive force */
-        for (Body otherBody : bodies) {
+        for (Body otherBody : super.getBodies()) {
             if (!b.equals(otherBody)) {
                 try {
                     Velocity2d forceByOtherBody = b.computeRepulsiveForceBy(otherBody);
@@ -60,20 +53,7 @@ public abstract class AbstractSequentialSimulator implements Simulator{
                 }
             }
         }
-        /* add friction force */
         totalForce.sum(b.getCurrentFrictionForce());
         return totalForce;
-    }
-
-    public List<Body> getBodies() {
-        return bodies;
-    }
-
-    public Boundary getBounds() {
-        return bounds;
-    }
-
-    public int getNumSteps() {
-        return numSteps;
     }
 }
