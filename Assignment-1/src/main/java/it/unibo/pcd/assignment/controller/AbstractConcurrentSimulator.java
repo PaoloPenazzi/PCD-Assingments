@@ -13,8 +13,10 @@ public abstract class AbstractConcurrentSimulator implements Simulator{
     private Boundary bounds;
     private List<Body> bodies;
     public static final double DELTA_TIME = 0.001;
+    private final int numSteps;
 
-    public AbstractConcurrentSimulator(int numBodies, int sideLenght) {
+    public AbstractConcurrentSimulator(int numBodies, int sideLenght, int numSteps) {
+        this.numSteps = numSteps;
         this.createField(sideLenght);
         this.spawnBodies(numBodies);
     }
@@ -40,5 +42,9 @@ public abstract class AbstractConcurrentSimulator implements Simulator{
 
     public Boundary getBounds() {
         return bounds;
+    }
+
+    public int getNumSteps() {
+        return numSteps;
     }
 }

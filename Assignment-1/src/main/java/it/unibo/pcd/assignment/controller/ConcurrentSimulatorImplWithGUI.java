@@ -9,30 +9,34 @@ public class ConcurrentSimulatorImplWithGUI extends AbstractConcurrentSimulator 
     private final Barrier barrier;
     private final Worker[] workers;
     private final ViewController view;
+    private double virtualTime;
+    private int iteration;
 
-    public ConcurrentSimulatorImplWithGUI(int numBodies, int sideLenght, ViewController view) {
-        super(numBodies, sideLenght);
-        this.view = view;
+    public ConcurrentSimulatorImplWithGUI(int numBodies, int sideLenght, int numSteps) {
+        super(numBodies, sideLenght, numSteps);
+        this.view = new ViewController(620, 620, this);
         this.nWorkers = Runtime.getRuntime().availableProcessors() + 1;
         this.workers = new Worker[nWorkers];
         this.barrier = new BarrierImpl(this.nWorkers);
         this.createWorkers();
+        this.virtualTime = 0;
+        this.iteration = 0;
     }
 
-    public ConcurrentSimulatorImplWithGUI(int numBodies, int sideLenght, ViewController view, int numThread) {
-        super(numBodies, sideLenght);
-        this.view = view;
+    public ConcurrentSimulatorImplWithGUI(int numBodies, int sideLenght, int numSteps, int numThread) {
+        super(numBodies, sideLenght, numSteps);
+        this.view = new ViewController(620, 620, this);
         this.nWorkers = numThread;
         this.workers = new Worker[nWorkers];
         this.barrier = new BarrierImpl(this.nWorkers);
         this.createWorkers();
+        this.virtualTime = 0;
+        this.iteration = 0;
     }
 
     @Override
-    public void execute(int numSteps) {
-        double virtualTime = 0;
-        long iteration = 0;
-        while (iteration < numSteps) {
+    public void execute() {
+        while (this.iteration < super.getNumSteps() && !isPaused()) {
             this.createWorkers();
             for (Worker worker : this.workers) {
                 worker.start();
@@ -44,10 +48,14 @@ public class ConcurrentSimulatorImplWithGUI extends AbstractConcurrentSimulator 
                     e.printStackTrace();
                 }
             }
-            virtualTime = virtualTime + DELTA_TIME;
-            iteration++;
-            view.display(super.getBodies(), virtualTime, iteration, super.getBounds());
+            this.virtualTime = this.virtualTime + DELTA_TIME;
+            this.iteration++;
+            view.display(super.getBodies(), this.virtualTime, this.iteration, super.getBounds());
         }
+    }
+
+    private boolean isPaused() {
+        return !view.getIsRunning();
     }
 
     public void createWorkers() {

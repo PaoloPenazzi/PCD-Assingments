@@ -9,8 +9,8 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
     private final Barrier barrier;
     private final Worker[] workers;
 
-    public ConcurrentSimulatorImpl(int numBodies, int sideLenght) {
-        super(numBodies, sideLenght);
+    public ConcurrentSimulatorImpl(int numBodies, int sideLenght, int numSteps) {
+        super(numBodies, sideLenght, numSteps);
         this.nWorkers = Runtime.getRuntime().availableProcessors() + 1;
         System.out.println("Workers number: " + this.nWorkers);
         this.workers = new Worker[nWorkers];
@@ -19,9 +19,9 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
     }
 
     @Override
-    public void execute(int numSteps) {
+    public void execute() {
         long iteration = 0;
-        while (iteration < numSteps) {
+        while (iteration < getNumSteps()) {
             this.createWorkers();
             for (Worker worker : this.workers) {
                 worker.start();

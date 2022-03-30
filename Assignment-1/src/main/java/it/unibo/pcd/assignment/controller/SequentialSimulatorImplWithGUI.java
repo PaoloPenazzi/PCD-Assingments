@@ -7,16 +7,16 @@ import it.unibo.pcd.assignment.view.SimulationFrame;
 public class SequentialSimulatorImplWithGUI extends AbstractSequentialSimulator {
     private final SimulationFrame viewer;
 
-    public SequentialSimulatorImplWithGUI(int numBodies, int sideLenght, SimulationFrame view) {
-        super(numBodies, sideLenght);
+    public SequentialSimulatorImplWithGUI(int numBodies, int sideLenght, SimulationFrame view, int numSteps) {
+        super(numBodies, sideLenght, numSteps);
         this.viewer = view;
     }
 
     @Override
-    public void execute(int numSteps) {
+    public void execute() {
         double virtualTime = 0;
         long iteration = 0;
-        while (iteration < numSteps) {
+        while (iteration < super.getNumSteps()) {
             if(iteration % 500 == 0) {
                 System.out.println("Iterazione: " + iteration);
             }

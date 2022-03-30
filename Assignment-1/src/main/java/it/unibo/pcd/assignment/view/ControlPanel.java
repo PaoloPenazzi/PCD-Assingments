@@ -31,7 +31,7 @@ public class ControlPanel extends JPanel {
     private void addButtonsToPanel() {
         for (JButton button : buttonsList) {
             this.add(button);
-            button.addActionListener(controller::performAction);
+            button.addActionListener(controller::actionPerformed);
         }
     }
 }

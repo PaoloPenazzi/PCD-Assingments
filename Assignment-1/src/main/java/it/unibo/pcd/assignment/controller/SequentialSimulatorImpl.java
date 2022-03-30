@@ -4,15 +4,15 @@ import it.unibo.pcd.assignment.model.Body;
 
 public class SequentialSimulatorImpl extends AbstractSequentialSimulator {
 
-    public SequentialSimulatorImpl(int numBodies, int sideLenght) {
-        super(numBodies, sideLenght);
+    public SequentialSimulatorImpl(int numBodies, int sideLenght, int numSteps) {
+        super(numBodies, sideLenght, numSteps);
     }
 
     @Override
-    public void execute(int numSteps) {
+    public void execute() {
         double virtualTime = 0;
         long iteration = 0;
-        while (iteration < numSteps) {
+        while (iteration < super.getNumSteps()) {
             if(iteration % 500 == 0) {
                 System.out.println("Iterazione: " + iteration);
             }
