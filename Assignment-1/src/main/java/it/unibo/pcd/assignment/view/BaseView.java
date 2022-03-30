@@ -10,12 +10,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedReader;
 import java.util.List;
 
 /**
  * @author aricci
  */
-public class SimulationView {
+public class BaseView {
     private final VisualiserFrame frame;
 
     /**
@@ -24,7 +25,7 @@ public class SimulationView {
      * @param width  the panel width.
      * @param height the panel height.
      */
-    public SimulationView(int width, int height) {
+    public BaseView(int width, int height) {
         frame = new VisualiserFrame(width, height);
     }
 

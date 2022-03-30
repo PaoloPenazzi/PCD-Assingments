@@ -1,12 +1,13 @@
 package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Body;
-import it.unibo.pcd.assignment.view.SimulationView;
+import it.unibo.pcd.assignment.view.BaseView;
+import it.unibo.pcd.assignment.view.SimulationFrame;
 
 public class SequentialSimulatorImplWithGUI extends AbstractSequentialSimulator {
-    private final SimulationView viewer;
+    private final SimulationFrame viewer;
 
-    public SequentialSimulatorImplWithGUI(int numBodies, int sideLenght, SimulationView view) {
+    public SequentialSimulatorImplWithGUI(int numBodies, int sideLenght, SimulationFrame view) {
         super(numBodies, sideLenght);
         this.viewer = view;
     }

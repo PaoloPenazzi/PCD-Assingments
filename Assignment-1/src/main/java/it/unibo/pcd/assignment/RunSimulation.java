@@ -1,7 +1,8 @@
 package it.unibo.pcd.assignment;
 
 import it.unibo.pcd.assignment.controller.*;
-import it.unibo.pcd.assignment.view.SimulationView;
+import it.unibo.pcd.assignment.view.BaseView;
+import it.unibo.pcd.assignment.view.SimulationFrame;
 
 /**
  * @author aricci
@@ -9,8 +10,9 @@ import it.unibo.pcd.assignment.view.SimulationView;
 public class RunSimulation {
 
     public static void main(String[] args) {
-    	SimulationView viewer = new SimulationView(620,620);
-        Simulator sim = new SequentialSimulatorImplWithGUI(100, 4, viewer);
+        SimulationFrame view = new SimulationFrame(620, 620);
+    	//BaseView viewer = new BaseView(620,620);
+        Simulator sim = new SequentialSimulatorImplWithGUI(1000, 4, view);
         long startTime = System.currentTimeMillis();
         sim.execute(50000);
         long finishTime = System.currentTimeMillis();
