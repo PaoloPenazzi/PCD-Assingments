@@ -17,14 +17,12 @@ public class SequentialSimulatorImpl extends AbstractSequentialSimulator {
                 System.out.println("Iterazione: " + iteration);
             }
             super.computeBodiesVelocity();
-            // Compute bodies' new position.
             for (Body b : super.getBodies()) {
                 b.updatePos(DELTA_TIME);
             }
             for (Body b : super.getBodies()) {
                 b.checkAndSolveBoundaryCollision(super.getBounds());
             }
-            /* update virtual time */
             virtualTime = virtualTime + DELTA_TIME;
             iteration++;
         }

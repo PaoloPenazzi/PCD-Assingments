@@ -10,8 +10,7 @@ public class RunSimulation {
 
     public static void main(String[] args) {
     	SimulationView viewer = new SimulationView(620,620);
-        Simulator sim = new ConcurrentSimulatorImplWithGUI(1000, 4, viewer, 2);
-        //Simulator sim = new ConcurrentSimulatorImpl(1000, 5, viewer);
+        Simulator sim = new SequentialSimulatorImplWithGUI(100, 4, viewer);
         long startTime = System.currentTimeMillis();
         sim.execute(50000);
         long finishTime = System.currentTimeMillis();

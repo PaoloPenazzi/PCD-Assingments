@@ -11,7 +11,6 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
 
     public ConcurrentSimulatorImpl(int numBodies, int sideLenght) {
         super(numBodies, sideLenght);
-        //this.nWorkers = 4;
         this.nWorkers = Runtime.getRuntime().availableProcessors() + 1;
         System.out.println("Workers number: " + this.nWorkers);
         this.workers = new Worker[nWorkers];
@@ -35,9 +34,6 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
                 }
             }
             iteration++;
-            if(iteration % 500 == 0) {
-                System.out.println(iteration);
-            }
         }
     }
 

@@ -1,5 +1,8 @@
 package it.unibo.pcd.assignment.model;
 
+import it.unibo.pcd.assignment.controller.AbstractConcurrentSimulator;
+import it.unibo.pcd.assignment.controller.ConcurrentSimulatorImplWithGUI;
+
 import java.util.List;
 import java.util.Objects;
 
@@ -9,7 +12,6 @@ public class Worker extends Thread {
     private final Boundary boundary;
     private final int indexFrom;
     private final int indexTo;
-    protected static final double DELTA_TIME = 0.001;
 
     public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary) {
         this.indexFrom = indexFrom;
@@ -40,7 +42,7 @@ public class Worker extends Thread {
         for (Body body : this.allBodies.subList(indexFrom, indexTo)) {
             Velocity2d totalForce = computeTotalForceOnBody(body);
             Velocity2d acceleration = new Velocity2d(totalForce).scalarMul(1.0 / body.getMass());
-            body.updateVelocity(acceleration, DELTA_TIME);
+            body.updateVelocity(acceleration, AbstractConcurrentSimulator.DELTA_TIME);
         }
     }
 
@@ -62,7 +64,7 @@ public class Worker extends Thread {
 
     private void updatePositionAndCheckCollision() {
         for (Body body : this.allBodies.subList(indexFrom, indexTo)) {
-            body.updatePos(DELTA_TIME);
+            body.updatePos(AbstractConcurrentSimulator.DELTA_TIME);
             body.checkAndSolveBoundaryCollision(boundary);
         }
     }

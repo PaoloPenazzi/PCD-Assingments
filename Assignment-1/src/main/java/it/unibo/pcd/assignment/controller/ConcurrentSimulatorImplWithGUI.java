@@ -2,7 +2,6 @@ package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Barrier;
 import it.unibo.pcd.assignment.model.BarrierImpl;
-import it.unibo.pcd.assignment.model.Body;
 import it.unibo.pcd.assignment.model.Worker;
 import it.unibo.pcd.assignment.view.SimulationView;
 
@@ -11,7 +10,6 @@ public class ConcurrentSimulatorImplWithGUI extends AbstractConcurrentSimulator 
     private final Barrier barrier;
     private final Worker[] workers;
     private final SimulationView view;
-    public static final double DELTA_TIME = 0.001;
 
     public ConcurrentSimulatorImplWithGUI(int numBodies, int sideLenght, SimulationView view) {
         super(numBodies, sideLenght);

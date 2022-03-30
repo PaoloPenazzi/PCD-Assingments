@@ -12,6 +12,7 @@ import java.util.Random;
 public abstract class AbstractConcurrentSimulator implements Simulator{
     private Boundary bounds;
     private List<Body> bodies;
+    public static final double DELTA_TIME = 0.001;
 
     public AbstractConcurrentSimulator(int numBodies, int sideLenght) {
         this.createField(sideLenght);
