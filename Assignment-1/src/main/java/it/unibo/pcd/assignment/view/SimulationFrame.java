@@ -1,5 +1,6 @@
 package it.unibo.pcd.assignment.view;
 
+import it.unibo.pcd.assignment.controller.ViewController;
 import it.unibo.pcd.assignment.model.Body;
 import it.unibo.pcd.assignment.model.Boundary;
 
@@ -11,18 +12,18 @@ import java.util.List;
 
 public class SimulationFrame extends JFrame {
     private final SimulationPanel simulationPanel;
-    private final JPanel buttonPanel;
+    private final ControlPanel controlPanel;
+    private final ViewController controller;
 
-    public SimulationFrame(int width, int height) {
+    public SimulationFrame(int width, int height, ViewController controller) {
         this.setLayout(new BorderLayout());
         setTitle("Bodies Simulation");
         setSize(width, height);
         setResizable(false);
-        this.buttonPanel = new JPanel();
-        this.buttonPanel.setSize(width, (int) (height * 0.1));
-        this.buttonPanel.add(new JButton("CIao"));
+        this.controller = controller;
+        this.controlPanel = new ControlPanel(width, (int) (height * 0.1), controller);
         this.simulationPanel = new SimulationPanel(width, (int) (height * 0.9));
-        getContentPane().add(this.buttonPanel);
+        getContentPane().add(this.controlPanel);
         getContentPane().add(this.simulationPanel);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent ev) {
@@ -34,6 +35,7 @@ public class SimulationFrame extends JFrame {
         });
         this.setVisible(true);
     }
+
 
     public void display(List<Body> bodies, double virtualTime, long iteration, Boundary bounds) {
         try {

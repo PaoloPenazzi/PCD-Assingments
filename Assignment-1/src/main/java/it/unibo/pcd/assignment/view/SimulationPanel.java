@@ -7,12 +7,9 @@ import it.unibo.pcd.assignment.model.Position2d;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.List;
 
-public class SimulationPanel extends JPanel implements KeyListener {
-    private static final int KEY_UP_CODE = 38;
-    private static final int KEY_DOWN_CODE = 40;
+public class SimulationPanel extends JPanel {
     private List<Body> bodies;
     private Boundary bounds;
     private long iteration;
@@ -25,7 +22,6 @@ public class SimulationPanel extends JPanel implements KeyListener {
         setSize(width, height);
         dx = width / 2 - 20;
         dy = height / 2 - 20;
-        this.addKeyListener(this);
         setFocusable(true);
         setFocusTraversalKeysEnabled(false);
         requestFocusInWindow();
@@ -72,21 +68,6 @@ public class SimulationPanel extends JPanel implements KeyListener {
 
     public void updateScale(double k) {
         this.scale *= k;
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KEY_UP_CODE) {        /* KEY UP */
-            this.scale *= 1.1;
-        } else if (e.getKeyCode() == KEY_DOWN_CODE) {    /* KEY DOWN */
-            this.scale *= 0.9;
-        }
-    }
-
-    public void keyReleased(KeyEvent e) {
-    }
-
-    public void keyTyped(KeyEvent e) {
     }
 }
 

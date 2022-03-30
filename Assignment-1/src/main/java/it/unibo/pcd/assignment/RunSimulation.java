@@ -10,11 +10,11 @@ import it.unibo.pcd.assignment.view.SimulationFrame;
 public class RunSimulation {
 
     public static void main(String[] args) {
-        SimulationFrame view = new SimulationFrame(620, 620);
-    	//BaseView viewer = new BaseView(620,620);
-        Simulator sim = new SequentialSimulatorImplWithGUI(1000, 4, view);
+        ViewController viewController = new ViewController(620, 620);
+    	// BaseView viewer = new BaseView(620,620);
+        Simulator sim = new ConcurrentSimulatorImplWithGUI(1000, 8, viewController);
         long startTime = System.currentTimeMillis();
-        sim.execute(50000);
+        sim.execute(10000);
         long finishTime = System.currentTimeMillis();
         System.out.println(finishTime - startTime + " ms");
     }
