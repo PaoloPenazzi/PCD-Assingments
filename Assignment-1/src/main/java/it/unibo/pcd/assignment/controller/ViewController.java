@@ -11,11 +11,11 @@ import java.util.List;
 
 public class ViewController {
     private final SimulationFrame frame;
-    private final Monitor pause;
+    private final Monitor monitor;
 
-    public ViewController(int width, int height, Monitor pause) {
+    public ViewController(int width, int height, Monitor monitor) {
         this.frame = new SimulationFrame(width, height, this);
-        this.pause = pause;
+        this.monitor = monitor;
     }
 
     public void display(List<Body> bodies, double virtualTime, long iteration, Boundary bounds) {
@@ -27,12 +27,12 @@ public class ViewController {
         switch (button.getText()) {
             case "PLAY":
                 synchronized (this) {
-                    this.pause.play();
+                    this.monitor.play();
                 }
                 break;
             case "PAUSE":
                 synchronized (this) {
-                    this.pause.pause();
+                    this.monitor.pause();
                 }
                 break;
             case "+":
