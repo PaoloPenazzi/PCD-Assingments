@@ -14,6 +14,11 @@ public class SequentialSimulatorImpl extends AbstractSequentialSimulator {
             if(iteration % 500 == 0) {
                 System.out.println("Iterazione: " + iteration);
             }
+            /*if (iteration == super.getNumSteps() - 1) {
+                System.out.println("Calcolo velocità: " + super.getTempoCalcoloVelocita());
+                System.out.println("Aggiornamento posizioni: " + super.getTempoAggiornamentoPosizioni());
+                System.out.println("Controllo collisioni: " + super.getTempoControlloCollisioni());
+            }*/
             super.computeBodies();
             virtualTime = virtualTime + DELTA_TIME;
             iteration++;
