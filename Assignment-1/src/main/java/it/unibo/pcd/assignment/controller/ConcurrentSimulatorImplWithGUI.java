@@ -1,6 +1,5 @@
 package it.unibo.pcd.assignment.controller;
 
-import it.unibo.pcd.assignment.model.Monitor;
 import it.unibo.pcd.assignment.model.Worker;
 
 public class ConcurrentSimulatorImplWithGUI extends AbstractConcurrentSimulator {
@@ -18,11 +17,7 @@ public class ConcurrentSimulatorImplWithGUI extends AbstractConcurrentSimulator 
     @Override
     public void run() {
         while (this.iteration < super.getNumSteps()) {
-            synchronized (this) {
-                while (super.getMonitor().isPaused()) {
-                    // System.out.println("BUSYYYYYYYYYYY");
-                }
-            }
+            super.getMonitor().pauseCheck();
             super.createWorkers(super.getWorkers().length);
             for (Worker worker : super.getWorkers()) {
                 worker.start();

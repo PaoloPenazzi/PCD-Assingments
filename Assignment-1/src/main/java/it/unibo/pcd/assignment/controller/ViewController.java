@@ -27,12 +27,12 @@ public class ViewController {
         switch (button.getText()) {
             case "PLAY":
                 synchronized (this) {
-                    this.monitor.play();
+                    this.monitor.setPauseState(false);
                 }
                 break;
             case "PAUSE":
                 synchronized (this) {
-                    this.monitor.pause();
+                    this.monitor.setPauseState(true);
                 }
                 break;
             case "+":

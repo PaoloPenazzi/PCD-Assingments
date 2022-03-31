@@ -7,23 +7,23 @@ public class Monitor {
         this.pause = false;
     }
 
-    public synchronized void pause() {
-        this.pause = true;
-        while (this.isPaused()) {
+    public synchronized void pauseCheck() {
+        while (isPause()) {
             try {
-                wait();
+                this.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public synchronized void play() {
-        this.pause = false;
-        notifyAll();
+    public synchronized void setPauseState(boolean state) {
+        this.pause = state;
+        this.notifyAll();
     }
 
-    public synchronized boolean isPaused() {
+    public boolean isPause() {
         return this.pause;
     }
+
 }
