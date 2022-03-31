@@ -12,18 +12,15 @@ import java.util.List;
 
 public class SimulationFrame extends JFrame {
     private final SimulationPanel simulationPanel;
-    private final ControlPanel controlPanel;
-    private final ViewController controller;
 
     public SimulationFrame(int width, int height, ViewController controller) {
         this.setLayout(new BorderLayout());
         setTitle("Bodies Simulation");
         setSize(width, height);
         setResizable(false);
-        this.controller = controller;
-        this.controlPanel = new ControlPanel(width, (int) (height * 0.1), controller);
+        ControlPanel controlPanel = new ControlPanel(width, (int) (height * 0.1), controller);
         this.simulationPanel = new SimulationPanel(width, (int) (height * 0.9));
-        getContentPane().add(this.controlPanel);
+        getContentPane().add(controlPanel);
         getContentPane().add(this.simulationPanel);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent ev) {

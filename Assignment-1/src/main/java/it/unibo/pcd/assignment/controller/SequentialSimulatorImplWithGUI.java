@@ -12,7 +12,7 @@ public class SequentialSimulatorImplWithGUI extends AbstractSequentialSimulator 
 
     public SequentialSimulatorImplWithGUI(int numBodies, int numSteps, int sideLenght) {
         super(numBodies, numSteps, sideLenght);
-        this.viewer = new ViewController(620, 620, new Monitor());
+        this.viewer = new ViewController(620, 620, new Monitor()); //TODO remove this useless monitor
     }
 
     @Override

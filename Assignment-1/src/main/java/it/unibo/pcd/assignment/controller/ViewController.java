@@ -31,7 +31,9 @@ public class ViewController {
                 }
                 break;
             case "PAUSE":
-                this.pause.pause();
+                synchronized (this) {
+                    this.pause.pause();
+                }
                 break;
             case "+":
                 this.frame.updateScale(1.1);

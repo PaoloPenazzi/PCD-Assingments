@@ -18,13 +18,11 @@ public class SimulationPanel extends JPanel {
     private final long dx;
     private final long dy;
 
+
     public SimulationPanel(int width, int height) {
         setSize(width, height);
         dx = width / 2 - 20;
         dy = height / 2 - 20;
-        setFocusable(true);
-        setFocusTraversalKeysEnabled(false);
-        requestFocusInWindow();
     }
 
     public void paint(Graphics g) {
@@ -32,7 +30,7 @@ public class SimulationPanel extends JPanel {
             Graphics2D g2 = (Graphics2D) g;
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g2.clearRect(0, 0, this.getWidth(), this.getHeight());
+            g2.clearRect(0, this.getHeight(), this.getWidth(), this.getHeight());
             int x0 = getXCoordinate(bounds.getX0());
             int y0 = getYCoordinate(bounds.getY0());
             int wd = getXCoordinate(bounds.getX1()) - x0;
@@ -47,7 +45,7 @@ public class SimulationPanel extends JPanel {
                 g2.drawOval(getXCoordinate(p.getX()), getYCoordinate(p.getY()), radius, radius);
             });
             String time = String.format("%.2f", virtualTime);
-            g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " + iteration + " (UP for zoom in, DOWN for zoom out)", 2, 20);
+            g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " + iteration + " (+ for zoom in, - for zoom out)", 2, (int)(this.getHeight() * 0.1) + 20);
         }
     }
 
