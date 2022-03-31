@@ -5,11 +5,13 @@ import it.unibo.pcd.assignment.model.*;
 public abstract class AbstractConcurrentSimulator extends AbstractSimulator{
     private final Worker[] workers;
     private final Barrier barrier;
+    private final Monitor monitor;
 
     protected AbstractConcurrentSimulator(int numBodies,int numSteps, int sideLenght, int nThreads) {
         super(numBodies, numSteps, sideLenght);
         this.barrier = new BarrierImpl(nThreads);
         this.workers = new Worker[nThreads];
+        this.monitor = new Monitor();
         this.createWorkers(nThreads);
     }
 
@@ -27,10 +29,14 @@ public abstract class AbstractConcurrentSimulator extends AbstractSimulator{
     }
 
     public Worker[] getWorkers() {
-        return workers;
+        return this.workers;
     }
 
     public Barrier getBarrier() {
-        return barrier;
+        return this.barrier;
+    }
+
+    public Monitor getMonitor() {
+        return this.monitor;
     }
 }
