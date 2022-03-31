@@ -1,21 +1,29 @@
 package it.unibo.pcd.assignment.model;
 
 public class Monitor {
-    private int i;
+    private boolean pause;
 
     public Monitor() {
-        this.i = 0;
+        this.pause = false;
     }
 
     public synchronized void pause() {
-        this.i = 1;
+        this.pause = true;
+        while (this.isPaused()) {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public synchronized void play() {
-        this.i = 0;
+        this.pause = false;
+        notifyAll();
     }
 
     public synchronized boolean isPaused() {
-        return this.i == 1;
+        return this.pause;
     }
 }
