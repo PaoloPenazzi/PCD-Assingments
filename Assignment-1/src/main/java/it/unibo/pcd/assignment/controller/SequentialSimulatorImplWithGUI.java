@@ -1,15 +1,18 @@
 package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Body;
+import it.unibo.pcd.assignment.model.Monitor;
 import it.unibo.pcd.assignment.view.BaseView;
 import it.unibo.pcd.assignment.view.SimulationFrame;
+
+import java.util.concurrent.CountDownLatch;
 
 public class SequentialSimulatorImplWithGUI extends AbstractSequentialSimulator {
     private final ViewController viewer;
 
     public SequentialSimulatorImplWithGUI(int numBodies, int numSteps, int sideLenght) {
         super(numBodies, numSteps, sideLenght);
-        this.viewer = new ViewController(620, 620, this);
+        this.viewer = new ViewController(620, 620, new Monitor());
     }
 
     @Override

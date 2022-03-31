@@ -2,6 +2,7 @@ package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Body;
 import it.unibo.pcd.assignment.model.Boundary;
+import it.unibo.pcd.assignment.model.Monitor;
 import it.unibo.pcd.assignment.view.SimulationFrame;
 
 import javax.swing.*;
@@ -10,12 +11,11 @@ import java.util.List;
 
 public class ViewController {
     private final SimulationFrame frame;
-    private boolean isRunning = true;
-    private final Thread simulator;
+    private final Monitor pause;
 
-    public ViewController(int width, int height, Thread simulator) {
+    public ViewController(int width, int height, Monitor pause) {
         this.frame = new SimulationFrame(width, height, this);
-        this.simulator = simulator;
+        this.pause = pause;
     }
 
     public void display(List<Body> bodies, double virtualTime, long iteration, Boundary bounds) {
@@ -26,13 +26,12 @@ public class ViewController {
         JButton button = (JButton) e.getSource();
         switch (button.getText()) {
             case "PLAY":
-                if(!this.isRunning) {
-                    this.isRunning = true;
-                    this.simulator.notifyAll();
+                synchronized (this) {
+                    this.pause.play();
                 }
                 break;
             case "PAUSE":
-                this.isRunning = false;
+                this.pause.pause();
                 break;
             case "+":
                 this.frame.updateScale(1.1);
@@ -43,9 +42,5 @@ public class ViewController {
             default:
                 throw new IllegalStateException();
         }
-    }
-
-    public boolean getIsRunning() {
-        return this.isRunning;
     }
 }
