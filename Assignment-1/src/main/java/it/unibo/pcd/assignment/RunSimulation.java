@@ -1,11 +1,8 @@
 package it.unibo.pcd.assignment;
 
 import it.unibo.pcd.assignment.controller.*;
-import it.unibo.pcd.assignment.model.Monitor;
 
-/**
- * @author aricci
- */
+
 public class RunSimulation {
 
     public static void main(String[] args) {

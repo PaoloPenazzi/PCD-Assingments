@@ -7,7 +7,7 @@ public class Monitor {
         this.pause = false;
     }
 
-    public synchronized void pauseCheck() {
+    public synchronized void waitPauseTrue() {
         while (isPause()) {
             try {
                 this.wait();
