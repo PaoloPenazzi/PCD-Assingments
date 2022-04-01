@@ -5,6 +5,7 @@ import it.unibo.pcd.assignment.controller.ConcurrentSimulatorImplWithGUI;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.CountDownLatch;
 
 public class Worker extends Thread {
     private final List<Body> allBodies;
@@ -12,13 +13,15 @@ public class Worker extends Thread {
     private final Boundary boundary;
     private final int indexFrom;
     private final int indexTo;
+    private final CountDownLatch latch;
 
-    public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary) {
+    public Worker(int indexFrom, int indexTo, List<Body> bodies, Barrier barrier, Boundary boundary, CountDownLatch latch) {
         this.indexFrom = indexFrom;
         this.indexTo = indexTo;
         this.allBodies = bodies;
         this.barrier = barrier;
         this.boundary = boundary;
+        this.latch = latch;
     }
 
     @Override
@@ -27,6 +30,7 @@ public class Worker extends Thread {
             this.computeBodiesVelocity();
             this.barrier.waitAndNotifyAll();
             updatePositionAndCheckCollision();
+            latch.countDown();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

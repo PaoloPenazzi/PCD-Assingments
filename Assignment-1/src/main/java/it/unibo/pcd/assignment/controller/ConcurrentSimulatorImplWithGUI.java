@@ -18,16 +18,15 @@ public class ConcurrentSimulatorImplWithGUI extends AbstractConcurrentSimulator 
     public void run() {
         while (this.iteration < super.getNumSteps()) {
             super.getMonitor().pauseCheck();
+            super.createLatch();
             super.createWorkers(super.getWorkers().length);
             for (Worker worker : super.getWorkers()) {
                 worker.start();
             }
-            for (Worker worker : super.getWorkers()) {
-                try {
-                    worker.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                super.getLatch().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             this.virtualTime = this.virtualTime + DELTA_TIME;
             this.iteration++;

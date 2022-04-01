@@ -16,6 +16,7 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
         //long startTime = 0;
         //long barrierTime = 0;
         while (iteration < super.getNumSteps()) {
+            super.createLatch();
             //long start = System.currentTimeMillis();
             this.createWorkers(super.getWorkers().length);
             //long create = System.currentTimeMillis();
@@ -23,12 +24,10 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
                 worker.start();
             }
             //long compute = System.currentTimeMillis();
-            for (Worker worker : super.getWorkers()) {
-                try {
-                    worker.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            try {
+                super.getLatch().await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
             //long finale = System.currentTimeMillis();
             /*createTime += create - start;
