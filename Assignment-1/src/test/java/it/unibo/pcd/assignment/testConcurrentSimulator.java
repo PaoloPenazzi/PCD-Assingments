@@ -26,4 +26,15 @@ public class testConcurrentSimulator {
         Assert.assertEquals(10, this.concurrentSimulator.getBodies().size());
     }
 
+    @Test
+    public void testCreateWorkers() {
+        Assert.assertEquals(5, this.concurrentSimulator.getWorkers().length);
+    }
+
+    @Test
+    public void testCreateLatch() {
+        this.concurrentSimulator.createLatch();
+        Assert.assertEquals(5, this.concurrentSimulator.getLatch().getCount());
+    }
+
 }

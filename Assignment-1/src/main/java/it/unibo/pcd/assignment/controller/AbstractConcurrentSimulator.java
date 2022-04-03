@@ -31,7 +31,7 @@ public abstract class AbstractConcurrentSimulator extends AbstractSimulator{
         }
     }
 
-    protected void createLatch() {
+    public void createLatch() {
         this.latch = new CountDownLatch(this.workers.length);
     }
 
