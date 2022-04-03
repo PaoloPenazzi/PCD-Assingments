@@ -1,10 +1,8 @@
 package it.unibo.pcd.assignment.model;
 
 import it.unibo.pcd.assignment.controller.AbstractConcurrentSimulator;
-import it.unibo.pcd.assignment.controller.ConcurrentSimulatorImplWithGUI;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 public class Worker extends Thread {

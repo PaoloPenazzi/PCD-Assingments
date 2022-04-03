@@ -4,4 +4,4 @@ classpath = build/classes/java/main/
 
 listener = gov.nasa.jpf.listener.PreciseRaceDetector
 
-report.console.property_violation = error,trace
+report.console.property_violation = error,snapshot
