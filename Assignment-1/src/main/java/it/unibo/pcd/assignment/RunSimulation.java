@@ -7,7 +7,7 @@ public class RunSimulation {
 
     public static void main(String[] args) {
         int nWorkers = Runtime.getRuntime().availableProcessors() + 1;
-        Thread simulator = new ConcurrentSimulatorImplWithGUI(1000, 10000, 8, nWorkers);
+        Thread simulator = new SequentialSimulatorImplWithGUI(1000, 10000, 8);
         //Thread simulator = new SequentialSimulatorImpl(1000, 10000, 8);
         long startTime = System.currentTimeMillis();
         simulator.start();
