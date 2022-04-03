@@ -20,8 +20,8 @@ public class SimulationFrame extends JFrame {
         setResizable(false);
         ControlPanel controlPanel = new ControlPanel(width, (int) (height * 0.1), controller);
         this.simulationPanel = new SimulationPanel(width, (int) (height * 0.9));
-        getContentPane().add(controlPanel);
         getContentPane().add(this.simulationPanel);
+        getContentPane().add(controlPanel);
         addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent ev) {
                 System.exit(-1);
