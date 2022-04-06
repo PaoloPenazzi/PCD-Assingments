@@ -47,7 +47,7 @@ public class SimulationPanel extends JPanel {
             String time = String.format("%.2f", virtualTime);
             // g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " +
             // iteration + " (+ for zoom in, - for zoom out)", 2, (int)(this.getHeight() * 0.1) + 20);
-            g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " +
+            g2.drawString("Bodies: " + bodies.size() + " - virtualTime: " + time + " - iteration: " +
                     iteration + " (+ for zoom in, - for zoom out)", 2, 45);
         }
     }

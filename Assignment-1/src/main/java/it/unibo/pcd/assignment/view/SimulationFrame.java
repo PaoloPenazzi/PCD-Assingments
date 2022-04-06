@@ -17,7 +17,7 @@ public class SimulationFrame extends JFrame {
         this.setLayout(new BorderLayout());
         setTitle("Bodies Simulation");
         setSize(width, height);
-        setResizable(false);
+        setResizable(true);
         ControlPanel controlPanel = new ControlPanel(width, (int) (height * 0.1), controller);
         this.simulationPanel = new SimulationPanel(width, (int) (height * 0.9));
         getContentPane().add(this.simulationPanel);
