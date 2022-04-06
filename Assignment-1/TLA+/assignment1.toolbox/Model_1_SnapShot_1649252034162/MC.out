@@ -2,7 +2,7 @@
 TLC2 Version 2.16 of 31 December 2020 (rev: cdddf55)
 @!@!@ENDMSG 2262 @!@!@
 @!@!@STARTMSG 2187:0 @!@!@
-Running breadth-first search Model-Checking with fp 79 and seed -1951136001047077312 with 6 workers on 12 cores with 1195MB heap and 2684MB offheap memory [pid: 12744] (Windows 10 10.0 amd64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
+Running breadth-first search Model-Checking with fp 71 and seed -864424328646114650 with 6 workers on 12 cores with 1195MB heap and 2684MB offheap memory [pid: 12328] (Windows 10 10.0 amd64, AdoptOpenJDK 14.0.1 x86_64, OffHeapDiskFPSet, DiskStateQueue).
 @!@!@ENDMSG 2187 @!@!@
 @!@!@STARTMSG 2220:0 @!@!@
 Starting SANY...
@@ -25,7 +25,7 @@ Semantic processing of module MC
 SANY finished.
 @!@!@ENDMSG 2219 @!@!@
 @!@!@STARTMSG 2185:0 @!@!@
-Starting... (2022-04-06 15:39:01)
+Starting... (2022-04-06 15:33:51)
 @!@!@ENDMSG 2185 @!@!@
 @!@!@STARTMSG 2212:0 @!@!@
 Implied-temporal checking--satisfiability problem has 5 branches.
@@ -34,16 +34,16 @@ Implied-temporal checking--satisfiability problem has 5 branches.
 Computing initial states...
 @!@!@ENDMSG 2189 @!@!@
 @!@!@STARTMSG 2190:0 @!@!@
-Finished computing initial states: 1 distinct state generated at 2022-04-06 15:39:02.
+Finished computing initial states: 1 distinct state generated at 2022-04-06 15:33:52.
 @!@!@ENDMSG 2190 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(92) at 2022-04-06 15:39:02: 2.333 states generated, 929 distinct states found, 0 states left on queue.
+Progress(92) at 2022-04-06 15:33:52: 2.333 states generated, 929 distinct states found, 0 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2192:0 @!@!@
-Checking 5 branches of temporal properties for the complete state space with 4645 total distinct states at (2022-04-06 15:39:02)
+Checking 5 branches of temporal properties for the complete state space with 4645 total distinct states at (2022-04-06 15:33:52)
 @!@!@ENDMSG 2192 @!@!@
 @!@!@STARTMSG 2267:0 @!@!@
-Finished checking temporal properties in 00s at 2022-04-06 15:39:02
+Finished checking temporal properties in 00s at 2022-04-06 15:33:53
 @!@!@ENDMSG 2267 @!@!@
 @!@!@STARTMSG 2193:0 @!@!@
 Model checking completed. No error has been found.
@@ -52,343 +52,343 @@ Model checking completed. No error has been found.
   calculated (optimistic):  val = 7.1E-14
 @!@!@ENDMSG 2193 @!@!@
 @!@!@STARTMSG 2201:0 @!@!@
-The coverage statistics at 2022-04-06 15:39:02
+The coverage statistics at 2022-04-06 15:33:53
 @!@!@ENDMSG 2201 @!@!@
 @!@!@STARTMSG 2773:0 @!@!@
-<Init line 126, col 1 to line 126, col 4 of module assignment1>: 1:1
+<Init line 124, col 1 to line 124, col 4 of module assignment1>: 1:1
 @!@!@ENDMSG 2773 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 127, col 9 to line 135, col 98 of module assignment1: 1
+  line 125, col 9 to line 133, col 98 of module assignment1: 1
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<evaluateWhile line 137, col 1 to line 137, col 13 of module assignment1>: 6:108
+<evaluateWhile line 135, col 1 to line 135, col 13 of module assignment1>: 6:94
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 137, col 21 to line 137, col 43 of module assignment1: 1129
+  line 135, col 21 to line 135, col 43 of module assignment1: 1046
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 137, col 21 to line 137, col 25 of module assignment1: 1021
+  |line 135, col 21 to line 135, col 25 of module assignment1: 952
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 138, col 24 to line 138, col 40 of module assignment1: 108
+  line 136, col 24 to line 136, col 40 of module assignment1: 94
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 139, col 29 to line 139, col 75 of module assignment1: 72
+  line 137, col 29 to line 137, col 75 of module assignment1: 67
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 140, col 29 to line 140, col 62 of module assignment1: 36
+  line 138, col 29 to line 138, col 62 of module assignment1: 27
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 141, col 21 to line 142, col 71 of module assignment1: 108
+  line 139, col 21 to line 140, col 71 of module assignment1: 94
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<startLatchBarrier line 144, col 1 to line 144, col 17 of module assignment1>: 3:85
+<startLatchBarrier line 142, col 1 to line 142, col 17 of module assignment1>: 4:72
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 144, col 25 to line 144, col 51 of module assignment1: 1106
+  line 142, col 25 to line 142, col 51 of module assignment1: 1024
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 144, col 25 to line 144, col 29 of module assignment1: 1021
+  |line 142, col 25 to line 142, col 29 of module assignment1: 952
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 145, col 25 to line 145, col 50 of module assignment1: 85
+  line 143, col 25 to line 143, col 50 of module assignment1: 72
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 146, col 25 to line 146, col 36 of module assignment1: 85
+  line 144, col 25 to line 144, col 36 of module assignment1: 72
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 147, col 25 to line 147, col 63 of module assignment1: 85
+  line 145, col 25 to line 145, col 63 of module assignment1: 72
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 148, col 25 to line 149, col 59 of module assignment1: 85
+  line 146, col 25 to line 147, col 59 of module assignment1: 72
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<startWorkers line 151, col 1 to line 151, col 12 of module assignment1>: 3:78
+<startWorkers line 149, col 1 to line 149, col 12 of module assignment1>: 3:62
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 151, col 20 to line 151, col 41 of module assignment1: 1099
+  line 149, col 20 to line 149, col 41 of module assignment1: 1014
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 151, col 20 to line 151, col 24 of module assignment1: 1021
+  |line 149, col 20 to line 149, col 24 of module assignment1: 952
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 152, col 20 to line 152, col 32 of module assignment1: 78
+  line 150, col 20 to line 150, col 32 of module assignment1: 62
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 153, col 20 to line 153, col 60 of module assignment1: 78
+  line 151, col 20 to line 151, col 60 of module assignment1: 62
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 154, col 20 to line 155, col 60 of module assignment1: 78
+  line 152, col 20 to line 153, col 60 of module assignment1: 62
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<waitLatchReady line 157, col 1 to line 157, col 14 of module assignment1>: 3:3
+<waitLatchReady line 155, col 1 to line 155, col 14 of module assignment1>: 3:3
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 157, col 22 to line 157, col 45 of module assignment1: 1024
+  line 155, col 22 to line 155, col 45 of module assignment1: 955
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 157, col 22 to line 157, col 26 of module assignment1: 1021
+  |line 155, col 22 to line 155, col 26 of module assignment1: 952
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 158, col 22 to line 158, col 30 of module assignment1: 712
+  line 156, col 22 to line 156, col 30 of module assignment1: 695
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 158, col 22 to line 158, col 26 of module assignment1: 709
+  |line 156, col 22 to line 156, col 26 of module assignment1: 692
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 159, col 22 to line 159, col 76 of module assignment1: 3
+  line 157, col 22 to line 157, col 76 of module assignment1: 3
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 160, col 22 to line 160, col 77 of module assignment1: 3
+  line 158, col 22 to line 158, col 77 of module assignment1: 3
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 161, col 22 to line 161, col 34 of module assignment1: 3
+  line 159, col 22 to line 159, col 34 of module assignment1: 3
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 162, col 22 to line 162, col 63 of module assignment1: 3
+  line 160, col 22 to line 160, col 63 of module assignment1: 3
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 163, col 22 to line 163, col 79 of module assignment1: 3
+  line 161, col 22 to line 161, col 79 of module assignment1: 3
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<updateIteration line 165, col 1 to line 165, col 15 of module assignment1>: 3:5
+<updateIteration line 163, col 1 to line 163, col 15 of module assignment1>: 3:5
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 165, col 23 to line 165, col 47 of module assignment1: 1026
+  line 163, col 23 to line 163, col 47 of module assignment1: 957
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 165, col 23 to line 165, col 27 of module assignment1: 1021
+  |line 163, col 23 to line 163, col 27 of module assignment1: 952
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 166, col 23 to line 166, col 48 of module assignment1: 5
+  line 164, col 23 to line 164, col 48 of module assignment1: 5
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 167, col 23 to line 167, col 62 of module assignment1: 5
+  line 165, col 23 to line 165, col 62 of module assignment1: 5
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 168, col 23 to line 169, col 62 of module assignment1: 5
+  line 166, col 23 to line 167, col 62 of module assignment1: 5
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<evaluateWhileWorker line 174, col 1 to line 174, col 25 of module assignment1>: 207:543
+<evaluateWhileWorker line 172, col 1 to line 172, col 25 of module assignment1>: 204:496
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 174, col 33 to line 174, col 64 of module assignment1: 3606
+  line 172, col 33 to line 172, col 64 of module assignment1: 3352
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 174, col 33 to line 174, col 40 of module assignment1: 3063
+  |line 172, col 33 to line 172, col 40 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 175, col 36 to line 175, col 64 of module assignment1: 543
+  line 173, col 36 to line 173, col 64 of module assignment1: 496
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 176, col 41 to line 176, col 92 of module assignment1: 471
+  line 174, col 41 to line 174, col 92 of module assignment1: 442
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 177, col 41 to line 177, col 77 of module assignment1: 72
+  line 175, col 41 to line 175, col 77 of module assignment1: 54
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 178, col 33 to line 180, col 62 of module assignment1: 543
+  line 176, col 33 to line 178, col 62 of module assignment1: 496
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<waitCreationWorkers line 182, col 1 to line 182, col 25 of module assignment1>: 88:199
+<waitCreationWorkers line 180, col 1 to line 180, col 25 of module assignment1>: 85:198
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 182, col 33 to line 182, col 64 of module assignment1: 3262
+  line 180, col 33 to line 180, col 64 of module assignment1: 3054
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 182, col 33 to line 182, col 40 of module assignment1: 3063
+  |line 180, col 33 to line 180, col 40 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 183, col 33 to line 183, col 44 of module assignment1: 610
+  line 181, col 33 to line 181, col 44 of module assignment1: 605
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 183, col 33 to line 183, col 40 of module assignment1: 411
+  |line 181, col 33 to line 181, col 40 of module assignment1: 407
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 184, col 33 to line 184, col 77 of module assignment1: 199
+  line 182, col 33 to line 182, col 77 of module assignment1: 198
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 185, col 33 to line 187, col 62 of module assignment1: 199
+  line 183, col 33 to line 185, col 62 of module assignment1: 198
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<computeVelocity line 189, col 1 to line 189, col 21 of module assignment1>: 83:198
+<computeVelocity line 187, col 1 to line 187, col 21 of module assignment1>: 84:198
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 189, col 29 to line 189, col 56 of module assignment1: 3261
+  line 187, col 29 to line 187, col 56 of module assignment1: 3054
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 189, col 29 to line 189, col 36 of module assignment1: 3063
+  |line 187, col 29 to line 187, col 36 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 190, col 29 to line 190, col 73 of module assignment1: 198
+  line 188, col 29 to line 188, col 73 of module assignment1: 198
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 191, col 29 to line 191, col 50 of module assignment1: 198
+  line 189, col 29 to line 189, col 50 of module assignment1: 198
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 192, col 29 to line 192, col 69 of module assignment1: 198
+  line 190, col 29 to line 190, col 69 of module assignment1: 198
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 193, col 29 to line 194, col 59 of module assignment1: 198
+  line 191, col 29 to line 192, col 59 of module assignment1: 198
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<waitBarrier line 196, col 1 to line 196, col 17 of module assignment1>: 80:249
+<waitBarrier line 194, col 1 to line 194, col 17 of module assignment1>: 89:229
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 196, col 25 to line 196, col 48 of module assignment1: 3312
+  line 194, col 25 to line 194, col 48 of module assignment1: 3085
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 196, col 25 to line 196, col 32 of module assignment1: 3063
+  |line 194, col 25 to line 194, col 32 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 197, col 25 to line 197, col 51 of module assignment1: 687
+  line 195, col 25 to line 195, col 51 of module assignment1: 647
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 197, col 25 to line 197, col 31 of module assignment1: 438
+  |line 195, col 25 to line 195, col 31 of module assignment1: 418
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 197, col 35 to line 197, col 51 of module assignment1: 438
+  |line 195, col 35 to line 195, col 51 of module assignment1: 418
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 198, col 25 to line 198, col 78 of module assignment1: 249
+  line 196, col 25 to line 196, col 78 of module assignment1: 229
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 199, col 25 to line 200, col 75 of module assignment1: 249
+  line 197, col 25 to line 198, col 75 of module assignment1: 229
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<computePositionCollision line 202, col 1 to line 202, col 30 of module assignment1>: 93:238
+<computePositionCollision line 200, col 1 to line 200, col 30 of module assignment1>: 94:227
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 202, col 38 to line 202, col 74 of module assignment1: 3301
+  line 200, col 38 to line 200, col 74 of module assignment1: 3083
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 202, col 38 to line 202, col 45 of module assignment1: 3063
+  |line 200, col 38 to line 200, col 45 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 203, col 38 to line 203, col 80 of module assignment1: 238
+  line 201, col 38 to line 201, col 80 of module assignment1: 227
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 204, col 38 to line 204, col 84 of module assignment1: 238
+  line 202, col 38 to line 202, col 84 of module assignment1: 227
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 205, col 38 to line 207, col 67 of module assignment1: 238
+  line 203, col 38 to line 205, col 67 of module assignment1: 227
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<updateMyIteration line 209, col 1 to line 209, col 23 of module assignment1>: 105:227
+<updateMyIteration line 207, col 1 to line 207, col 23 of module assignment1>: 95:225
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 209, col 31 to line 209, col 60 of module assignment1: 3290
+  line 207, col 31 to line 207, col 60 of module assignment1: 3081
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 209, col 31 to line 209, col 38 of module assignment1: 3063
+  |line 207, col 31 to line 207, col 38 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 210, col 31 to line 210, col 109 of module assignment1: 227
+  line 208, col 31 to line 208, col 109 of module assignment1: 225
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 211, col 31 to line 211, col 71 of module assignment1: 227
+  line 209, col 31 to line 209, col 71 of module assignment1: 225
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 212, col 31 to line 213, col 70 of module assignment1: 227
+  line 210, col 31 to line 211, col 70 of module assignment1: 225
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<signalLatch line 215, col 1 to line 215, col 17 of module assignment1>: 94:225
+<signalLatch line 213, col 1 to line 213, col 17 of module assignment1>: 94:225
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 215, col 25 to line 215, col 48 of module assignment1: 3288
+  line 213, col 25 to line 213, col 48 of module assignment1: 3081
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 215, col 25 to line 215, col 32 of module assignment1: 3063
+  |line 213, col 25 to line 213, col 32 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 216, col 25 to line 216, col 42 of module assignment1: 225
+  line 214, col 25 to line 214, col 42 of module assignment1: 225
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 217, col 25 to line 217, col 71 of module assignment1: 225
+  line 215, col 25 to line 215, col 71 of module assignment1: 225
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 218, col 25 to line 219, col 68 of module assignment1: 225
+  line 216, col 25 to line 217, col 68 of module assignment1: 225
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<awaitWorkFinished line 221, col 1 to line 221, col 23 of module assignment1>: 160:485
+<awaitWorkFinished line 219, col 1 to line 219, col 23 of module assignment1>: 164:366
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 221, col 31 to line 221, col 60 of module assignment1: 3548
+  line 219, col 31 to line 219, col 60 of module assignment1: 3222
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 221, col 31 to line 221, col 38 of module assignment1: 3063
+  |line 219, col 31 to line 219, col 38 of module assignment1: 2856
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 222, col 31 to line 222, col 63 of module assignment1: 1210
+  line 220, col 31 to line 220, col 63 of module assignment1: 972
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 222, col 31 to line 222, col 51 of module assignment1: 725
+  |line 220, col 31 to line 220, col 51 of module assignment1: 606
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 222, col 55 to line 222, col 63 of module assignment1: 725
+  |line 220, col 55 to line 220, col 63 of module assignment1: 606
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 223, col 31 to line 223, col 79 of module assignment1: 485
+  line 221, col 31 to line 221, col 79 of module assignment1: 366
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 224, col 31 to line 226, col 60 of module assignment1: 485
+  line 222, col 31 to line 224, col 60 of module assignment1: 366
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2772:0 @!@!@
-<Terminating line 235, col 1 to line 235, col 11 of module assignment1>: 0:1
+<Terminating line 233, col 1 to line 233, col 11 of module assignment1>: 0:1
 @!@!@ENDMSG 2772 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 235, col 40 to line 235, col 56 of module assignment1: 1073
+  line 233, col 40 to line 233, col 56 of module assignment1: 995
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 235, col 40 to line 235, col 47 of module assignment1: 1069
+  |line 233, col 40 to line 233, col 47 of module assignment1: 991
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 235, col 31 to line 235, col 37 of module assignment1: 1021
+  line 233, col 31 to line 233, col 37 of module assignment1: 952
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 236, col 19 to line 236, col 32 of module assignment1: 1
+  line 234, col 19 to line 234, col 32 of module assignment1: 1
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2774:0 @!@!@
-<WorkerIterationGreaterThanOrEqualIterationInvariant line 113, col 1 to line 113, col 51 of module assignment1>
+<WorkerIterationGreaterThanOrEqualIterationInvariant line 111, col 1 to line 111, col 51 of module assignment1>
 @!@!@ENDMSG 2774 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 113, col 57 to line 113, col 118 of module assignment1: 929
+  line 111, col 58 to line 111, col 119 of module assignment1: 929
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 113, col 88 to line 113, col 118 of module assignment1: 2787
+  |line 111, col 89 to line 111, col 119 of module assignment1: 2787
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 113, col 66 to line 113, col 85 of module assignment1: 929
+  |line 111, col 67 to line 111, col 86 of module assignment1: 929
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2774:0 @!@!@
-<Action line 114, col 41 to line 114, col 143 of module assignment1>
+<Action line 112, col 41 to line 112, col 143 of module assignment1>
 @!@!@ENDMSG 2774 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  line 114, col 41 to line 114, col 143 of module assignment1: 929
+  line 112, col 41 to line 112, col 143 of module assignment1: 929
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 114, col 42 to line 114, col 88 of module assignment1: 929
+  |line 112, col 42 to line 112, col 88 of module assignment1: 929
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  ||line 114, col 73 to line 114, col 88 of module assignment1: 1289
+  ||line 112, col 73 to line 112, col 88 of module assignment1: 1289
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  ||line 114, col 51 to line 114, col 70 of module assignment1: 929
+  ||line 112, col 51 to line 112, col 70 of module assignment1: 929
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  |line 114, col 95 to line 114, col 142 of module assignment1: 81
+  |line 112, col 95 to line 112, col 142 of module assignment1: 81
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  ||line 114, col 126 to line 114, col 142 of module assignment1: 243
+  ||line 112, col 126 to line 112, col 142 of module assignment1: 243
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2221:0 @!@!@
-  ||line 114, col 104 to line 114, col 123 of module assignment1: 81
+  ||line 112, col 104 to line 112, col 123 of module assignment1: 81
 @!@!@ENDMSG 2221 @!@!@
 @!@!@STARTMSG 2202:0 @!@!@
 End of statistics.
 @!@!@ENDMSG 2202 @!@!@
 @!@!@STARTMSG 2200:0 @!@!@
-Progress(92) at 2022-04-06 15:39:03: 2.333 states generated (72.266 s/min), 929 distinct states found (28.776 ds/min), 0 states left on queue.
+Progress(92) at 2022-04-06 15:33:53: 2.333 states generated (70.060 s/min), 929 distinct states found (27.897 ds/min), 0 states left on queue.
 @!@!@ENDMSG 2200 @!@!@
 @!@!@STARTMSG 2199:0 @!@!@
 2333 states generated, 929 distinct states found, 0 states left on queue.
@@ -400,5 +400,5 @@ The depth of the complete state graph search is 92.
 The average outdegree of the complete state graph is 1 (minimum is 0, the maximum 4 and the 95th percentile is 2).
 @!@!@ENDMSG 2268 @!@!@
 @!@!@STARTMSG 2186:0 @!@!@
-Finished in 1963ms at (2022-04-06 15:39:03)
+Finished in 2022ms at (2022-04-06 15:33:53)
 @!@!@ENDMSG 2186 @!@!@

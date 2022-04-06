@@ -6,17 +6,15 @@ ASSUME STEPS > 0
 
 (*--algorithm assignment1
 
-variable 
-    iteration = 0,
-    workerIteration = [myIteration \in 1..NUMBER_OF_WORKERS |-> 0 ],
-    velocities = [velocity \in 1..NUMBER_OF_WORKERS |-> 0 ], 
-    positions = [position \in 1..NUMBER_OF_WORKERS |-> 0 ], 
-    creation = 0,
-    barrier = 0,
-    latch = NUMBER_OF_WORKERS;
-
+variable iteration = 0,
+workerIteration = [myIteration \in 1..NUMBER_OF_WORKERS |-> 0 ],
+velocities = [velocity \in 1..NUMBER_OF_WORKERS |-> 0 ], 
+positions = [position \in 1..NUMBER_OF_WORKERS |-> 0 ], 
+creation = 0,
+barrier = 0,
+latch = NUMBER_OF_WORKERS;
 define
-    WorkerIterationGreaterThanOrEqualIterationInvariant == (\A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
+    WorkerIterationGreaterThanOrEqualIterationInvariant == ( \A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
     PositionAfterVelocityComputation == []( (\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1) => (\A n \in 1..NUMBER_OF_WORKERS: velocities[n] = 1) )
     PositionComputation ==  <>(\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1)
     SimTermination == <>(iteration = STEPS)
@@ -51,66 +49,66 @@ end macro;
 fair+ process master = 0
 begin
 
-    evaluateWhile:
-        while iteration < STEPS do
-            
-            startLatchBarrier:
-                startLatch(latch);
-                startBarrier(barrier);
+evaluateWhile:
+    while iteration < STEPS do
         
-            startWorkers:
-                creation := 1;
-            
-            waitLatchReady:
-                waitLatch(latch);
-                positions := [position \in 1..NUMBER_OF_WORKERS |-> 0 ];
-                velocities :=  [velocity \in 1..NUMBER_OF_WORKERS |-> 0 ];
-                creation := 0;
-                
-            updateIteration:
-                iteration := iteration + 1;
-        end while;
+        startLatchBarrier:
+            startLatch(latch);
+            startBarrier(barrier);
+    
+        startWorkers:
+            creation := 1;
         
+        waitLatchReady:
+            waitLatch(latch);
+            positions := [position \in 1..NUMBER_OF_WORKERS |-> 0 ];
+            velocities :=  [velocity \in 1..NUMBER_OF_WORKERS |-> 0 ];
+            creation := 0;
+            
+        updateIteration:
+            iteration := iteration + 1;
+            
+    end while;
 end process;
 
 fair+ process worker \in 1..NUMBER_OF_WORKERS
 begin
 
-    evaluateWhileWorker:
-        while workerIteration[self] < STEPS do
-        
-            waitCreationWorkers:
-                await creation = 1;
-                
-            computeVelocity:
-                velocities[self] := 1;
-                signalBarrier(barrier);
-            
-            waitBarrier:
-                waitBarrier(barrier);
-            
-            computePositionCollision:
-                positions[self] := 1;
-                
-            updateMyIteration:
-                 workerIteration[self] := workerIteration[self] + 1;
-            
-            signalLatch:
-                signalLatch(latch);
-            
-            awaitWorkFinished:
-                await workerIteration[self] = iteration;
-        end while;
+evaluateWhileWorker:
+    while workerIteration[self] < STEPS do
     
+        waitCreationWorkers:
+            await creation = 1;
+            
+        computeVelocity:
+            velocities[self] := 1;
+            signalBarrier(barrier);
+        
+        waitBarrier:
+            waitBarrier(barrier);
+        
+        computePositionCollision:
+            positions[self] := 1;
+            
+        updateMyIteration:
+             workerIteration[self] := workerIteration[self] + 1;
+        
+        signalLatch:
+            signalLatch(latch);
+        
+        awaitWorkFinished:
+            await workerIteration[self] = iteration;
+                
+    end while;
 end process;
 
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "bdbd0d14" /\ chksum(tla) = "d372d707")
+\* BEGIN TRANSLATION (chksum(pcal) = "bdbd0d14" /\ chksum(tla) = "7daa3c99")
 VARIABLES iteration, workerIteration, velocities, positions, creation, 
           barrier, latch, pc
 
 (* define statement *)
-WorkerIterationGreaterThanOrEqualIterationInvariant == (\A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
+WorkerIterationGreaterThanOrEqualIterationInvariant == ( \A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
 PositionAfterVelocityComputation == []( (\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1) => (\A n \in 1..NUMBER_OF_WORKERS: velocities[n] = 1) )
 PositionComputation ==  <>(\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1)
 SimTermination == <>(iteration = STEPS)
@@ -250,5 +248,5 @@ Termination == <>(\A self \in ProcSet: pc[self] = "Done")
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Apr 06 15:38:45 CEST 2022 by angel
+\* Last modified Wed Apr 06 15:33:47 CEST 2022 by angel
 \* Created Wed Apr 06 10:24:20 CEST 2022 by angel
