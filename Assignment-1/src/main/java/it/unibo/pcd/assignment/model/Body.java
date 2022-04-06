@@ -1,16 +1,10 @@
 package it.unibo.pcd.assignment.model;
 
-
 import it.unibo.pcd.assignment.InfiniteForceException;
 
-/*
- * This class represents a body
- *
- */
 public class Body {
     private static final double REPULSIVE_CONST = 0.01;
     private static final double FRICTION_CONST = 1;
-
     private final Position2d position;
     private final Velocity2d velocity;
     private final double mass;
@@ -25,6 +19,7 @@ public class Body {
 
     /**
      * Check if two bodies are the same.
+     *
      * @param body the target body.
      * @return true if they're the same body, false otherwise.
      */
@@ -34,6 +29,7 @@ public class Body {
 
     /**
      * Update the position, according to current velocity
+     *
      * @param deltaTime time elapsed
      */
     public void updatePos(double deltaTime) {
@@ -44,7 +40,7 @@ public class Body {
      * Update the velocity, given the instant acceleration
      *
      * @param acceleration instant acceleration
-     * @param deltaTime  time elapsed
+     * @param deltaTime    time elapsed
      */
     public void updateVelocity(Velocity2d acceleration, double deltaTime) {
         velocity.sum(new Velocity2d(acceleration).scalarMul(deltaTime));
@@ -52,6 +48,7 @@ public class Body {
 
     /**
      * Change the velocity
+     *
      * @param xVelocity velocity on x-axis.
      * @param yVelocity velocity on y-axis.
      */
@@ -61,6 +58,7 @@ public class Body {
 
     /**
      * Computes the distance from the specified body
+     *
      * @param body the target body.
      * @return the distance between bodies.
      */
@@ -72,6 +70,7 @@ public class Body {
 
     /**
      * Compute the repulsive force exerted by another body.
+     *
      * @param body the body.
      * @return the velocity of the repulsive force.
      * @throws InfiniteForceException if the force is infinite (Bodies are overlapping).
@@ -79,9 +78,7 @@ public class Body {
     public Velocity2d computeRepulsiveForceBy(Body body) throws InfiniteForceException {
         double dist = getDistanceFrom(body);
         try {
-            return new Velocity2d(body.getPosition(), position)
-                    .normalize()
-                    .scalarMul(body.getMass() * REPULSIVE_CONST / (dist * dist));
+            return new Velocity2d(body.getPosition(), position).normalize().scalarMul(body.getMass() * REPULSIVE_CONST / (dist * dist));
         } catch (Exception ex) {
             throw new InfiniteForceException();
         }
@@ -89,6 +86,7 @@ public class Body {
 
     /**
      * Compute current friction force, given the current velocity.
+     *
      * @return The new velocity.
      */
     public Velocity2d getCurrentFrictionForce() {
@@ -98,6 +96,7 @@ public class Body {
     /**
      * Check if there are collisions with the boundary and update the
      * position and velocity accordingly.
+     *
      * @param bounds the field's bound.
      */
     public void checkAndSolveBoundaryCollision(final Boundary bounds) {

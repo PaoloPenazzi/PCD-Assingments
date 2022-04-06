@@ -25,5 +25,4 @@ public class Monitor {
     public boolean isPause() {
         return this.pause;
     }
-
 }

@@ -1,7 +1,6 @@
 package it.unibo.pcd.assignment.model;
 
 public class BarrierImpl implements Barrier {
-
     private final int nWorkers;
     private int count;
 
