@@ -5,7 +5,7 @@
     <stringAttribute key="distributedNetworkInterface" value="172.20.48.1"/>
     <intAttribute key="distributedNodesCount" value="1"/>
     <stringAttribute key="distributedTLC" value="off"/>
-    <intAttribute key="fpIndex" value="79"/>
+    <intAttribute key="fpIndex" value="88"/>
     <intAttribute key="maxHeapSize" value="25"/>
     <stringAttribute key="modelBehaviorInit" value=""/>
     <stringAttribute key="modelBehaviorNext" value=""/>
@@ -15,7 +15,7 @@
     <stringAttribute key="modelComments" value=""/>
     <booleanAttribute key="modelCorrectnessCheckDeadlock" value="true"/>
     <listAttribute key="modelCorrectnessInvariants">
-        <listEntry value="1WorkerIterationGreaterThanOrEqualIterationInvariant"/>
+        <listEntry value="1WorkerIterationGEIterationInvariant"/>
     </listAttribute>
     <listAttribute key="modelCorrectnessProperties">
         <listEntry value="1Termination"/>

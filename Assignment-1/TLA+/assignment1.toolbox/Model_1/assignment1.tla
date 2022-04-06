@@ -16,7 +16,7 @@ variable
     latch = NUMBER_OF_WORKERS;
 
 define
-    WorkerIterationGreaterThanOrEqualIterationInvariant == (\A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
+    WorkerIterationGEIterationInvariant == (\A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
     PositionAfterVelocityComputation == []( (\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1) => (\A n \in 1..NUMBER_OF_WORKERS: velocities[n] = 1) )
     PositionComputation ==  <>(\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1)
     SimTermination == <>(iteration = STEPS)
@@ -105,12 +105,12 @@ begin
 end process;
 
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "bdbd0d14" /\ chksum(tla) = "d372d707")
+\* BEGIN TRANSLATION (chksum(pcal) = "a74f2bb6" /\ chksum(tla) = "21f55aa0")
 VARIABLES iteration, workerIteration, velocities, positions, creation, 
           barrier, latch, pc
 
 (* define statement *)
-WorkerIterationGreaterThanOrEqualIterationInvariant == (\A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
+WorkerIterationGEIterationInvariant == (\A n \in 1..NUMBER_OF_WORKERS: workerIteration[n] >= iteration)
 PositionAfterVelocityComputation == []( (\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1) => (\A n \in 1..NUMBER_OF_WORKERS: velocities[n] = 1) )
 PositionComputation ==  <>(\A n \in 1..NUMBER_OF_WORKERS: positions[n] = 1)
 SimTermination == <>(iteration = STEPS)
@@ -250,5 +250,5 @@ Termination == <>(\A self \in ProcSet: pc[self] = "Done")
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Apr 06 15:38:45 CEST 2022 by angel
+\* Last modified Wed Apr 06 16:11:30 CEST 2022 by angel
 \* Created Wed Apr 06 10:24:20 CEST 2022 by angel
