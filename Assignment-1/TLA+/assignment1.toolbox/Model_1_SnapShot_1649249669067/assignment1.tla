@@ -5,7 +5,7 @@ CONSTANTS NUMBER_OF_WORKERS, STEPS
 (*--algorithm assignment1
 
 variable iteration = 0,
-positions = [position \in 1..NUMBER_OF_WORKERS |-> 0 ], \* 1 0, 2 0
+positions =  <<0, 0>>, \* [position \in 1..NUMBER_OF_WORKERS |-> 0 ],  1 0, 2 0
 creation = 0,
 barrierNumber = 0,
 latchNumber = NUMBER_OF_WORKERS;
@@ -15,7 +15,7 @@ define
 \* es: pc[master] /= evaluateWhile, ovvero vogliamo che il program counter del processo master non esegua mai l'istruzione
 \* con la label evaluateWhile
 \* prima o poi sempre incontriamo .. <>[]
-\* PositionComputation == <>[](\A position \in positions : position = 1)
+PositionComputation ==  []<>(positions[1] = 1 /\ positions[2] = 1)\* <>[](\A n \in DOMAIN NUMBER_OF_WORKERS : positions[n] = 1)
 SimTermination == <>[](iteration = STEPS)
 end define;
 
@@ -99,7 +99,6 @@ evaluateWhileWorker:
         \* computo posizione
         computePositionCollision:
             positions[self] := 1;
-            print positions[self];
             
             
         updateMyIteration:
@@ -115,10 +114,11 @@ evaluateWhileWorker:
 end process;
 
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "a6049459" /\ chksum(tla) = "81362b55")
+\* BEGIN TRANSLATION (chksum(pcal) = "43de3593" /\ chksum(tla) = "dc54d65e")
 VARIABLES iteration, positions, creation, barrierNumber, latchNumber, pc
 
 (* define statement *)
+PositionComputation ==  []<>(positions[1] = 1 /\ positions[2] = 1)
 SimTermination == <>[](iteration = STEPS)
 
 VARIABLE myIteration
@@ -130,7 +130,7 @@ ProcSet == {0} \cup (1..NUMBER_OF_WORKERS)
 
 Init == (* Global variables *)
         /\ iteration = 0
-        /\ positions = [position \in 1..NUMBER_OF_WORKERS |-> 0 ]
+        /\ positions = <<0, 0>>
         /\ creation = 0
         /\ barrierNumber = 0
         /\ latchNumber = NUMBER_OF_WORKERS
@@ -206,7 +206,6 @@ waitBarrier(self) == /\ pc[self] = "waitBarrier"
 
 computePositionCollision(self) == /\ pc[self] = "computePositionCollision"
                                   /\ positions' = [positions EXCEPT ![self] = 1]
-                                  /\ PrintT(positions'[self])
                                   /\ pc' = [pc EXCEPT ![self] = "updateMyIteration"]
                                   /\ UNCHANGED << iteration, creation, 
                                                   barrierNumber, latchNumber, 
@@ -256,5 +255,5 @@ Termination == <>(\A self \in ProcSet: pc[self] = "Done")
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Apr 06 12:29:10 CEST 2022 by angel
+\* Last modified Wed Apr 06 14:49:04 CEST 2022 by angel
 \* Created Wed Apr 06 10:24:20 CEST 2022 by angel

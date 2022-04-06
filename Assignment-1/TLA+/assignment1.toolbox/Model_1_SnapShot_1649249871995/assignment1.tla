@@ -5,7 +5,7 @@ CONSTANTS NUMBER_OF_WORKERS, STEPS
 (*--algorithm assignment1
 
 variable iteration = 0,
-positions = [position \in 1..NUMBER_OF_WORKERS |-> 0 ], \* 1 0, 2 0
+positions =  <<0, 0>>, \* [position \in 1..NUMBER_OF_WORKERS |-> 0 ],  1 0, 2 0
 creation = 0,
 barrierNumber = 0,
 latchNumber = NUMBER_OF_WORKERS;
@@ -15,8 +15,8 @@ define
 \* es: pc[master] /= evaluateWhile, ovvero vogliamo che il program counter del processo master non esegua mai l'istruzione
 \* con la label evaluateWhile
 \* prima o poi sempre incontriamo .. <>[]
-PositionComputation == <>[](\A n \in NUMBER_OF_WORKERS : positions[n] = 1)
-SimTermination == <>[](iteration = STEPS)
+PositionComputation ==  <>(positions[1] = 1 /\ positions[2] = 1)\* <>[](\A n \in DOMAIN NUMBER_OF_WORKERS : positions[n] = 1)
+SimTermination == <>(iteration = STEPS)
 end define;
 
 macro startLatch(latch) begin
@@ -114,12 +114,12 @@ evaluateWhileWorker:
 end process;
 
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "c445ed14" /\ chksum(tla) = "48002bca")
+\* BEGIN TRANSLATION (chksum(pcal) = "a8d7dacb" /\ chksum(tla) = "6668833b")
 VARIABLES iteration, positions, creation, barrierNumber, latchNumber, pc
 
 (* define statement *)
-PositionComputation == <>[](\A n \in NUMBER_OF_WORKERS : positions[n] = 1)
-SimTermination == <>[](iteration = STEPS)
+PositionComputation ==  <>(positions[1] = 1 /\ positions[2] = 1)
+SimTermination == <>(iteration = STEPS)
 
 VARIABLE myIteration
 
@@ -130,7 +130,7 @@ ProcSet == {0} \cup (1..NUMBER_OF_WORKERS)
 
 Init == (* Global variables *)
         /\ iteration = 0
-        /\ positions = [position \in 1..NUMBER_OF_WORKERS |-> 0 ]
+        /\ positions = <<0, 0>>
         /\ creation = 0
         /\ barrierNumber = 0
         /\ latchNumber = NUMBER_OF_WORKERS
@@ -255,5 +255,5 @@ Termination == <>(\A self \in ProcSet: pc[self] = "Done")
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Apr 06 12:33:22 CEST 2022 by angel
+\* Last modified Wed Apr 06 14:57:44 CEST 2022 by angel
 \* Created Wed Apr 06 10:24:20 CEST 2022 by angel

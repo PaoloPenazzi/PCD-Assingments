@@ -15,8 +15,8 @@ define
 \* es: pc[master] /= evaluateWhile, ovvero vogliamo che il program counter del processo master non esegua mai l'istruzione
 \* con la label evaluateWhile
 \* prima o poi sempre incontriamo .. <>[]
-PositionComputation ==  []<>(positions[1] = 1 /\ positions[2] = 1)\* <>[](\A n \in DOMAIN NUMBER_OF_WORKERS : positions[n] = 1)
-SimTermination == <>[](iteration = STEPS)
+PositionComputation ==  <>(positions[1] = 1 /\ positions[2] = 1)\* <>[](\A n \in DOMAIN NUMBER_OF_WORKERS : positions[n] = 1)
+SimTermination == <>(iteration = STEPS)
 end define;
 
 macro startLatch(latch) begin
@@ -114,12 +114,12 @@ evaluateWhileWorker:
 end process;
 
 end algorithm;*)
-\* BEGIN TRANSLATION (chksum(pcal) = "43de3593" /\ chksum(tla) = "dc54d65e")
+\* BEGIN TRANSLATION (chksum(pcal) = "a8d7dacb" /\ chksum(tla) = "6668833b")
 VARIABLES iteration, positions, creation, barrierNumber, latchNumber, pc
 
 (* define statement *)
-PositionComputation ==  []<>(positions[1] = 1 /\ positions[2] = 1)
-SimTermination == <>[](iteration = STEPS)
+PositionComputation ==  <>(positions[1] = 1 /\ positions[2] = 1)
+SimTermination == <>(iteration = STEPS)
 
 VARIABLE myIteration
 
@@ -255,5 +255,5 @@ Termination == <>(\A self \in ProcSet: pc[self] = "Done")
 
 =============================================================================
 \* Modification History
-\* Last modified Wed Apr 06 14:49:04 CEST 2022 by angel
+\* Last modified Wed Apr 06 14:57:44 CEST 2022 by angel
 \* Created Wed Apr 06 10:24:20 CEST 2022 by angel

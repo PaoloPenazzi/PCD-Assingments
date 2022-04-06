@@ -2,15 +2,15 @@
 EXTENDS assignment1, TLC
 
 \* CONSTANT definitions @modelParameterConstants:0STEPS
-const_164924096029767000 == 
+const_16492496656622000 == 
 2
 ----
 
 \* CONSTANT definitions @modelParameterConstants:1NUMBER_OF_WORKERS
-const_164924096029768000 == 
+const_16492496656633000 == 
 2
 ----
 
 =============================================================================
 \* Modification History
-\* Created Wed Apr 06 12:29:20 CEST 2022 by angel
+\* Created Wed Apr 06 14:54:25 CEST 2022 by angel
