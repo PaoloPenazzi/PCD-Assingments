@@ -26,6 +26,7 @@ public class SimulationFrame extends JFrame {
             public void windowClosing(WindowEvent ev) {
                 System.exit(-1);
             }
+
             public void windowClosed(WindowEvent ev) {
                 System.exit(-1);
             }

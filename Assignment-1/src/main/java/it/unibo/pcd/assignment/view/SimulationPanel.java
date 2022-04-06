@@ -6,7 +6,6 @@ import it.unibo.pcd.assignment.model.Position2d;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.util.List;
 
 public class SimulationPanel extends JPanel {
@@ -17,7 +16,6 @@ public class SimulationPanel extends JPanel {
     private double scale = 1;
     private final long dx;
     private final long dy;
-
 
     public SimulationPanel(int width, int height) {
         setSize(width, height);
@@ -45,8 +43,6 @@ public class SimulationPanel extends JPanel {
                 g2.drawOval(getXCoordinate(p.getX()), getYCoordinate(p.getY()), radius, radius);
             });
             String time = String.format("%.2f", virtualTime);
-            // g2.drawString("Bodies: " + bodies.size() + " - vt: " + time + " - nIter: " +
-            // iteration + " (+ for zoom in, - for zoom out)", 2, (int)(this.getHeight() * 0.1) + 20);
             g2.drawString("Bodies: " + bodies.size() + " - virtualTime: " + time + " - iteration: " +
                     iteration + " (+ for zoom in, - for zoom out)", 2, 45);
         }
