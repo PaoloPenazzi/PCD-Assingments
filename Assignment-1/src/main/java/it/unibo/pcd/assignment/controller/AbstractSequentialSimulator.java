@@ -1,46 +1,18 @@
 package it.unibo.pcd.assignment.controller;
 
 import it.unibo.pcd.assignment.model.Body;
-import it.unibo.pcd.assignment.model.Boundary;
-import it.unibo.pcd.assignment.model.Position2d;
 import it.unibo.pcd.assignment.model.Velocity2d;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 public abstract class AbstractSequentialSimulator extends AbstractSimulator {
-    /*private int tempoCalcoloVelocita;
-    private int tempoAggiornamentoPosizioni;
-    private int tempoControlloCollisioni;*/
 
     protected AbstractSequentialSimulator(int numBodies,int numSteps, int sideLenght) {
         super(numBodies, numSteps, sideLenght);
     }
 
-    /*public int getTempoCalcoloVelocita() {
-        return tempoCalcoloVelocita;
-    }
-
-    public int getTempoAggiornamentoPosizioni() {
-        return tempoAggiornamentoPosizioni;
-    }
-
-    public int getTempoControlloCollisioni() {
-        return tempoControlloCollisioni;
-    }*/
-
     protected void computeBodies() {
-        //long startTime = System.currentTimeMillis();
         this.computeBodiesVelocity();
-        //long finishTimeVelocity = System.currentTimeMillis();
         this.computeBodiesPosition();
-        //long finishTimePosition = System.currentTimeMillis();
         this.computeBodiesCollision();
-        //long finishTime = System.currentTimeMillis();
-        //this.tempoCalcoloVelocita += (finishTimeVelocity - startTime);
-        //this.tempoAggiornamentoPosizioni += (finishTimePosition - finishTimeVelocity);
-        //this.tempoControlloCollisioni += (finishTime - finishTimePosition);
     }
 
     private void computeBodiesVelocity() {
