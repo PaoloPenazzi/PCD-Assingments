@@ -2,12 +2,11 @@ package it.unibo.pcd.assignment;
 
 import it.unibo.pcd.assignment.controller.*;
 
-
 public class RunSimulation {
 
     public static void main(String[] args) {
         int nWorkers = Runtime.getRuntime().availableProcessors() + 1;
-        Thread simulator = new ConcurrentSimulatorImpl(2, 2, 8, 2);
+        Thread simulator = new ConcurrentSimulatorImplWithGUI(1000, 60000, 8, 4);
         long startTime = System.currentTimeMillis();
         simulator.start();
         try {
