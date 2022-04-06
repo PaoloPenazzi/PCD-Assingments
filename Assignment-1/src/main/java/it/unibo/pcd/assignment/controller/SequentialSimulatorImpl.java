@@ -11,7 +11,7 @@ public class SequentialSimulatorImpl extends AbstractSequentialSimulator {
         double virtualTime = 0;
         long iteration = 0;
         while (iteration < super.getNumSteps()) {
-            if(iteration % 500 == 0) {
+            if (iteration % 500 == 0) {
                 System.out.println("Iterazione: " + iteration);
             }
             super.computeBodies();

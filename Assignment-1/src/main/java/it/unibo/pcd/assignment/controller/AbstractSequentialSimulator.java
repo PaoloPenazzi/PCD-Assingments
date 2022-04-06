@@ -5,7 +5,7 @@ import it.unibo.pcd.assignment.model.Velocity2d;
 
 public abstract class AbstractSequentialSimulator extends AbstractSimulator {
 
-    protected AbstractSequentialSimulator(int numBodies,int numSteps, int sideLenght) {
+    protected AbstractSequentialSimulator(int numBodies, int numSteps, int sideLenght) {
         super(numBodies, numSteps, sideLenght);
     }
 

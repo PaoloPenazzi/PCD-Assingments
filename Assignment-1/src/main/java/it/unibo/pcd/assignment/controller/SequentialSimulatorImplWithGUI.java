@@ -21,5 +21,4 @@ public class SequentialSimulatorImplWithGUI extends AbstractSequentialSimulator 
             this.viewer.display(getBodies(), virtualTime, iteration, getBounds());
         }
     }
-
 }

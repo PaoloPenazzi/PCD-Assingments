@@ -44,7 +44,11 @@ public abstract class AbstractConcurrentSimulator extends AbstractSimulator {
         return this.workers;
     }
 
-    public Monitor getMonitor() {return this.monitor;}
+    public Monitor getMonitor() {
+        return this.monitor;
+    }
 
-    public Barrier getBarrier() {return this.barrier;}
+    public Barrier getBarrier() {
+        return this.barrier;
+    }
 }
