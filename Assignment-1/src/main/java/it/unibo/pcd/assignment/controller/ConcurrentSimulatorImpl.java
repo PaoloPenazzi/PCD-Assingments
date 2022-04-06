@@ -6,7 +6,6 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
 
     public ConcurrentSimulatorImpl(int numBodies, int numSteps, int sideLenght, int nThreads) {
         super(numBodies, numSteps, sideLenght, nThreads);
-        System.out.println("Workers number: " + super.getWorkers().length);
     }
 
     @Override
@@ -14,7 +13,7 @@ public class ConcurrentSimulatorImpl extends AbstractConcurrentSimulator {
         long iteration = 0;
         while (iteration < super.getNumSteps()) {
             super.createLatch();
-            this.createWorkers(super.getWorkers().length);
+            super.createWorkers();
             for (Worker worker : super.getWorkers()) {
                 worker.start();
             }

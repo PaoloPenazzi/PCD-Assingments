@@ -4,24 +4,25 @@ import it.unibo.pcd.assignment.model.*;
 
 import java.util.concurrent.CountDownLatch;
 
-public abstract class AbstractConcurrentSimulator extends AbstractSimulator{
+public abstract class AbstractConcurrentSimulator extends AbstractSimulator {
     private final Worker[] workers;
-    private final Barrier barrier;
-    private final Monitor monitor;
+    private Barrier barrier;
     private CountDownLatch latch;
+    private final int nThreads;
+    private final Monitor monitor;
 
-    protected AbstractConcurrentSimulator(int numBodies,int numSteps, int sideLenght, int nThreads) {
+    protected AbstractConcurrentSimulator(int numBodies, int numSteps, int sideLenght, int nThreads) {
         super(numBodies, numSteps, sideLenght);
-        this.barrier = new BarrierImpl(nThreads);
-        this.workers = new Worker[nThreads];
         this.monitor = new Monitor();
-        this.createWorkers(nThreads);
+        this.workers = new Worker[nThreads];
+        this.nThreads = nThreads;
     }
 
-    protected void createWorkers(int nThread) {
-        int bodiesPerWorker = super.getBodies().size() / nThread;
-        for(int i = 0; i < nThread; i++) {
-            if (i == nThread - 1) {
+    protected void createWorkers() {
+        this.barrier = new BarrierImpl(nThreads);
+        int bodiesPerWorker = super.getBodies().size() / this.nThreads;
+        for (int i = 0; i < this.nThreads; i++) {
+            if (i == this.nThreads - 1) {
                 this.workers[i] = new Worker(i * bodiesPerWorker, super.getBodies().size(), super.getBodies(),
                         this.barrier, super.getBounds(), this.latch);
             } else {
@@ -32,7 +33,7 @@ public abstract class AbstractConcurrentSimulator extends AbstractSimulator{
     }
 
     public void createLatch() {
-        this.latch = new CountDownLatch(this.workers.length);
+        this.latch = new CountDownLatch(this.nThreads);
     }
 
     public CountDownLatch getLatch() {
@@ -43,11 +44,7 @@ public abstract class AbstractConcurrentSimulator extends AbstractSimulator{
         return this.workers;
     }
 
-    public Barrier getBarrier() {
-        return this.barrier;
-    }
+    public Monitor getMonitor() {return this.monitor;}
 
-    public Monitor getMonitor() {
-        return this.monitor;
-    }
+    public Barrier getBarrier() {return this.barrier;}
 }
