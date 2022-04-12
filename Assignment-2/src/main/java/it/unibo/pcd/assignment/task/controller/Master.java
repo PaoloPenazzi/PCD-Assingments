@@ -41,7 +41,7 @@ public class Master extends AbstractSimulator {
         this.executor.shutdown();
     }
 
-    private void waitForFuture() {
+    protected void waitForFuture() {
         for (Future<Void> future : futureList) {
             try {
                 future.get();
@@ -52,7 +52,7 @@ public class Master extends AbstractSimulator {
         this.futureList = new ArrayList<>();
     }
 
-    private void createTaskPosition() {
+    protected void createTaskPosition() {
         this.taskPositionArray = new TaskPosition[this.taskNumber];
         int bodiesPerTask = super.getBodies().size() / this.taskNumber;
         for (int i = 0; i < this.taskNumber; i++) {
@@ -66,7 +66,7 @@ public class Master extends AbstractSimulator {
         }
     }
 
-    private void createTaskVelocity() {
+    protected void createTaskVelocity() {
         this.taskVelocityArray = new TaskVelocity[this.taskNumber];
         int bodiesPerTask = super.getBodies().size() / this.taskNumber;
         for (int i = 0; i < this.taskNumber; i++) {
@@ -78,5 +78,25 @@ public class Master extends AbstractSimulator {
                         super.getBodies());
             }
         }
+    }
+
+    public ExecutorService getExecutor() {
+        return executor;
+    }
+
+    public int getTaskNumber() {
+        return taskNumber;
+    }
+
+    public TaskVelocity[] getTaskVelocityArray() {
+        return taskVelocityArray;
+    }
+
+    public TaskPosition[] getTaskPositionArray() {
+        return taskPositionArray;
+    }
+
+    public List<Future<Void>> getFutureList() {
+        return futureList;
     }
 }
