@@ -19,7 +19,7 @@ public class TaskPosition implements Callable<Void> {
     }
 
     @Override
-    public Void call() throws Exception {
+    public Void call() {
         this.updatePositionAndCheckCollision();
         return null;
     }
