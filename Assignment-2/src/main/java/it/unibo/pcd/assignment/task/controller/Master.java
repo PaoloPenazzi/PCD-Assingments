@@ -57,10 +57,10 @@ public class Master extends AbstractSimulator {
         for (int i = 0; i < this.taskNumber; i++) {
             if (i == this.taskNumber - 1) {
                 taskPositionArray[i] = new TaskPosition(i * bodiesPerTask, super.getBodies().size(),
-                        super.getBodies());
+                        super.getBodies(), super.getBounds());
             } else {
                 taskPositionArray[i] = new TaskPosition(i * bodiesPerTask, ((i + 1) * bodiesPerTask),
-                        super.getBodies());
+                        super.getBodies(), super.getBounds());
             }
         }
     }
