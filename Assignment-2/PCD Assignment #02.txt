@@ -1,0 +1,100 @@
+﻿PCD Assignment #02 - v 0.9-20220411
+                                
+L’assignment è articolato in tre punti, relativi a tre stili di programmazione asincrona diversi (tasks, eventi, programmazione reattiva).
+
+
+1. [Task frameworks] (assegnato il 20210408)
+
+
+Realizzare una soluzione a task del problema descritto nell'assignment #01, mantenendo la suddivisione nei due punti:
+
+
+1. senza GUI, per fare un confronto a livello di performance (facendo i medesimi test svolti nell'assignment #01 e facendo un confronto anche con quei risultati).
+2. con GUI
+
+
+Adottare un approccio basato su Java Executors, adottando, da un lato, principi e metodi di progettazione utili per favorire modularità, incapsulamento e proprietà relative, dall’altro una soluzione che massimizzi le performance e reattività. 
+
+
+2. [Event-driven Asynchronous Programming ] [TBC]
+
+
+JavaParser (http://javaparser.org/) è una libreria open-source che fornisce funzionalità per fare il parsing e analisi di codice sorgente Java, costruendo l'AST e permettendo di navigare l'albero  con il pattern Visitor. La libreria lavora a livello di singolo file. Sul sito del corso, in "Resources" è presente il testo "javaparservisited.pdf" che rappresenta la documentazione di riferimento.
+
+
+Punto (A)
+
+
+Si vuole creare una libreria con API asincrona (basata su event-loop) che permetta di fornire un insieme di funzionalità minimale di analisi di un progetto Java, potendo sfruttare nella sua implementazione JavaParser. 
+
+
+Le funzionalità che la libreria dovrà fornire sono (sketch):
+
+
+* getInterfaceReport(srcInterfacePath)
+   * metodo asincrono per ottenere il report di una specifica interfaccia
+   * il report di una interfaccia si presuppone contenga nome completo interfaccia, full path del file sorgente, info su essenziali su metodi (nome)
+
+
+* getClassReport(srcClassPath)
+   * metodo asincrono per ottenere il report di una specifica classe
+   * il report di una classe si presuppone contenga nome completo classe full path del file sorgente, info essenziali su metodi (nome, se pubblico/privato/protected, posizione nel sorgente: inizio linea, fine linea) e campi (nome, tipo)
+
+
+* getPackageReport(srcPackageFolderPath)
+   * metodo asincrono per costruire il report di uno specifico package
+   * il report di un package si presuppone contenga nome completo del package e informazioni (report) relativamente alle classi e interfacce che appartengono al package
+
+
+* getProjectReport(srcProjectFolderPath)
+   * metodo asincrono per costruire il report di un progetto intero
+   * il report di un progetto si presuppone contenga informazioni (report) circa i package che appartengono al package e l'indicazione di quale sia la main class
+
+
+* analyzeProject(srcProjectFolderPath, callback);
+   * metodo asincrono per poter effettuare un'analisi incrementale, potendo eseguire una certa computazione (callback) specificata come parametro, per ogni elemento del progetto man mano incontrato
+   * gli elementi rilevanti sono: campi, metodi, classi, interfacce, package 
+
+
+Nel repository del corso, nel package pcd.ass02 sono forniti alcuni esempi/sketch utili per comprendere il punto.
+
+
+Punto (B)
+
+
+Data la libreria, costruire una semplice applicazione con GUI che consenta di:
+
+
+* selezionare il project folder 
+* far partire analisi e poterla eventualmente interrompere, in modo responsivo
+* visualizzare man mano gli elementi trovati, in forma opportuna
+
+
+Adottare un approccio basato su framework di programmazione ad eventi ad event-loop. Esempio di riferimento visto nel corso: Vert.x, in Java o nel linguaggio che si preferisce.
+E' possibile usare framework alternativi (es. Node.js in Javascript/TypeScript).  
+
+
+3. [Reactive Programming]
+
+
+Realizzare una soluzione basato su programmazione reattiva al problema descritto nell'assignment #02.
+
+
+Adottare un approccio basato su estensioni Rx (RxJava se si usa Java come linguaggio di riferimento, non obbligatorio). 
+
+
+________________
+
+
+
+
+LA CONSEGNA
+
+
+La consegna consiste in una cartella “Assignment-02” compressa (formato zip)  do sottoporre sul sito del corso, contenente:
+* directory src con i sorgenti del programma
+* directory doc che contenga una breve relazione in PDF (report.pdf). La relazione deve includere:
+   * Analisi del problema, focalizzando in particolare gli aspetti relativi alla concorrenza.
+   * Descrizione della strategia risolutiva e dell’architettura proposta, sempre focalizzando l’attenzione su aspetti relativi alla concorrenza.
+   * Descrizione del comportamento del sistema (ad un certo livello di astrazione) utilizzando Reti di Petri. 
+   * [Opzionale] Identificazione di proprietà di correttezza e verifica (JPF e/o TLA+).

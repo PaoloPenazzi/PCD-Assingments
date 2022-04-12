@@ -1,0 +1,7 @@
+target = it.unibo.pcd.assignment.RunSimulation //TODO
+
+classpath = build/classes/java/main/
+
+listener = gov.nasa.jpf.listener.PreciseRaceDetector
+
+report.console.property_violation = error,trace,snapshot
