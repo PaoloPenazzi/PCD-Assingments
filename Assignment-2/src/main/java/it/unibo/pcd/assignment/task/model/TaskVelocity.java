@@ -19,6 +19,7 @@ public class TaskVelocity implements Callable<Void> {
     @Override
     public Void call() throws Exception {
         this.computeBodiesVelocity();
+        System.out.println("Velocity update done.");
         return null;
     }
 

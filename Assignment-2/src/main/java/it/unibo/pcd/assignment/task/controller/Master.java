@@ -13,7 +13,7 @@ public class Master extends AbstractSimulator {
     private final int taskNumber;
     private TaskVelocity[] taskVelocityArray;
     private TaskPosition[] taskPositionArray;
-    private final List<Future<Void>> futureList;
+    private List<Future<Void>> futureList;
 
     public Master(int numBodies, int numSteps, int sideLenght, int taskNumber) {
         super(numBodies, numSteps, sideLenght);
@@ -31,7 +31,6 @@ public class Master extends AbstractSimulator {
                 futureList.add(this.executor.submit(taskVelocity));
             }
             this.waitForFuture();
-            futureList.clear();
             this.createTaskPosition();
             for (TaskPosition taskPosition : taskPositionArray) {
                 futureList.add(this.executor.submit(taskPosition));
@@ -39,16 +38,19 @@ public class Master extends AbstractSimulator {
             this.waitForFuture();
             iteration++;
         }
+        this.executor.shutdown();
     }
 
     private void waitForFuture() {
         for (Future<Void> future : futureList) {
             try {
                 future.get();
+                System.out.println("MASTER: waiting for future..");
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
         }
+        this.futureList = new ArrayList<>();
     }
 
     private void createTaskPosition() {
