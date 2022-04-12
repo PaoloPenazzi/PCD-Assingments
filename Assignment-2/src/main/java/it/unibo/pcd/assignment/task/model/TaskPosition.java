@@ -21,7 +21,6 @@ public class TaskPosition implements Callable<Void> {
     @Override
     public Void call() throws Exception {
         this.updatePositionAndCheckCollision();
-        System.out.println("Position update done.");
         return null;
     }
 

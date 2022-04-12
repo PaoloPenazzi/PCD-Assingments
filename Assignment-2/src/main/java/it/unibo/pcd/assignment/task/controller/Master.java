@@ -45,7 +45,6 @@ public class Master extends AbstractSimulator {
         for (Future<Void> future : futureList) {
             try {
                 future.get();
-                System.out.println("MASTER: waiting for future..");
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
