@@ -1,0 +1,20 @@
+package it.unibo.pcd.assignment.task;
+
+import it.unibo.pcd.assignment.task.controller.*;
+
+public class RunSimulation {
+
+    public static void main(String[] args) {
+        int nWorkers = Runtime.getRuntime().availableProcessors() + 1;
+        Thread simulator = new ConcurrentSimulatorImplWithGUI(1000, 10000, 8, 4);
+        long startTime = System.currentTimeMillis();
+        simulator.start();
+        try {
+            simulator.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        long finishTime = System.currentTimeMillis();
+        System.out.println(finishTime - startTime + " ms");
+    }
+}

@@ -1,4 +1,4 @@
-target = it.unibo.pcd.assignment.RunSimulation //TODO
+target = it.unibo.pcd.assignment.task.RunSimulation
 
 classpath = build/classes/java/main/
 
