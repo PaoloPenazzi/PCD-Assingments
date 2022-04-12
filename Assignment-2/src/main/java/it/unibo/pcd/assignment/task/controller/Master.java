@@ -15,11 +15,11 @@ public class Master extends AbstractSimulator {
     private TaskPosition[] taskPositionArray;
     private final List<Future<Void>> futureList;
 
-    public Master(int numBodies, int numSteps, int sideLenght, int threadNumber, int taskNumber) {
+    public Master(int numBodies, int numSteps, int sideLenght, int taskNumber) {
         super(numBodies, numSteps, sideLenght);
         this.futureList = new ArrayList<>();
         this.taskNumber = taskNumber;
-        this.executor = Executors.newFixedThreadPool(threadNumber);
+        this.executor = Executors.newCachedThreadPool();
     }
 
     @Override
