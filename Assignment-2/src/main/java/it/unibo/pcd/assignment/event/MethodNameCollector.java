@@ -13,7 +13,6 @@ around during the traversal of the tree. This gives us the option of having the 
 action, the visitor’s responsibility will be to collect the items i.e. method names. Then what the
 invoking class does with the method names collected is then up to them.
  */
-
 class MethodNameCollector extends VoidVisitorAdapter<List<String>> {
     public void visit(MethodDeclaration md, List<String> collector) {
         super.visit(md, collector);
