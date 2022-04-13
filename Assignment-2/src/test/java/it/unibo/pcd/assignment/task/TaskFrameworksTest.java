@@ -5,7 +5,11 @@ import static org.junit.Assert.*;
 
 public class TaskFrameworksTest {
 
-    @Test public void appHasAGreeting() {
+    @Test public void testOne() {
+        //TODO
+    }
+
+    @Test public void testTwo() {
         //TODO
     }
 
