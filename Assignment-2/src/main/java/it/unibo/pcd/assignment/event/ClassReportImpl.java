@@ -1,5 +1,6 @@
 package it.unibo.pcd.assignment.event;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ClassReportImpl implements ClassReport {
@@ -16,12 +17,12 @@ public class ClassReportImpl implements ClassReport {
         this.srcFullFileName = srcFullFileName;
     }
 
-    public void setMethodsInfo(List<MethodInfo> methodsInfo) {
-        this.methodsInfo = methodsInfo;
+    public void setMethodsInfo(List<? extends MethodInfo> methodsInfo) {
+        this.methodsInfo = new ArrayList<>(methodsInfo);
     }
 
-    public void setFieldsInfo(List<FieldInfo> fieldsInfo) {
-        this.fieldsInfo = fieldsInfo;
+    public void setFieldsInfo(List<? extends FieldInfo> fieldsInfo) {
+        this.fieldsInfo = new ArrayList<>(fieldsInfo);
     }
 
     @Override
@@ -42,5 +43,15 @@ public class ClassReportImpl implements ClassReport {
     @Override
     public List<FieldInfo> getFieldsInfo() {
         return this.fieldsInfo;
+    }
+
+    @Override
+    public String toString() {
+        return "ClassReportImpl{" +
+                "fullClassName='" + fullClassName + '\'' +
+                ", srcFullFileName='" + srcFullFileName + '\'' +
+                ", methodsInfo=" + methodsInfo +
+                ", fieldsInfo=" + fieldsInfo +
+                '}';
     }
 }

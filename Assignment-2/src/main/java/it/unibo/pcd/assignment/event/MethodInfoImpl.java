@@ -53,4 +53,15 @@ public class MethodInfoImpl implements MethodInfo {
     public ClassReport getParent() {
         return this.parentClass;
     }
+
+    @Override
+    public String toString() {
+        return "MethodInfoImpl{" +
+                "name='" + name + '\'' +
+                ", modifiers='" + modifiers + '\'' +
+                ", beginLine=" + beginLine +
+                ", endBeginLine=" + endBeginLine +
+                ", parentClass=" + parentClass.getFullClassName() +
+                '}';
+    }
 }

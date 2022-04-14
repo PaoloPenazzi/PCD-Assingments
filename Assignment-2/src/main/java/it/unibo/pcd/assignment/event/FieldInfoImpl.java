@@ -31,4 +31,13 @@ public class FieldInfoImpl implements FieldInfo {
     public void setParentClass(ClassReport parentClass) {
         this.parentClass = parentClass;
     }
+
+    @Override
+    public String toString() {
+        return "FieldInfoImpl{" +
+                "name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", parentClass=" + parentClass.getFullClassName() +
+                '}';
+    }
 }

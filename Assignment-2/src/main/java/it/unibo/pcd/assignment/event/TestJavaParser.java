@@ -15,7 +15,7 @@ public class TestJavaParser {
 	private static final String FILE_PATH = "src/main/java/it/unibo/pcd/assignment/event/TestClassReversePolishNotation.java";
 
 	public static void main(String[] args) throws Exception {
-		CompilationUnit cu = StaticJavaParser.parse(new File(FILE_PATH));
+		/*CompilationUnit cu = StaticJavaParser.parse(new File(FILE_PATH));
 
 		VoidVisitor<Void> methodNameVisitor = new MethodNamePrinter();
 		methodNameVisitor.visit(cu, null);
@@ -46,6 +46,11 @@ public class TestJavaParser {
 		var fullc = new FullCollector();
 		fullc.visit(cu, null);
 		*/
+
+
+		// ProjectAnalyzerImpl projectAnalyzer = new ProjectAnalyzerImpl();
+		//projectAnalyzer.getClassReport(null);
+
 	}
 
 }
