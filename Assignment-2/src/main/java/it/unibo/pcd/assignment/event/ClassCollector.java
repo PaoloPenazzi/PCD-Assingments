@@ -25,7 +25,7 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         List<FieldInfoImpl> fieldInfoList = new ArrayList<>();
         dec.getFields().forEach(f -> {
             FieldInfoImpl fieldInfo = new FieldInfoImpl();
-            fieldInfo.setName(f.getVariable(0).getName().asString()); // TODO Perchè ho una lista di nodi???
+            fieldInfo.setName(f.getVariable(0).getName().asString());
             fieldInfo.setType(f.getElementType().asString());
             fieldInfoList.add(fieldInfo);
         });
