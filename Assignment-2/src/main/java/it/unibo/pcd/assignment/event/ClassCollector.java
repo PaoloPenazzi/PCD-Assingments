@@ -8,11 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
-
     @Override
     public void visit(ClassOrInterfaceDeclaration dec, ClassReportImpl collector) {
         super.visit(dec, collector);
-        collector.setFullClassName(dec.getNameAsString());
+        collector.setFullClassName(dec.getFullyQualifiedName().get());
         List<MethodInfoImpl> methodInfoList = new ArrayList<>();
         dec.getMethods().forEach(m -> {
             MethodInfoImpl methodInfo = new MethodInfoImpl();
@@ -26,14 +25,15 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         dec.getFields().forEach(f -> {
             FieldInfoImpl fieldInfo = new FieldInfoImpl();
             fieldInfo.setName(f.getVariable(0).getName().asString());
+<<<<<<< HEAD
+=======
+            // getVariable() returns a list because it's possible to declare more fields in the same line.
+>>>>>>> 632c836683fdff71e7fb0f75a37c3dda0237a51e
             fieldInfo.setType(f.getElementType().asString());
             fieldInfoList.add(fieldInfo);
         });
         // settato qui perchè si deve richiamare solo quando ha completato il class report
         methodInfoList.forEach(m -> m.setParentClass(collector));
         fieldInfoList.forEach(f -> f.setParentClass(collector));
-
-
-
     }
 }
