@@ -1,13 +1,21 @@
 package it.unibo.pcd.assignment.event;
 
-public class MethodInfoImpl implements MethodInfo{
+public class MethodInfoImpl implements MethodInfo {
     private String name;
-    private int beginLine;
-    private int endBeginLine;
-    private ClassReport parentClass;
 
+    private String modifiers;
+
+    private int beginLine;
+
+    private int endBeginLine;
+
+    private ClassReport parentClass;
     public void setName(String name) {
         this.name = name;
+    }
+
+    public void setModifiers(String modifiers) {
+        this.modifiers = modifiers;
     }
 
     public void setBeginLine(int beginLine) {
@@ -25,6 +33,10 @@ public class MethodInfoImpl implements MethodInfo{
     @Override
     public String getName() {
         return this.name;
+    }
+
+    public String getModifiers() {
+        return modifiers;
     }
 
     @Override

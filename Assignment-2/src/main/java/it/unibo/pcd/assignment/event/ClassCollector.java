@@ -16,12 +16,11 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         List<MethodInfoImpl> methodInfoList = new ArrayList<>();
         dec.getMethods().forEach(m -> {
             MethodInfoImpl methodInfo = new MethodInfoImpl();
+            methodInfo.setModifiers(m.getModifiers().toString());
             methodInfo.setBeginLine(m.getBegin().get().line);
             methodInfo.setEndBeginLine(m.getEnd().get().line);
             methodInfo.setName(m.getNameAsString());
             methodInfoList.add(methodInfo);
-
-
         });
         // settato qui perchè si deve richiamare solo quando ha completato il class report
         methodInfoList.forEach(m -> m.setParentClass(collector));
