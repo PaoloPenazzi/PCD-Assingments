@@ -22,8 +22,16 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
             methodInfo.setName(m.getNameAsString());
             methodInfoList.add(methodInfo);
         });
+        List<FieldInfoImpl> fieldInfoList = new ArrayList<>();
+        dec.getFields().forEach(f -> {
+            FieldInfoImpl fieldInfo = new FieldInfoImpl();
+            fieldInfo.setName(f.getVariable(0).getName().asString()); // TODO Perchè ho una lista di nodi???
+            fieldInfo.setType(f.getElementType().asString());
+            fieldInfoList.add(fieldInfo);
+        });
         // settato qui perchè si deve richiamare solo quando ha completato il class report
         methodInfoList.forEach(m -> m.setParentClass(collector));
+        fieldInfoList.forEach(f -> f.setParentClass(collector));
 
 
 
