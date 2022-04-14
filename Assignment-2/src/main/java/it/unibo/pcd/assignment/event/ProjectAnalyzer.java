@@ -1,10 +1,18 @@
 package it.unibo.pcd.assignment.event;
 
 import io.vertx.core.*;
-
 import java.util.function.Consumer;
 
 public interface ProjectAnalyzer {
+
+	/**
+	 * Async method to retrieve the report about a specific interface,
+	 * given the full path of the interface source file
+	 *
+	 * @param srcInterfacePath
+	 * @return
+	 */
+	Future<InterfaceReport> getInterfaceReport(String srcInterfacePath);
 
 	/**
 	 * Async method to retrieve the report about a specific class,
