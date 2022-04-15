@@ -5,18 +5,12 @@ import java.util.List;
 
 public class PackageReportImpl implements PackageReport{
     private String fullPackageName;
-    private String srcFullFileName;
     private List<ClassReportImpl> classReports;
     private List<InterfaceReportImpl> interfaceReports;
 
     public void setFullPackageName(String fullPackageName) {
         this.fullPackageName = fullPackageName;
     }
-
-    public void setSrcFullFileName(String srcFullFileName) {
-        this.srcFullFileName = srcFullFileName;
-    }
-
     public void setClassReports(List<ClassReportImpl> classReports) {
         this.classReports = classReports;
     }
@@ -27,11 +21,6 @@ public class PackageReportImpl implements PackageReport{
 
     public String getFullPackageName() {
         return this.fullPackageName;
-    }
-
-    @Override
-    public String getSrcFullFileName() {
-        return this.srcFullFileName;
     }
 
     @Override
@@ -48,7 +37,6 @@ public class PackageReportImpl implements PackageReport{
     public String toString() {
         return "PackageReportImpl{" +
                 "fullPackageName='" + fullPackageName + '\'' +
-                ", srcFullFileName='" + srcFullFileName + '\'' +
                 ", classReports=" + classReports.toString() +
                 ", interfaceReports=" + interfaceReports.toString() +
                 '}';
