@@ -1,4 +1,4 @@
-package it.unibo.pcd.assignment.event;
+package it.unibo.pcd.assignment.event.report;
 
 import java.util.List;
 import java.util.Objects;

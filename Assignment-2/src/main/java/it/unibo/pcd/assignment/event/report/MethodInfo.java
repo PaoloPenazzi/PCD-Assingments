@@ -1,4 +1,6 @@
-package it.unibo.pcd.assignment.event;
+package it.unibo.pcd.assignment.event.report;
+
+import it.unibo.pcd.assignment.event.report.ClassReport;
 
 public interface MethodInfo {
 

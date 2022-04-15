@@ -2,12 +2,14 @@ package it.unibo.pcd.assignment.event;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import it.unibo.pcd.assignment.event.collector.ClassCollector;
+import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
+import it.unibo.pcd.assignment.event.report.ClassReportImpl;
+import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-
-import static org.junit.Assert.*;
 
 public class EventDrivenProgrammingTest {
 

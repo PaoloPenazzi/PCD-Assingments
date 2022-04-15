@@ -1,6 +1,11 @@
 package it.unibo.pcd.assignment.event;
 
 import io.vertx.core.*;
+import it.unibo.pcd.assignment.event.report.ClassReport;
+import it.unibo.pcd.assignment.event.report.InterfaceReport;
+import it.unibo.pcd.assignment.event.report.PackageReport;
+import it.unibo.pcd.assignment.event.report.ProjectReport;
+
 import java.util.function.Consumer;
 
 public interface ProjectAnalyzer {

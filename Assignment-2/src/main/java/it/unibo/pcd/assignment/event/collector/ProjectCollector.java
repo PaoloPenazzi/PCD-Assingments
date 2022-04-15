@@ -1,28 +1,18 @@
-package it.unibo.pcd.assignment.event;
+package it.unibo.pcd.assignment.event.collector;
 
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.EnumDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.expr.Name;
-import com.github.javaparser.ast.nodeTypes.NodeWithMembers;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.symbolsolver.utils.SymbolSolverCollectionStrategy;
 import com.github.javaparser.utils.Pair;
-import com.github.javaparser.utils.ParserCollectionStrategy;
-import com.github.javaparser.utils.ProjectRoot;
 import com.github.javaparser.utils.SourceRoot;
-import org.checkerframework.checker.units.qual.C;
+import it.unibo.pcd.assignment.event.report.ClassReportImpl;
+import it.unibo.pcd.assignment.event.report.MethodInfo;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ProjectCollector {

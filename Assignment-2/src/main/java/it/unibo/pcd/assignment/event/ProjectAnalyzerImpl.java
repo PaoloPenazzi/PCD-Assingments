@@ -1,14 +1,11 @@
 package it.unibo.pcd.assignment.event;
 
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.visitor.VoidVisitor;
 import io.vertx.core.Future;
+import it.unibo.pcd.assignment.event.report.ClassReport;
+import it.unibo.pcd.assignment.event.report.InterfaceReport;
+import it.unibo.pcd.assignment.event.report.PackageReport;
+import it.unibo.pcd.assignment.event.report.ProjectReport;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Consumer;
 
 public class ProjectAnalyzerImpl implements ProjectAnalyzer {

@@ -1,4 +1,4 @@
-package it.unibo.pcd.assignment.event;
+package it.unibo.pcd.assignment.event.report;
 
 public class MethodInfoImpl implements MethodInfo {
     private String name;

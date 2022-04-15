@@ -1,4 +1,4 @@
-package it.unibo.pcd.assignment.event;
+package it.unibo.pcd.assignment.event.collector;
 
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
