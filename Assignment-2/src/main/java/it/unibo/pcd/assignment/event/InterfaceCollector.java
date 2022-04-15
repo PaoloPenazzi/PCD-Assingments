@@ -1,0 +1,21 @@
+package it.unibo.pcd.assignment.event;
+
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class InterfaceCollector extends VoidVisitorAdapter<InterfaceReportImpl> {
+    @Override
+    public void visit(ClassOrInterfaceDeclaration dec, InterfaceReportImpl collector) {
+        super.visit(dec, collector);
+        collector.setInterfaceName(dec.getNameAsString());
+        collector.setFullFileName(dec.getFullyQualifiedName().get());
+        List<String> methodNameList = new ArrayList<>();
+        dec.getMethods().forEach(m -> {
+            methodNameList.add(m.getName().asString());
+        });
+        collector.setMethodNameList(methodNameList);
+    }
+}
