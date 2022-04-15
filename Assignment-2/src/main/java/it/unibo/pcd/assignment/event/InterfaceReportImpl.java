@@ -35,4 +35,13 @@ public class InterfaceReportImpl implements InterfaceReport {
     public void setMethodNameList(List<String> methodNameList) {
         this.methodNameList = methodNameList;
     }
+
+    @Override
+    public String toString() {
+        return "InterfaceReportImpl{" +
+                "interfaceName='" + interfaceName + '\'' +
+                ", fullFileName='" + fullFileName + '\'' +
+                ", methodNameList=" + methodNameList +
+                '}';
+    }
 }

@@ -24,8 +24,17 @@ public class EventDrivenProgrammingTest {
         System.out.println(classReport);
     }
 
-    @Test public void testTwo() {
-        //TODO
+    @Test public void testInterfaceReport() {
+        CompilationUnit cu;
+        try {
+            cu = StaticJavaParser.parse(new File("src/main/java/it/unibo/pcd/assignment/event/ProjectReport.java"));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
+        InterfaceCollector interfaceCollector = new InterfaceCollector();
+        interfaceCollector.visit(cu, interfaceReport);
+        System.out.println(interfaceReport);
     }
 
 }
