@@ -2,14 +2,12 @@ package it.unibo.pcd.assignment.event;
 
 public class MethodInfoImpl implements MethodInfo {
     private String name;
-
     private String modifiers;
-
     private int beginLine;
-
     private int endBeginLine;
-
+    private boolean isMain;
     private ClassReport parentClass;
+
     public void setName(String name) {
         this.name = name;
     }
@@ -28,6 +26,15 @@ public class MethodInfoImpl implements MethodInfo {
 
     public void setParentClass(ClassReport parentClass) {
         this.parentClass = parentClass;
+    }
+
+    public void setMain(boolean main) {
+        this.isMain = main;
+    }
+
+    @Override
+    public boolean isMain() {
+        return this.isMain;
     }
 
     @Override
@@ -61,6 +68,7 @@ public class MethodInfoImpl implements MethodInfo {
                 ", modifiers='" + modifiers + '\'' +
                 ", beginLine=" + beginLine +
                 ", endBeginLine=" + endBeginLine +
+                ", isMain=" + isMain +
                 ", parentClass=" + parentClass.getFullClassName() +
                 '}';
     }

@@ -1,7 +1,6 @@
 package it.unibo.pcd.assignment.event;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.expr.Name;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.util.ArrayList;
@@ -19,6 +18,9 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         List<MethodInfoImpl> methodInfoList = new ArrayList<>();
         dec.getMethods().forEach(m -> {
             MethodInfoImpl methodInfo = new MethodInfoImpl();
+            methodInfo.setMain(m.isStatic() && m.getNameAsString().equals("main")
+                                && m.getParameterByType(String[].class).isPresent()
+                                && m.getParameters().size() == 1 );
             methodInfo.setModifiers(m.getModifiers().toString());
             methodInfo.setBeginLine(m.getBegin().get().line);
             methodInfo.setEndBeginLine(m.getEnd().get().line);
@@ -39,6 +41,5 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         fieldInfoList.forEach(f -> f.setParentClass(collector));
         collector.setMethodsInfo(methodInfoList);
         collector.setFieldsInfo(fieldInfoList);
-
     }
 }
