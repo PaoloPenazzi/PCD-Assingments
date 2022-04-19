@@ -46,7 +46,7 @@ public class EventDrivenProgrammingTest {
 
     @Test public void testPackageReport() {
         PackageDeclaration cu;
-        cu = StaticJavaParser.parsePackageDeclaration("package it.unibo.pcd.assignment.event.report;");
+        cu = StaticJavaParser.parsePackageDeclaration("package it.unibo.pcd.assignment.event.collector;");
         // cu = StaticJavaParser.parseResource("src/main/java/it/unibo/pcd/assignment/event/");
         PackageReportImpl packageReport = new PackageReportImpl();
         PackageCollector packageCollector = new PackageCollector();

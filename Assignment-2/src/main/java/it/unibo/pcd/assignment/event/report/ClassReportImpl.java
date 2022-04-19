@@ -47,11 +47,9 @@ public class ClassReportImpl implements ClassReport {
 
     @Override
     public String toString() {
-        return "ClassReportImpl{" +
-                "fullClassName='" + fullClassName + '\'' +
-                ", srcFullFileName='" + srcFullFileName + '\'' +
-                ", methodsInfo=" + methodsInfo +
-                ", fieldsInfo=" + fieldsInfo +
-                '}';
+        return "ClassReportImpl: " + fullClassName + '\n' +
+                "File Name: " + srcFullFileName + '\n' +
+                "Methods: " + methodsInfo + '\n' +
+                "Fields: " + fieldsInfo + '\n' + '\n';
     }
 }
