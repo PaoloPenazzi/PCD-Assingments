@@ -9,13 +9,13 @@ import java.awt.*;
 import java.util.List;
 
 public class SimulationPanel extends JPanel {
+    private final long dx;
+    private final long dy;
     private List<Body> bodies;
     private Boundary bounds;
     private long iteration;
     private double virtualTime;
     private double scale = 1;
-    private final long dx;
-    private final long dy;
 
     public SimulationPanel(int width, int height) {
         setSize(width, height);

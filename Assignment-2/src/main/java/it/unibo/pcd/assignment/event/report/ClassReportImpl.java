@@ -9,25 +9,13 @@ public class ClassReportImpl implements ClassReport {
     private List<MethodInfo> methodsInfo;
     private List<FieldInfo> fieldsInfo;
 
-    public void setFullClassName(String fullClassName) {
-        this.fullClassName = fullClassName;
-    }
-
-    public void setSrcFullFileName(String srcFullFileName) {
-        this.srcFullFileName = srcFullFileName;
-    }
-
-    public void setMethodsInfo(List<? extends MethodInfo> methodsInfo) {
-        this.methodsInfo = new ArrayList<>(methodsInfo);
-    }
-
-    public void setFieldsInfo(List<? extends FieldInfo> fieldsInfo) {
-        this.fieldsInfo = new ArrayList<>(fieldsInfo);
-    }
-
     @Override
     public String getFullClassName() {
         return this.fullClassName;
+    }
+
+    public void setFullClassName(String fullClassName) {
+        this.fullClassName = fullClassName;
     }
 
     @Override
@@ -35,14 +23,26 @@ public class ClassReportImpl implements ClassReport {
         return this.srcFullFileName;
     }
 
+    public void setSrcFullFileName(String srcFullFileName) {
+        this.srcFullFileName = srcFullFileName;
+    }
+
     @Override
     public List<MethodInfo> getMethodsInfo() {
         return this.methodsInfo;
     }
 
+    public void setMethodsInfo(List<? extends MethodInfo> methodsInfo) {
+        this.methodsInfo = new ArrayList<>(methodsInfo);
+    }
+
     @Override
     public List<FieldInfo> getFieldsInfo() {
         return this.fieldsInfo;
+    }
+
+    public void setFieldsInfo(List<? extends FieldInfo> fieldsInfo) {
+        this.fieldsInfo = new ArrayList<>(fieldsInfo);
     }
 
     @Override

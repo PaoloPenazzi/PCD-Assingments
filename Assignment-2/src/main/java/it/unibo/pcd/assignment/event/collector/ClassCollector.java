@@ -22,8 +22,8 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         dec.getMethods().forEach(m -> {
             MethodInfoImpl methodInfo = new MethodInfoImpl();
             methodInfo.setMain(m.isStatic() && m.getNameAsString().equals("main")
-                                && m.getParameterByType(String[].class).isPresent()
-                                && m.getParameters().size() == 1 );
+                    && m.getParameterByType(String[].class).isPresent()
+                    && m.getParameters().size() == 1);
             methodInfo.setModifiers(m.getModifiers().toString());
             methodInfo.setBeginLine(m.getBegin().get().line);
             methodInfo.setEndBeginLine(m.getEnd().get().line);

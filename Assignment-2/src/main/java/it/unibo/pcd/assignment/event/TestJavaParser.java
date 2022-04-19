@@ -1,20 +1,10 @@
 package it.unibo.pcd.assignment.event;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.visitor.VoidVisitor;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-
 public class TestJavaParser {
 
-	private static final String FILE_PATH = "src/main/java/it/unibo/pcd/assignment/event/TestClassReversePolishNotation.java";
+    private static final String FILE_PATH = "src/main/java/it/unibo/pcd/assignment/event/TestClassReversePolishNotation.java";
 
-	public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {
 		/*CompilationUnit cu = StaticJavaParser.parse(new File(FILE_PATH));
 
 		VoidVisitor<Void> methodNameVisitor = new MethodNamePrinter();
@@ -48,9 +38,9 @@ public class TestJavaParser {
 		*/
 
 
-		// ProjectAnalyzerImpl projectAnalyzer = new ProjectAnalyzerImpl();
-		//projectAnalyzer.getClassReport(null);
+        // ProjectAnalyzerImpl projectAnalyzer = new ProjectAnalyzerImpl();
+        //projectAnalyzer.getClassReport(null);
 
-	}
+    }
 
 }

@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Random;
 
 public abstract class AbstractSimulator extends Thread {
+    public static final double DELTA_TIME = 0.001;
     private final Boundary bounds;
     private final List<Body> bodies;
     private final int numSteps;
-    public static final double DELTA_TIME = 0.001;
 
     protected AbstractSimulator(int numBodies, int numSteps, int sideLenght) {
         this.bounds = this.createField(sideLenght);

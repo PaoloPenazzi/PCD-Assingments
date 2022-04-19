@@ -10,6 +10,10 @@ public class FieldInfoImpl implements FieldInfo {
         return this.name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public String getFieldTypeFullName() {
         return this.type;
@@ -18,10 +22,6 @@ public class FieldInfoImpl implements FieldInfo {
     @Override
     public ClassReport getParent() {
         return this.parentClass;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public void setType(String type) {

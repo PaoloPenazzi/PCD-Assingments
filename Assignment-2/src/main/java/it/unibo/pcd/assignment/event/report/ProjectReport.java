@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ProjectReport {
 
-	List<PackageReport> getPackageReport();
+    List<PackageReport> getPackageReport();
 
-	List<Pair<String, String>> getPackageAndMain();
+    List<Pair<String, String>> getPackageAndMain();
 }

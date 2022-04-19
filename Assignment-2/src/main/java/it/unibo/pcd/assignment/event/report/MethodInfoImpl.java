@@ -8,28 +8,12 @@ public class MethodInfoImpl implements MethodInfo {
     private boolean isMain;
     private ClassReport parentClass;
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setModifiers(String modifiers) {
-        this.modifiers = modifiers;
-    }
-
     public void setBeginLine(int beginLine) {
         this.beginLine = beginLine;
     }
 
-    public void setEndBeginLine(int endBeginLine) {
-        this.endBeginLine = endBeginLine;
-    }
-
     public void setParentClass(ClassReport parentClass) {
         this.parentClass = parentClass;
-    }
-
-    public void setMain(boolean main) {
-        this.isMain = main;
     }
 
     @Override
@@ -37,13 +21,25 @@ public class MethodInfoImpl implements MethodInfo {
         return this.isMain;
     }
 
+    public void setMain(boolean main) {
+        this.isMain = main;
+    }
+
     @Override
     public String getName() {
         return this.name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getModifiers() {
         return modifiers;
+    }
+
+    public void setModifiers(String modifiers) {
+        this.modifiers = modifiers;
     }
 
     @Override
@@ -54,6 +50,10 @@ public class MethodInfoImpl implements MethodInfo {
     @Override
     public int getEndBeginLine() {
         return this.endBeginLine;
+    }
+
+    public void setEndBeginLine(int endBeginLine) {
+        this.endBeginLine = endBeginLine;
     }
 
     @Override

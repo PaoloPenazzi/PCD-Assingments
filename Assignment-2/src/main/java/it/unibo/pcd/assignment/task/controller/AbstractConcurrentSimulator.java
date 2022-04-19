@@ -1,15 +1,18 @@
 package it.unibo.pcd.assignment.task.controller;
 
-import it.unibo.pcd.assignment.task.model.*;
+import it.unibo.pcd.assignment.task.model.Barrier;
+import it.unibo.pcd.assignment.task.model.BarrierImpl;
+import it.unibo.pcd.assignment.task.model.Monitor;
+import it.unibo.pcd.assignment.task.model.Worker;
 
 import java.util.concurrent.CountDownLatch;
 
 public abstract class AbstractConcurrentSimulator extends AbstractSimulator {
     private final Worker[] workers;
-    private Barrier barrier;
-    private CountDownLatch latch;
     private final int nThreads;
     private final Monitor monitor;
+    private Barrier barrier;
+    private CountDownLatch latch;
 
     protected AbstractConcurrentSimulator(int numBodies, int numSteps, int sideLenght, int nThreads) {
         super(numBodies, numSteps, sideLenght);

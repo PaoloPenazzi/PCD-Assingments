@@ -8,11 +8,11 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.utils.Pair;
 import com.github.javaparser.utils.SourceRoot;
-import it.unibo.pcd.assignment.event.report.*;
+import it.unibo.pcd.assignment.event.report.ClassReportImpl;
+import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
+import it.unibo.pcd.assignment.event.report.PackageReportImpl;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -39,10 +39,10 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
         }
 
         List<CompilationUnit> classesOrInterfacesUnit = parseResultList.stream()
-                                                                       .filter(ParseResult::isSuccessful)
-                                                                       .filter(r -> r.getResult().isPresent())
-                                                                       .map(r -> r.getResult().get())
-                                                                       .collect(Collectors.toList());
+                .filter(ParseResult::isSuccessful)
+                .filter(r -> r.getResult().isPresent())
+                .map(r -> r.getResult().get())
+                .collect(Collectors.toList());
 
 
         ClassCollector classCollector = new ClassCollector();
@@ -51,18 +51,18 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
         InterfaceCollector interfaceCollector = new InterfaceCollector();
         List<InterfaceReportImpl> interfaceReports = new ArrayList<>();
 
-        for(CompilationUnit cu : classesOrInterfacesUnit){
+        for (CompilationUnit cu : classesOrInterfacesUnit) {
             List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
-                                                      .map(TypeDeclaration::asTypeDeclaration)
-                                                      .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                                                      .map(x -> (ClassOrInterfaceDeclaration) x)
-                                                      .collect(Collectors.toList());
+                    .map(TypeDeclaration::asTypeDeclaration)
+                    .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                    .map(x -> (ClassOrInterfaceDeclaration) x)
+                    .collect(Collectors.toList());
 
-            for(ClassOrInterfaceDeclaration declaration : declarationList){
+            for (ClassOrInterfaceDeclaration declaration : declarationList) {
                 ClassReportImpl classReport = new ClassReportImpl();
                 InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
 
-                if(declaration.isInterface()){
+                if (declaration.isInterface()) {
                     interfaceCollector.visit(cu, interfaceReport);
                     interfaceReports.add(interfaceReport);
                 } else {

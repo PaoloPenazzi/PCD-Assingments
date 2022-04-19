@@ -1,6 +1,6 @@
 package it.unibo.pcd.assignment.task;
 
-import it.unibo.pcd.assignment.task.controller.*;
+import it.unibo.pcd.assignment.task.controller.Master;
 
 public class RunSimulation {
 

@@ -4,10 +4,10 @@ import java.util.List;
 
 public interface PackageReport {
 
-	String getFullPackageName();
+    String getFullPackageName();
 
-	List<ClassReport> getClassesReport();
+    List<ClassReport> getClassesReport();
 
-	List<InterfaceReport> getInterfacesReport();
-	
+    List<InterfaceReport> getInterfacesReport();
+
 }

@@ -2,14 +2,13 @@ package it.unibo.pcd.assignment.event.report;
 
 import java.util.List;
 
-// sara il nsotro collector
 public interface ClassReport {
-	String getFullClassName();
-	
-	String getSrcFullFileName();
+    String getFullClassName();
 
-	List<MethodInfo> getMethodsInfo();
+    String getSrcFullFileName();
 
-	List<FieldInfo> getFieldsInfo();
-	
+    List<MethodInfo> getMethodsInfo();
+
+    List<FieldInfo> getFieldsInfo();
+
 }

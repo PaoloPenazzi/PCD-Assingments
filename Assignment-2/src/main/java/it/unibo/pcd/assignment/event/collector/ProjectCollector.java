@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 public class ProjectCollector {
 
-    public void visit(ProjectReportImpl projectReport){
+    public void visit(ProjectReportImpl projectReport) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/"));
         sourceRoot.setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList;
@@ -45,7 +45,7 @@ public class ProjectCollector {
         PackageCollector packageCollector = new PackageCollector();
         List<PackageReportImpl> packageReportList = new ArrayList<>();
 
-        for(PackageDeclaration pckDec : cuPack){
+        for (PackageDeclaration pckDec : cuPack) {
             PackageReportImpl report = new PackageReportImpl();
             packageCollector.visit(pckDec, report);
             packageReportList.add(report);
@@ -54,22 +54,21 @@ public class ProjectCollector {
         projectReport.setPackageReports(packageReportList);
 
 
-
         ClassReportImpl classReport = new ClassReportImpl();
         ClassCollector classCollector = new ClassCollector();
         List<Pair<String, Boolean>> pairList = new ArrayList<>();
 
-        for(CompilationUnit cu : allCus){
+        for (CompilationUnit cu : allCus) {
             classCollector.visit(cu, classReport);
             Pair<String, Boolean> pair = new Pair<>(classReport.getSrcFullFileName(), classReport.getMethodsInfo().stream().anyMatch(MethodInfo::isMain));
             pairList.add(pair);
         }
 
         List<Pair<String, String>> pairs = new ArrayList<>();
-        for(Pair<String, Boolean> booleanPair : pairList){
-            for(PackageDeclaration packageDeclaration : cuPack){
-                if(booleanPair.a.contains(packageDeclaration.getNameAsString())){
-                    if(booleanPair.b){
+        for (Pair<String, Boolean> booleanPair : pairList) {
+            for (PackageDeclaration packageDeclaration : cuPack) {
+                if (booleanPair.a.contains(packageDeclaration.getNameAsString())) {
+                    if (booleanPair.b) {
                         Pair<String, String> stringStringPair = new Pair<>(packageDeclaration.getNameAsString(), booleanPair.a);
                         pairs.add(stringStringPair);
                     }

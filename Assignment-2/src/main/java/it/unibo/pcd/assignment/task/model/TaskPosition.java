@@ -10,7 +10,7 @@ public class TaskPosition implements Callable<Void> {
     private final int indexFrom;
     private final int indexTo;
     private final Boundary boundary;
-    
+
     public TaskPosition(int indexFrom, int indexTo, List<Body> bodyList, Boundary boundary) {
         this.indexFrom = indexFrom;
         this.indexTo = indexTo;

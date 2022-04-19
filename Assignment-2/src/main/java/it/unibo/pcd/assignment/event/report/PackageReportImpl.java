@@ -3,14 +3,11 @@ package it.unibo.pcd.assignment.event.report;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PackageReportImpl implements PackageReport{
+public class PackageReportImpl implements PackageReport {
     private String fullPackageName;
     private List<ClassReportImpl> classReports;
     private List<InterfaceReportImpl> interfaceReports;
 
-    public void setFullPackageName(String fullPackageName) {
-        this.fullPackageName = fullPackageName;
-    }
     public void setClassReports(List<ClassReportImpl> classReports) {
         this.classReports = classReports;
     }
@@ -21,6 +18,10 @@ public class PackageReportImpl implements PackageReport{
 
     public String getFullPackageName() {
         return this.fullPackageName;
+    }
+
+    public void setFullPackageName(String fullPackageName) {
+        this.fullPackageName = fullPackageName;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class PackageReportImpl implements PackageReport{
     @Override
     public String toString() {
         return "PackageReportImpl: " + fullPackageName + '\n' +
-                "Classes: " + classReports.toString() + '\n'+
+                "Classes: " + classReports.toString() + '\n' +
                 "Interfaces: " + interfaceReports.toString() + '\n' + '\n';
     }
 }
