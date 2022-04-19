@@ -3,14 +3,14 @@ package it.unibo.pcd.assignment.event;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
 import it.unibo.pcd.assignment.event.collector.PackageCollector;
 import it.unibo.pcd.assignment.event.collector.ProjectCollector;
-import it.unibo.pcd.assignment.event.report.ClassReportImpl;
-import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
-import it.unibo.pcd.assignment.event.report.PackageReportImpl;
-import it.unibo.pcd.assignment.event.report.ProjectReportImpl;
+import it.unibo.pcd.assignment.event.report.*;
 import org.junit.Test;
 
 import java.io.File;
@@ -67,5 +67,26 @@ public class EventDrivenProgrammingTest {
         System.out.println("Packages report: ");
         System.out.println(projectReport.getPackageReport());
     }
+
+    @Test
+    public void testAsyncClassReport() {
+        Vertx vertx = Vertx.vertx();
+        vertx.deployVerticle("Oppla");
+        ProjectAnalyzer projectAnalyzer = new ProjectAnalyzerImpl(vertx);
+        Future<ClassReport> future =
+                projectAnalyzer.getClassReport("src/main/java/it/unibo/pcd/assignment/event/report/MethodInfoImpl.java");
+        future.onComplete((AsyncResult<ClassReport> promise) -> {
+            System.out.println(promise.result());
+        });
+    }
+
+    @Test
+    public void testAsyncInterfaceReport() {}
+
+    @Test
+    public void testAsyncPackageReport() {}
+
+    @Test
+    public void testAsyncProjectReport() {}
 
 }
