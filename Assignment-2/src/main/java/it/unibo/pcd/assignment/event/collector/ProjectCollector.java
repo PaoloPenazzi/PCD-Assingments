@@ -19,8 +19,8 @@ import java.util.stream.Collectors;
 
 public class ProjectCollector {
 
-    public void visit(ProjectReportImpl projectReport) {
-        SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/"));
+    public void visit(String srcProjectFolderPath, ProjectReportImpl projectReport) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderPath));
         sourceRoot.setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList;
 
