@@ -39,7 +39,7 @@ public class InterfaceReportImpl implements InterfaceReport {
     @Override
     public String toString() {
         return "InterfaceReportImpl: " + interfaceName + '\n' +
-                "File Name" + fullFileName + '\n' +
+                "File Name: " + fullFileName + '\n' +
                 "Methods: " + methodNameList + '\n' + '\n';
     }
 }
