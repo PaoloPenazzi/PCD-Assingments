@@ -26,7 +26,8 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
         super.visit(dec, collector);
         // name
         collector.setFullPackageName(dec.getNameAsString());
-        // classes report
+
+        // classes/interfaces report
         SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/"));
         sourceRoot.setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList;

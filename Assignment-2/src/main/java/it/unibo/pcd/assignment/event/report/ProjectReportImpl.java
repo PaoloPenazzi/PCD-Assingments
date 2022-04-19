@@ -1,59 +1,37 @@
 package it.unibo.pcd.assignment.event.report;
 
+import com.github.javaparser.utils.Pair;
+
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class ProjectReportImpl implements ProjectReport {
-    private ClassReport mainClass;
-    private List<ClassReport> allClasses;
-    private ClassReport specificClassReport;
+    private List<PackageReportImpl> packageReports;
+    private List<Pair<String, String>> pairList;
 
-    public void setMainClass(ClassReport mainClass) {
-        this.mainClass = mainClass;
+    public void setPackageReports(List<PackageReportImpl> packageReports) {
+        this.packageReports = packageReports;
     }
 
-    public void setAllClasses(List<ClassReport> allClasses) {
-        this.allClasses = allClasses;
-    }
-
-    public void setSpecificClassReport(ClassReport specificClassReport) {
-        this.specificClassReport = specificClassReport;
+    public void setPairList(List<Pair<String, String>> pairList) {
+        this.pairList = pairList;
     }
 
     @Override
-    public ClassReport getMainClass() {
-        return null;
+    public List<PackageReport> getPackageReport() {
+        return new ArrayList<>(this.packageReports);
     }
 
     @Override
-    public List<ClassReport> getAllClasses() {
-        return null;
-    }
-
-    @Override
-    public ClassReport getClassReport(String fullClassName) {
-        return null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ProjectReportImpl that = (ProjectReportImpl) o;
-        return Objects.equals(mainClass, that.mainClass) && Objects.equals(allClasses, that.allClasses) && Objects.equals(specificClassReport, that.specificClassReport);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(mainClass, allClasses, specificClassReport);
+    public List<Pair<String, String>> getPackageAndMain() {
+        return new ArrayList<>(this.pairList);
     }
 
     @Override
     public String toString() {
         return "ProjectReportImpl{" +
-                "mainClass=" + mainClass.getFullClassName() +
-                ", allClasses=" + allClasses.toString() +
-                ", specificClassReport=" + specificClassReport.getFullClassName() +
+                "packageReports=" + packageReports.toString() +
+                ", pairList=" + pairList.toString() +
                 '}';
     }
 }

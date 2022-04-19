@@ -6,9 +6,11 @@ import com.github.javaparser.ast.PackageDeclaration;
 import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
 import it.unibo.pcd.assignment.event.collector.PackageCollector;
+import it.unibo.pcd.assignment.event.collector.ProjectCollector;
 import it.unibo.pcd.assignment.event.report.ClassReportImpl;
 import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
 import it.unibo.pcd.assignment.event.report.PackageReportImpl;
+import it.unibo.pcd.assignment.event.report.ProjectReportImpl;
 import org.junit.Test;
 
 import java.io.File;
@@ -52,6 +54,18 @@ public class EventDrivenProgrammingTest {
         PackageCollector packageCollector = new PackageCollector();
         packageCollector.visit(cu, packageReport);
         System.out.println(packageReport);
+    }
+
+    @Test public void testProjectReport() {
+        ProjectCollector projectCollector = new ProjectCollector();
+        ProjectReportImpl projectReport = new ProjectReportImpl();
+        projectCollector.visit(projectReport);
+        System.out.println("Package and Main: ");
+        System.out.println(projectReport.getPackageAndMain());
+        System.out.println();
+        System.out.println();
+        System.out.println("Packages report: ");
+        System.out.println(projectReport.getPackageReport());
     }
 
 }
