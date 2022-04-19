@@ -36,9 +36,9 @@ public class PackageReportImpl implements PackageReport{
     @Override
     public String toString() {
         return "PackageReportImpl{" +
-                "fullPackageName='" + fullPackageName + '\'' +
-                ", classReports=" + classReports.toString() +
-                ", interfaceReports=" + interfaceReports.toString() +
+                "fullPackageName='" + fullPackageName + '\n' +'\'' +
+                ", classReports=" + classReports.toString() + '\n'+
+                ", interfaceReports=" + interfaceReports.toString() + '\n' +
                 '}';
     }
 }

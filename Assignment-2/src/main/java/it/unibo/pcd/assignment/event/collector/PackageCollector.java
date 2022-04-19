@@ -42,11 +42,11 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
 
         ClassReportImpl classReport = new ClassReportImpl();
         ClassCollector classCollector = new ClassCollector();
-        List<ClassReport> classReports = new ArrayList<>();
+        List<ClassReportImpl> classReports = new ArrayList<>();
 
         InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
         InterfaceCollector interfaceCollector = new InterfaceCollector();
-        List<InterfaceReport> interfaceReports = new ArrayList<>();
+        List<InterfaceReportImpl> interfaceReports = new ArrayList<>();
 
         for(CompilationUnit cu : classesOrInterfacesUnit){
             List<ClassOrInterfaceDeclaration> tipi = cu.getTypes().stream()
@@ -64,5 +64,8 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
                 }
             }
         }
+
+        collector.setClassReports(classReports);
+        collector.setInterfaceReports(interfaceReports);
     }
 }

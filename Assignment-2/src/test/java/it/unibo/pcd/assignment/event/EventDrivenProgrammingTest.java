@@ -2,6 +2,7 @@ package it.unibo.pcd.assignment.event;
 
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.PackageDeclaration;
 import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
 import it.unibo.pcd.assignment.event.collector.PackageCollector;
@@ -32,8 +33,9 @@ public class EventDrivenProgrammingTest {
     @Test public void testInterfaceReport() {
         CompilationUnit cu;
         try {
+
             cu = StaticJavaParser.parse(new File("src/main/java/it/unibo/pcd/assignment/event/ProjectReport.java"));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
         InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
@@ -43,12 +45,9 @@ public class EventDrivenProgrammingTest {
     }
 
     @Test public void testPackageReport() {
-        CompilationUnit cu;
-        try {
-            cu = StaticJavaParser.parseResource("src/main/java/it/unibo/pcd/assignment/event/");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        PackageDeclaration cu;
+        cu = StaticJavaParser.parsePackageDeclaration("package it.unibo.pcd.assignment.event.report;");
+        // cu = StaticJavaParser.parseResource("src/main/java/it/unibo/pcd/assignment/event/");
         PackageReportImpl packageReport = new PackageReportImpl();
         PackageCollector packageCollector = new PackageCollector();
         packageCollector.visit(cu, packageReport);
