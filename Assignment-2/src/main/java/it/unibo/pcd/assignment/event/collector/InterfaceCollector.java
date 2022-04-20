@@ -12,11 +12,15 @@ public class InterfaceCollector extends VoidVisitorAdapter<InterfaceReportImpl> 
     public void visit(ClassOrInterfaceDeclaration dec, InterfaceReportImpl collector) {
         super.visit(dec, collector);
         collector.setInterfaceName(dec.getNameAsString());
-        collector.setFullFileName(dec.getFullyQualifiedName().get());
+        collector.setFullFileName(dec.getFullyQualifiedName().orElse("NULL!"));
+        collector.setMethodNameList(this.createMethodNameList(dec));
+    }
+
+    private List<String> createMethodNameList(ClassOrInterfaceDeclaration dec){
         List<String> methodNameList = new ArrayList<>();
         dec.getMethods().forEach(m -> {
             methodNameList.add(m.getName().asString());
         });
-        collector.setMethodNameList(methodNameList);
+        return methodNameList;
     }
 }

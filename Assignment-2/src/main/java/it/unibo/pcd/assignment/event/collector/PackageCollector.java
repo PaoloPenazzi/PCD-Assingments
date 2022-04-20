@@ -8,6 +8,7 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.utils.Pair;
 import com.github.javaparser.utils.SourceRoot;
 import it.unibo.pcd.assignment.event.report.ClassReportImpl;
 import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
@@ -28,22 +29,11 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
         collector.setFullPackageName(dec.getNameAsString());
 
         // classes/interfaces report
-        SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/"));
-        sourceRoot.setParserConfiguration(new ParserConfiguration());
-        List<ParseResult<CompilationUnit>> parseResultList;
-
-        try {
-            parseResultList = sourceRoot.tryToParse(dec.getNameAsString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        List<CompilationUnit> classesOrInterfacesUnit = parseResultList.stream()
-                .filter(ParseResult::isSuccessful)
-                .filter(r -> r.getResult().isPresent())
-                .map(r -> r.getResult().get())
-                .collect(Collectors.toList());
-
+        List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(dec).stream()
+                                                                                      .filter(ParseResult::isSuccessful)
+                                                                                      .filter(r -> r.getResult().isPresent())
+                                                                                      .map(r -> r.getResult().get())
+                                                                                      .collect(Collectors.toList());
 
         ClassCollector classCollector = new ClassCollector();
         List<ClassReportImpl> classReports = new ArrayList<>();
@@ -74,5 +64,16 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
 
         collector.setClassReports(classReports);
         collector.setInterfaceReports(interfaceReports);
+    }
+
+    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec){
+        SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/")).setParserConfiguration(new ParserConfiguration());
+        List<ParseResult<CompilationUnit>> parseResultList;
+        try {
+            parseResultList = sourceRoot.tryToParse(dec.getNameAsString());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return parseResultList;
     }
 }

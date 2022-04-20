@@ -82,7 +82,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
     @Override
     public void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback) {
+        // visito il progetto e per ogni elemento del progetto che incontro creo un evento
 
+        // ad ogni evento che il mio event-loop incontra richiama la callback e si rimette in ascolto per un attimo
     }
 
     private void log(String msg) {
