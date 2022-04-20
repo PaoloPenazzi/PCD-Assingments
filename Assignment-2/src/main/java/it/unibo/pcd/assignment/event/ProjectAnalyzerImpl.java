@@ -3,6 +3,7 @@ package it.unibo.pcd.assignment.event;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import it.unibo.pcd.assignment.event.collector.ClassCollector;
@@ -15,16 +16,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.function.Consumer;
 
-public class ProjectAnalyzerImpl implements ProjectAnalyzer {
-    private final Vertx vertx;
+public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
 
-    public ProjectAnalyzerImpl(Vertx vertx) {
-        this.vertx = vertx;
+    public ProjectAnalyzerImpl() {
+        Vertx.vertx().deployVerticle(this);
     }
 
     @Override
     public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath) {
-        return this.vertx.executeBlocking(promise -> {
+        return this.getVertx().executeBlocking(promise -> {
             this.log("Starting on getInterfaceReport");
             CompilationUnit compilationUnit;
             try {
@@ -41,7 +41,7 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
 
     @Override
     public Future<ClassReport> getClassReport(String srcClassPath) {
-        return this.vertx.executeBlocking(promise -> {
+        return this.getVertx().executeBlocking(promise -> {
             this.log("Starting on getClassReport");
             CompilationUnit compilationUnit;
             try {
@@ -58,7 +58,7 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
 
     @Override
     public Future<PackageReport> getPackageReport(String srcPackagePath) {
-        return this.vertx.executeBlocking(promise -> {
+        return this.getVertx().executeBlocking(promise -> {
             this.log("Starting on getPackageReport");
             PackageDeclaration packageDeclaration;
             packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + srcPackagePath + ";");
@@ -71,7 +71,7 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
 
     @Override
     public Future<ProjectReport> getProjectReport(String srcProjectFolderPath) {
-        return this.vertx.executeBlocking(promise -> {
+        return this.getVertx().executeBlocking(promise -> {
             this.log("Starting on getProjectReport");
             ProjectCollector projectCollector = new ProjectCollector();
             ProjectReportImpl projectReport = new ProjectReportImpl();

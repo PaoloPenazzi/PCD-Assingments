@@ -7,7 +7,10 @@ import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
 import it.unibo.pcd.assignment.event.collector.PackageCollector;
 import it.unibo.pcd.assignment.event.collector.ProjectCollector;
-import it.unibo.pcd.assignment.event.report.*;
+import it.unibo.pcd.assignment.event.report.ClassReportImpl;
+import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
+import it.unibo.pcd.assignment.event.report.PackageReportImpl;
+import it.unibo.pcd.assignment.event.report.ProjectReportImpl;
 import org.junit.Test;
 
 import java.io.File;
