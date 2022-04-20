@@ -17,11 +17,9 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         collector.setFullClassName(dec.getNameAsString());
         collector.setSrcFullFileName(dec.getFullyQualifiedName().orElse("NULL!"));
 
-        List<MethodInfoImpl> methodInfoList = new ArrayList<>();
-        this.createMethodInfoList(dec, methodInfoList);
+        List<MethodInfoImpl> methodInfoList = this.createMethodInfoList(dec);
+        List<FieldInfoImpl> fieldInfoList = this.createFieldInfoList(dec);
 
-        List<FieldInfoImpl> fieldInfoList = new ArrayList<>();
-        this.createFieldInfoList(dec, fieldInfoList);
 
         methodInfoList.forEach(m -> m.setParentClass(collector));
         fieldInfoList.forEach(f -> f.setParentClass(collector));
@@ -29,7 +27,9 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         collector.setFieldsInfo(fieldInfoList);
     }
 
-    private void createMethodInfoList(ClassOrInterfaceDeclaration dec, List<MethodInfoImpl> methodInfoList){
+    private List<MethodInfoImpl> createMethodInfoList(ClassOrInterfaceDeclaration dec) {
+        List<MethodInfoImpl> methodInfoList = new ArrayList<>();
+
         dec.getMethods().forEach(m -> {
             MethodInfoImpl methodInfo = new MethodInfoImpl();
             methodInfo.setMain(m.isStatic() && m.getNameAsString().equals("main")
@@ -41,14 +41,20 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
             methodInfo.setName(m.getNameAsString());
             methodInfoList.add(methodInfo);
         });
+
+        return methodInfoList;
     }
 
-    private void createFieldInfoList(ClassOrInterfaceDeclaration dec, List<FieldInfoImpl> fieldInfoList){
+    private List<FieldInfoImpl> createFieldInfoList(ClassOrInterfaceDeclaration dec) {
+        List<FieldInfoImpl> fieldInfoList = new ArrayList<>();
+
         dec.getFields().forEach(f -> {
             FieldInfoImpl fieldInfo = new FieldInfoImpl();
             fieldInfo.setName(f.getVariable(0).getName().asString());
             fieldInfo.setType(f.getElementType().asString());
             fieldInfoList.add(fieldInfo);
         });
+
+        return fieldInfoList;
     }
 }
