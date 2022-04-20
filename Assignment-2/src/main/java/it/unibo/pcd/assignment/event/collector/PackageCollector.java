@@ -8,7 +8,6 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import com.github.javaparser.utils.Pair;
 import com.github.javaparser.utils.SourceRoot;
 import it.unibo.pcd.assignment.event.report.ClassReportImpl;
 import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
