@@ -170,7 +170,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             CompositeFuture.all(futureListPackage).onComplete(res -> {
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
-                callback.accept(projectReport);
+                //callback.accept(projectReport);
                 promise.complete(projectReport);
             });
         });
