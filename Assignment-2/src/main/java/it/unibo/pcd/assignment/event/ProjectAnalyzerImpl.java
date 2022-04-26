@@ -31,9 +31,13 @@ import java.util.stream.Stream;
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
     private final ViewController viewController;
     public static String PATH = "";
+    public static int CLASS_NUMBER = 0;
+    public static int INTERFACE_NUMBER = 0;
+    public static int PACKAGE_NUMBER = 0;
+
 
     public ProjectAnalyzerImpl() {
-        this.viewController = new ViewController();
+        this.viewController = new ViewController(this);
         Vertx.vertx().deployVerticle(this);
     }
 
@@ -49,6 +53,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
             InterfaceCollector interfaceCollector = new InterfaceCollector();
             interfaceCollector.visit(compilationUnit, interfaceReport);
+            ProjectAnalyzerImpl.INTERFACE_NUMBER++;
             callback.accept(interfaceReport);
             promise.complete(interfaceReport);
         });
@@ -66,6 +71,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
             classCollector.visit(compilationUnit, classReport);
+            ProjectAnalyzerImpl.CLASS_NUMBER++;
             callback.accept(classReport);
             promise.complete(classReport);
         });
@@ -105,9 +111,11 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 // riempiamo le future in modo tale da sapere in futuro quando saranno pronte le variabili
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     if (declaration.isInterface()) {
+
                         futureListInterface.add(this.getInterfaceReport("src/main/java/" + declaration.getFullyQualifiedName().get()
                                 .replace(".", "/") + ".java", callback));
                     } else {
+
                         futureListClass.add(this.getClassReport("src/main/java/" + declaration.getFullyQualifiedName().get()
                                 .replace(".", "/") + ".java", callback));
                     }
@@ -163,6 +171,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
+                ProjectAnalyzerImpl.PACKAGE_NUMBER++;
                 futureListPackage.add(getPackageReport(packageDeclaration.getNameAsString(), callback));
             }
 
@@ -170,7 +179,14 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             CompositeFuture.all(futureListPackage).onComplete(res -> {
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
+<<<<<<< HEAD
                 //callback.accept(projectReport);
+=======
+                callback.accept(projectReport);
+                this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
+                this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
+                this.viewController.log("Interface Number: " + ProjectAnalyzerImpl.INTERFACE_NUMBER + "\n");
+>>>>>>> 3281af6dc4c10ebc7bed9ace233b5490b1f4c1f8
                 promise.complete(projectReport);
             });
         });

@@ -4,6 +4,6 @@ import it.unibo.pcd.assignment.event.view.ViewController;
 
 public class Launcher {
     public static void main(String[] args) {
-        ViewController view = new ViewController();
+        ProjectAnalyzer projectAnalyzer = new ProjectAnalyzerImpl();
     }
 }

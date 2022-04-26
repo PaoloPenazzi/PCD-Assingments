@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class ViewFrame extends JFrame {
     private JButton openProjectButton;
+    private JButton startAnalysisButton;
+    private JButton stopAnalysisButton;
     private JTextArea consoleTextArea;
     private JLabel fileSelectedLabel;
     private JPanel northPanel;
@@ -16,7 +18,6 @@ public class ViewFrame extends JFrame {
         this.controller = controller;
         this.setSize(620, 620);
         this.setTitle("Project Analyzer");
-        this.setResizable(false);
         this.setLayout(new BorderLayout());
         this.createNorthPanel();
         this.createCentralPanel();
@@ -36,8 +37,13 @@ public class ViewFrame extends JFrame {
     private void createNorthPanel() {
         this.northPanel = new JPanel();
         this.openProjectButton = new JButton("Open Project");
-        this.openProjectButton.addActionListener(controller::actionPerformed);
+        this.startAnalysisButton = new JButton("Start");
+        this.stopAnalysisButton = new JButton("Stop");
+        this.startAnalysisButton.addActionListener(controller::startAnalysisPressed);
+        this.openProjectButton.addActionListener(controller::openProjectPressed);
         this.northPanel.add(this.openProjectButton);
+        this.northPanel.add(this.startAnalysisButton);
+        this.northPanel.add(this.stopAnalysisButton);
     }
 
     private void createCentralPanel() {
