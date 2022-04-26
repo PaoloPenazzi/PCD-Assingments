@@ -28,7 +28,7 @@ public class ViewController {
 
     public void startAnalysisPressed(ActionEvent e) {
         if (!Objects.equals(ProjectAnalyzerImpl.PATH, "")) {
-            this.projectAnalyzer.analyzeProject(ProjectAnalyzerImpl.PATH, System.out::println);
+            this.projectAnalyzer.analyzeProject(ProjectAnalyzerImpl.PATH, (k) -> this.log(k.toString()));
         }
     }
 

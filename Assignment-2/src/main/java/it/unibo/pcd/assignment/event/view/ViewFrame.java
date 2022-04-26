@@ -18,7 +18,6 @@ public class ViewFrame extends JFrame {
         this.controller = controller;
         this.setSize(620, 620);
         this.setTitle("Project Analyzer");
-        this.setResizable(false);
         this.setLayout(new BorderLayout());
         this.createNorthPanel();
         this.createCentralPanel();
