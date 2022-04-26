@@ -20,7 +20,6 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         List<MethodInfoImpl> methodInfoList = this.createMethodInfoList(dec);
         List<FieldInfoImpl> fieldInfoList = this.createFieldInfoList(dec);
 
-
         methodInfoList.forEach(m -> m.setParentClass(collector));
         fieldInfoList.forEach(f -> f.setParentClass(collector));
         collector.setMethodsInfo(methodInfoList);

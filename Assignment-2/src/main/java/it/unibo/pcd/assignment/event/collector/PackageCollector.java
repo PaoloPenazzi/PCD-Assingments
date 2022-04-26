@@ -9,9 +9,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.utils.SourceRoot;
-import it.unibo.pcd.assignment.event.report.ClassReportImpl;
-import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
-import it.unibo.pcd.assignment.event.report.PackageReportImpl;
+import it.unibo.pcd.assignment.event.report.*;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -35,10 +33,10 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
                                                                                       .collect(Collectors.toList());
 
         ClassCollector classCollector = new ClassCollector();
-        List<ClassReportImpl> classReports = new ArrayList<>();
+        List<ClassReport> classReports = new ArrayList<>();
 
         InterfaceCollector interfaceCollector = new InterfaceCollector();
-        List<InterfaceReportImpl> interfaceReports = new ArrayList<>();
+        List<InterfaceReport> interfaceReports = new ArrayList<>();
 
         for (CompilationUnit cu : classesOrInterfacesUnit) {
             List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()

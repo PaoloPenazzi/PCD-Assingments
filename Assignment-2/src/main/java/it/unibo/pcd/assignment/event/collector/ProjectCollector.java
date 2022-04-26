@@ -6,10 +6,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.utils.Pair;
 import com.github.javaparser.utils.SourceRoot;
-import it.unibo.pcd.assignment.event.report.ClassReportImpl;
-import it.unibo.pcd.assignment.event.report.MethodInfo;
-import it.unibo.pcd.assignment.event.report.PackageReportImpl;
-import it.unibo.pcd.assignment.event.report.ProjectReportImpl;
+import it.unibo.pcd.assignment.event.report.*;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -43,7 +40,7 @@ public class ProjectCollector {
                 .collect(Collectors.toList());
 
         PackageCollector packageCollector = new PackageCollector();
-        List<PackageReportImpl> packageReportList = new ArrayList<>();
+        List<PackageReport> packageReportList = new ArrayList<>();
 
         for (PackageDeclaration pckDec : cuPack) {
             PackageReportImpl report = new PackageReportImpl();

@@ -17,7 +17,7 @@ public interface ProjectAnalyzer {
      * @param srcInterfacePath
      * @return
      */
-    Future<InterfaceReport> getInterfaceReport(String srcInterfacePath);
+    Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, Consumer<ProjectElem> callback);
 
     /**
      * Async method to retrieve the report about a specific class,
@@ -26,7 +26,7 @@ public interface ProjectAnalyzer {
      * @param srcClassPath
      * @return
      */
-    Future<ClassReport> getClassReport(String srcClassPath);
+    Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback);
 
     /**
      * Async method to retrieve the report about a package,
@@ -35,16 +35,7 @@ public interface ProjectAnalyzer {
      * @param srcPackagePath
      * @return
      */
-    Future<PackageReport> getPackageReport(String srcPackagePath);
-
-    /**
-     * Async method to retrieve the report about a project
-     * given the full path of the project folder
-     *
-     * @param srcProjectFolderPath
-     * @return
-     */
-    Future<ProjectReport> getProjectReport(String srcProjectFolderPath);
+    Future<PackageReport> getPackageReport(String srcPackagePath, Consumer<ProjectElem> callback);
 
     /**
      * Async function that analyze a project given the full path of the project folder,
@@ -53,5 +44,5 @@ public interface ProjectAnalyzer {
      * @param srcProjectFolderName
      * @param callback
      */
-    void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback);
+    Future<ProjectReport> analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback);
 }

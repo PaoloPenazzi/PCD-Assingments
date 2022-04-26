@@ -5,14 +5,14 @@ import java.util.List;
 
 public class PackageReportImpl implements PackageReport {
     private String fullPackageName;
-    private List<ClassReportImpl> classReports;
-    private List<InterfaceReportImpl> interfaceReports;
+    private List<ClassReport> classReports;
+    private List<InterfaceReport> interfaceReports;
 
-    public void setClassReports(List<ClassReportImpl> classReports) {
+    public void setClassReports(List<ClassReport> classReports) {
         this.classReports = classReports;
     }
 
-    public void setInterfaceReports(List<InterfaceReportImpl> interfaceReports) {
+    public void setInterfaceReports(List<InterfaceReport> interfaceReports) {
         this.interfaceReports = interfaceReports;
     }
 
@@ -26,12 +26,12 @@ public class PackageReportImpl implements PackageReport {
 
     @Override
     public List<ClassReport> getClassesReport() {
-        return new ArrayList<>(this.classReports);
+        return this.classReports;
     }
 
     @Override
     public List<InterfaceReport> getInterfacesReport() {
-        return new ArrayList<>(this.interfaceReports);
+        return this.interfaceReports;
     }
 
     @Override
