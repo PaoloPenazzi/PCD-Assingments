@@ -7,17 +7,15 @@ public class ViewFrame extends JFrame {
     private JButton openProject;
     private JTextArea console;
     private JPanel controlPanel;
-    private JPanel outputPanel;
-
 
     public ViewFrame() {
-        this.setSize(1200, 720);
+        this.setSize(620, 620);
         this.setTitle("Project Analyzer");
         this.setLayout(new BorderLayout());
         this.createControlPanel();
         this.createOutputPanel();
-        this.getContentPane().add(this.controlPanel, BorderLayout.NORTH);
-        this.getContentPane().add(this.outputPanel, BorderLayout.SOUTH);
+        this.getContentPane().add(BorderLayout.NORTH, this.controlPanel);
+        this.getContentPane().add(BorderLayout.CENTER, this.console);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
     }
@@ -29,11 +27,11 @@ public class ViewFrame extends JFrame {
     }
 
     private void createOutputPanel() {
-        this.outputPanel = new JPanel();
         this.console = new JTextArea();
-        this.console.setSize(1200, 400);
-        this.outputPanel.add(this.console);
-        this.outputPanel.setSize(1200,400);
+        this.console.setLineWrap(true);
+        this.console.setWrapStyleWord(true);
+        this.console.setEditable(false);
+        this.console.setSize(620, 400);
         this.console.append("START");
     }
 }
