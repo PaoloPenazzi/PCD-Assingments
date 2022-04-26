@@ -180,6 +180,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
 <<<<<<< HEAD
+<<<<<<< HEAD
                 promise.complete(projectReport);
                 this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
                 this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
@@ -189,10 +190,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 //callback.accept(projectReport);
 =======
                 callback.accept(projectReport);
+=======
+                // callback.accept(projectReport);
+>>>>>>> cf87498c9c26e4f7699cbf42bc0a84bd114a669c
                 this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
                 this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
                 this.viewController.log("Interface Number: " + ProjectAnalyzerImpl.INTERFACE_NUMBER + "\n");
->>>>>>> 3281af6dc4c10ebc7bed9ace233b5490b1f4c1f8
                 promise.complete(projectReport);
 >>>>>>> 4d9213572605850bcdde461468a36f68988f7427
             });
