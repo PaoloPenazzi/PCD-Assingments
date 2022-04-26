@@ -1,5 +1,7 @@
 package it.unibo.pcd.assignment.event.view;
 
+import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
@@ -17,6 +19,7 @@ public class ViewController {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.showSaveDialog(fileChooser);
         String path = fileChooser.getSelectedFile().getPath();
+        ProjectAnalyzerImpl.PATH = path;
         view.getFileSelectedLabel().setText(path);
     }
 
