@@ -37,8 +37,7 @@ public class TestSyncReports {
     public void testInterfaceReport() {
         CompilationUnit cu;
         try {
-
-            cu = StaticJavaParser.parse(new File("src/main/java/it/unibo/pcd/assignment/event/ProjectReport.java"));
+            cu = StaticJavaParser.parse(new File("src/main/java/it/unibo/pcd/assignment/event/report/ProjectReport.java"));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

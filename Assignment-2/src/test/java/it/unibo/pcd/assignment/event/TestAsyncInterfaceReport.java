@@ -7,7 +7,8 @@ public class TestAsyncInterfaceReport {
 
     public static void main(String[] args) {
         ProjectAnalyzer projectAnalyzer = new ProjectAnalyzerImpl();
-        Future<InterfaceReport> reportFuture = projectAnalyzer.getInterfaceReport("src/main/java/it/unibo/pcd/assignment/event/ProjectAnalyzer.java");
+        Future<InterfaceReport> reportFuture = projectAnalyzer.getInterfaceReport("src/main/java/it/unibo/pcd/assignment/event/ProjectAnalyzer.java", System.out::println);
+        System.out.println(" \n \n \n \n");
         reportFuture.onComplete(res -> System.out.println(res.result().toString()));
     }
 
