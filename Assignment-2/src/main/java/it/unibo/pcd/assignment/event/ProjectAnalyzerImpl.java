@@ -139,6 +139,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 callback.accept(packageReport);
                 promise.complete(packageReport);
             });
+            ProjectAnalyzerImpl.PACKAGE_NUMBER++;
         });
     }
 
@@ -171,7 +172,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
-                ProjectAnalyzerImpl.PACKAGE_NUMBER++;
                 futureListPackage.add(getPackageReport(packageDeclaration.getNameAsString(), callback));
             }
 
@@ -179,17 +179,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             CompositeFuture.all(futureListPackage).onComplete(res -> {
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
-                callback.accept(projectReport);
+                promise.complete(projectReport);
                 this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
                 this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
                 this.viewController.log("Interface Number: " + ProjectAnalyzerImpl.INTERFACE_NUMBER + "\n");
-                promise.complete(projectReport);
             });
         });
-    }
-
-    private void log(String msg) {
-        System.out.println("[REACTIVE AGENT] " + Thread.currentThread().getName() + msg);
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
