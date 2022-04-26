@@ -33,7 +33,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     public static String PATH = "";
 
     public ProjectAnalyzerImpl() {
-        this.viewController = new ViewController();
+        this.viewController = new ViewController(this);
         Vertx.vertx().deployVerticle(this);
     }
 
