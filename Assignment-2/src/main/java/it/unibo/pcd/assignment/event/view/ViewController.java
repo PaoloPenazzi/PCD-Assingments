@@ -12,6 +12,10 @@ public class ViewController {
     }
 
     public void actionPerformed(ActionEvent e) {
-        console.append("BELLAAAAA");
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        fileChooser.showSaveDialog(fileChooser);
+        String path = fileChooser.getSelectedFile().getPath();
+        console.append(path);
     }
 }
