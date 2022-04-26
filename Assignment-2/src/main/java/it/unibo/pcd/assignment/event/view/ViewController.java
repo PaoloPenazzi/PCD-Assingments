@@ -5,9 +5,10 @@ import java.awt.event.ActionEvent;
 
 public class ViewController {
     private JTextArea console;
+    private ViewFrame view;
 
     public ViewController (){
-        ViewFrame view = new ViewFrame(this);
+        this.view = new ViewFrame(this);
         this.console = view.getConsole();
     }
 
@@ -16,6 +17,6 @@ public class ViewController {
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.showSaveDialog(fileChooser);
         String path = fileChooser.getSelectedFile().getPath();
-        console.append(path);
+        view.getFileSelected().setText(path);
     }
 }

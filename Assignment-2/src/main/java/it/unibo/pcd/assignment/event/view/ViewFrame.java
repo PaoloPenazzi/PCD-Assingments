@@ -5,12 +5,13 @@ import java.awt.*;
 
 public class ViewFrame extends JFrame {
     private JButton openProject;
-
     private JTextArea console;
-
     private JPanel controlPanel;
     private JScrollPane outputPanel;
+    private JLabel fileSelected;
+    private JPanel bottomPanel;
     private ViewController controller;
+
     public ViewFrame(ViewController controller) {
         this.controller = controller;
         this.setSize(620, 620);
@@ -18,10 +19,17 @@ public class ViewFrame extends JFrame {
         this.setLayout(new BorderLayout());
         this.createControlPanel();
         this.createConsole();
+        this.createBottomPanel();
         this.getContentPane().add(BorderLayout.NORTH, this.controlPanel);
         this.getContentPane().add(BorderLayout.CENTER, this.outputPanel);
+        this.getContentPane().add(BorderLayout.SOUTH, this.bottomPanel);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
+    }
+    private void createBottomPanel() {
+        this.bottomPanel = new JPanel();
+        this.fileSelected = new JLabel("Ready");
+        this.bottomPanel.add(this.fileSelected);
     }
 
     private void createControlPanel() {
@@ -38,6 +46,10 @@ public class ViewFrame extends JFrame {
         this.console.setEditable(false);
         this.console.setSize(620, 400);
         this.outputPanel = new JScrollPane(this.console);
+    }
+
+    public JLabel getFileSelected() {
+        return fileSelected;
     }
 
     public JTextArea getConsole() {
