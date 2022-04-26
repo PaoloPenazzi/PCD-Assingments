@@ -10,6 +10,9 @@ public class ViewController {
     private final JTextArea outputConsole;
     private final ViewFrame view;
     private final ProjectAnalyzerImpl projectAnalyzer;
+    public static int CLASS_NUMBER = 0;
+    public static int INTERFACE_NUMBER = 0;
+    public static int PACKAGE_NUMBER = 0;
 
     public ViewController (ProjectAnalyzerImpl projectAnalyzer){
         this.projectAnalyzer = projectAnalyzer;
@@ -30,6 +33,18 @@ public class ViewController {
         if (!Objects.equals(ProjectAnalyzerImpl.PATH, "")) {
             this.projectAnalyzer.analyzeProject(ProjectAnalyzerImpl.PATH, (k) -> this.log(k.toString()));
         }
+    }
+
+    public void increasePackageNumber(){
+        this.view.getTextPackage().setText(String.valueOf(PACKAGE_NUMBER++));
+    }
+
+    public void increaseClassNumber(){
+        this.view.getTextClass().setText(String.valueOf(CLASS_NUMBER++));
+    }
+
+    public void increaseInterfaceNumber(){
+        this.view.getTextInterface().setText(String.valueOf(INTERFACE_NUMBER++));
     }
 
     public void log(String message) {

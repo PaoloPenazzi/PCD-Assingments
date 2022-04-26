@@ -8,6 +8,9 @@ public class ViewFrame extends JFrame {
     private JButton startAnalysisButton;
     private JButton stopAnalysisButton;
     private JTextArea consoleTextArea;
+    private JTextField textPackage;
+    private JTextField textClass;
+    private JTextField textInterface;
     private JLabel fileSelectedLabel;
     private JPanel northPanel;
     private JScrollPane centralPanel;
@@ -29,8 +32,27 @@ public class ViewFrame extends JFrame {
         this.setVisible(true);
     }
     private void createBottomPanel() {
-        this.bottomPanel = new JPanel();
+        this.bottomPanel = new JPanel(new GridLayout(4,2));
         this.fileSelectedLabel = new JLabel("Ready");
+
+        JLabel labelPackage = new JLabel("Package: ");
+        this.textPackage = new JTextField();
+        this.textPackage.setEditable(false);
+
+        JLabel labelClass = new JLabel("Class: ");
+        this.textClass = new JTextField();
+        this.textClass.setEditable(false);
+
+        JLabel labelInterface = new JLabel("Interface: ");
+        this.textInterface = new JTextField();
+        this.textInterface.setEditable(false);
+
+        this.bottomPanel.add(labelPackage);
+        this.bottomPanel.add(textPackage);
+        this.bottomPanel.add(labelClass);
+        this.bottomPanel.add(textClass);
+        this.bottomPanel.add(labelInterface);
+        this.bottomPanel.add(textInterface);
         this.bottomPanel.add(this.fileSelectedLabel);
     }
 
@@ -51,7 +73,7 @@ public class ViewFrame extends JFrame {
         this.consoleTextArea.setLineWrap(true);
         this.consoleTextArea.setWrapStyleWord(true);
         this.consoleTextArea.setEditable(false);
-        this.consoleTextArea.setSize(620, 400);
+        this.consoleTextArea.setSize(620, 300);
         this.centralPanel = new JScrollPane(this.consoleTextArea);
     }
 
@@ -61,5 +83,17 @@ public class ViewFrame extends JFrame {
 
     public JTextArea getConsoleTextArea() {
         return consoleTextArea;
+    }
+
+    public JTextField getTextPackage() {
+        return this.textPackage;
+    }
+
+    public JTextField getTextClass() {
+        return this.textClass;
+    }
+
+    public JTextField getTextInterface() {
+        return this.textInterface;
     }
 }

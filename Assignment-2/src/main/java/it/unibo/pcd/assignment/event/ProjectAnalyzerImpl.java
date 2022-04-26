@@ -31,9 +31,6 @@ import java.util.stream.Stream;
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
     private final ViewController viewController;
     public static String PATH = "";
-    public static int CLASS_NUMBER = 0;
-    public static int INTERFACE_NUMBER = 0;
-    public static int PACKAGE_NUMBER = 0;
 
 
     public ProjectAnalyzerImpl() {
@@ -53,7 +50,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
             InterfaceCollector interfaceCollector = new InterfaceCollector();
             interfaceCollector.visit(compilationUnit, interfaceReport);
-            ProjectAnalyzerImpl.INTERFACE_NUMBER++;
+            this.viewController.increaseInterfaceNumber();
             callback.accept(interfaceReport);
             promise.complete(interfaceReport);
         });
@@ -71,7 +68,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
             classCollector.visit(compilationUnit, classReport);
-            ProjectAnalyzerImpl.CLASS_NUMBER++;
+            this.viewController.increaseClassNumber();
             callback.accept(classReport);
             promise.complete(classReport);
         });
@@ -139,7 +136,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 callback.accept(packageReport);
                 promise.complete(packageReport);
             });
-            ProjectAnalyzerImpl.PACKAGE_NUMBER++;
+            this.viewController.increasePackageNumber();
         });
     }
 
@@ -180,9 +177,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
                 // callback.accept(projectReport);
-                this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
-                this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
-                this.viewController.log("Interface Number: " + ProjectAnalyzerImpl.INTERFACE_NUMBER + "\n");
+                //this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
+                //this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
+                //this.viewController.log("Interface Number: " + ProjectAnalyzerImpl.INTERFACE_NUMBER + "\n");
                 promise.complete(projectReport);
             });
         });
