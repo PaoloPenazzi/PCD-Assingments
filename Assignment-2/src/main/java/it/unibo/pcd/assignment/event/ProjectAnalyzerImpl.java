@@ -139,6 +139,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 callback.accept(packageReport);
                 promise.complete(packageReport);
             });
+            ProjectAnalyzerImpl.PACKAGE_NUMBER++;
         });
     }
 
@@ -171,7 +172,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
-                ProjectAnalyzerImpl.PACKAGE_NUMBER++;
                 futureListPackage.add(getPackageReport(packageDeclaration.getNameAsString(), callback));
             }
 
@@ -186,10 +186,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 promise.complete(projectReport);
             });
         });
-    }
-
-    private void log(String msg) {
-        System.out.println("[REACTIVE AGENT] " + Thread.currentThread().getName() + msg);
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
