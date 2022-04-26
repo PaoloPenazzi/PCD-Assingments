@@ -19,4 +19,8 @@ public class ViewController {
         String path = fileChooser.getSelectedFile().getPath();
         view.getFileSelected().setText(path);
     }
+
+    public void log(String message) {
+        this.console.append(message + "\n");
+    }
 }
