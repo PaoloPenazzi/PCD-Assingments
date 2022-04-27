@@ -8,7 +8,7 @@ public class ClassReportImpl implements ClassReport {
     private String srcFullFileName;
     private List<MethodInfo> methodsInfo;
     private List<FieldInfo> fieldsInfo;
-    private List<ClassReport> innerClassList;
+    private List<ClassReport> innerClassList = new ArrayList<>();
 
     @Override
     public String getFullClassName() {
@@ -57,9 +57,12 @@ public class ClassReportImpl implements ClassReport {
 
     @Override
     public String toString() {
-        return "ClassReportImpl: " + fullClassName + '\n' +
-                "File Name: " + srcFullFileName + '\n' +
-                "Methods: " + methodsInfo + '\n' +
-                "Fields: " + fieldsInfo + '\n' + '\n';
+        return "ClassReportImpl{" +
+                "fullClassName='" + fullClassName + '\'' +
+                ", srcFullFileName='" + srcFullFileName + '\'' +
+                ", methodsInfo=" + methodsInfo +
+                ", fieldsInfo=" + fieldsInfo +
+                ", innerClassList=" + innerClassList +
+                '}';
     }
 }

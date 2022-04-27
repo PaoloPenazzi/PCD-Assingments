@@ -81,13 +81,30 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 ClassReportImpl classReport = new ClassReportImpl();
                 ClassCollector classCollector = new ClassCollector();
                 classCollector.visit(compilationUnit, classReport);
+
                 this.viewController.increaseClassNumber();
+
+                if(!classReport.getInnerClassList().isEmpty()){
+                    this.addInnerChildClassNodeToFather(classReport, fatherTreeNode);
+                }
+
                 callback.accept(classReport);
                 promise.complete(classReport);
             } else {
                 promise.complete();
             }
         });
+    }
+
+    private void addInnerChildClassNodeToFather(ClassReport classReportFather, SimpleTreeNode fatherTreeNode){
+        for(ClassReport classReport : classReportFather.getInnerClassList()){
+            SimpleTreeNode innerClassChildNode = new SimpleTreeNode("Inner Class child: "+classReport.getFullClassName());
+            fatherTreeNode.addChild(innerClassChildNode);
+            if(!classReport.getInnerClassList().isEmpty()){
+                this.addInnerChildClassNodeToFather(classReport, innerClassChildNode);
+            }
+        }
+
     }
 
     @Override
@@ -128,11 +145,10 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                         futureListInterface.add(this.getInterfaceReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
                                 .replace(".", "/") + ".java", callback));
                     } else {
-                        // TODO il father non dovrà essere null nel caso di inner class
                         SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: "+ declaration.getNameAsString());
                         fatherTreeNode.addChild(classNodeChild);
                         futureListClass.add(this.getClassReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java", callback,  null));
+                                .replace(".", "/") + ".java", callback,  classNodeChild));
                     }
                 }
             }

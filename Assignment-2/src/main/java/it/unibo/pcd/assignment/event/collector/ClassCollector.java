@@ -13,7 +13,16 @@ import java.util.List;
 public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
     @Override
     public void visit(ClassOrInterfaceDeclaration dec, ClassReportImpl collector) {
+//        ClassReportImpl innerClassReport = new ClassReportImpl();
+//        super.visit(dec, innerClassReport);
+//        System.out.println(dec.getNameAsString());
+//        if (innerClassReport.getFullClassName() != null) {
+//            System.out.println(innerClassReport.getFullClassName());
+//            collector.getInnerClassList().add(innerClassReport);
+//        }
+
         super.visit(dec, collector);
+
         collector.setFullClassName(dec.getNameAsString());
         collector.setSrcFullFileName(dec.getFullyQualifiedName().orElse("NULL!"));
 
