@@ -31,11 +31,6 @@ public class ViewController {
 
     public void startAnalysisPressed(ActionEvent e) {
         if (!Objects.equals(ProjectAnalyzerImpl.PATH, "")) {
-            try {
-                this.projectAnalyzer.start();
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
             ViewController.CLASS_NUMBER = 0;
             ViewController.INTERFACE_NUMBER = 0;
             ViewController.PACKAGE_NUMBER = 0;
@@ -48,11 +43,6 @@ public class ViewController {
     }
 
     public void stopAnalysisPressed(ActionEvent e) {
-        try {
-            this.projectAnalyzer.stop();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
     public void increasePackageNumber(){

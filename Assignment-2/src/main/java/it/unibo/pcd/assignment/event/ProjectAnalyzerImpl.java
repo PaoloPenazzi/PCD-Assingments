@@ -41,10 +41,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     public ProjectAnalyzerImpl() {
         this.viewController = new ViewController(this);
         this.alreadyAnalyzed = new ArrayList<>();
-    }
-
-    @Override
-    public void start() {
         Vertx.vertx().deployVerticle(this);
     }
 
@@ -226,12 +222,5 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
     public List<String> getAlreadyAnalyzed() {
         return alreadyAnalyzed;
-    }
-
-    @Override
-    public void stop() throws Exception {
-        super.stop();
-        this.getVertx().close();
-
     }
 }
