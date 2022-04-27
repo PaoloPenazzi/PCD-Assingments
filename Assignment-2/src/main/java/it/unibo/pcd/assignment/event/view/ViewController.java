@@ -1,5 +1,6 @@
 package it.unibo.pcd.assignment.event.view;
 
+import io.vertx.core.Vertx;
 import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
 
 import javax.swing.*;
@@ -45,6 +46,11 @@ public class ViewController {
     }
 
     public void stopAnalysisPressed(ActionEvent e) {
+        try {
+            this.projectAnalyzer.getVertx().undeploy(projectAnalyzer.deploymentID());
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     public void increasePackageNumber() {
