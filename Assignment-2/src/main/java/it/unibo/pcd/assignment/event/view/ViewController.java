@@ -43,15 +43,15 @@ public class ViewController {
     }
 
     public void increasePackageNumber(){
-        this.view.getTextPackage().setText(String.valueOf(PACKAGE_NUMBER++));
+        this.view.getTextPackage().setText(String.valueOf(++PACKAGE_NUMBER));
     }
 
     public void increaseClassNumber(){
-        this.view.getTextClass().setText(String.valueOf(CLASS_NUMBER++));
+        this.view.getTextClass().setText(String.valueOf(++CLASS_NUMBER));
     }
 
     public void increaseInterfaceNumber(){
-        this.view.getTextInterface().setText(String.valueOf(INTERFACE_NUMBER++));
+        this.view.getTextInterface().setText(String.valueOf(++INTERFACE_NUMBER));
     }
 
     public void log(String message) {

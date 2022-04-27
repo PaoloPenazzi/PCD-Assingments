@@ -46,6 +46,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         return this.getVertx().executeBlocking(promise -> {
             if(!this.alreadyAnalyzed.contains(srcInterfacePath)) {
                 this.alreadyAnalyzed.add(srcInterfacePath);
+                System.out.println("INTERFACCIA:   " + srcInterfacePath);
                 CompilationUnit compilationUnit;
                 try {
                     compilationUnit = StaticJavaParser.parse(new File(srcInterfacePath));
@@ -58,6 +59,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 this.viewController.increaseInterfaceNumber();
                 callback.accept(interfaceReport);
                 promise.complete(interfaceReport);
+            } else {
+                promise.complete();
             }
         });
     }
@@ -67,6 +70,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         return this.getVertx().executeBlocking(promise -> {
             if(!this.alreadyAnalyzed.contains(srcClassPath)) {
                 this.alreadyAnalyzed.add(srcClassPath);
+                System.out.println(srcClassPath);
                 CompilationUnit compilationUnit;
                 try {
                     compilationUnit = StaticJavaParser.parse(new File(srcClassPath));
@@ -79,6 +83,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 this.viewController.increaseClassNumber();
                 callback.accept(classReport);
                 promise.complete(classReport);
+            } else {
+                promise.complete();
             }
         });
     }
