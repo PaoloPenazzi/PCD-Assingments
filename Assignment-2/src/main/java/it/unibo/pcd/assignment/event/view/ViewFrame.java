@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 public class ViewFrame extends JFrame {
+    private final ViewController controller;
     private JButton openProjectButton;
     private JButton startAnalysisButton;
     private JButton stopAnalysisButton;
@@ -15,7 +16,6 @@ public class ViewFrame extends JFrame {
     private JPanel northPanel;
     private JScrollPane centralPanel;
     private JPanel bottomPanel;
-    private final ViewController controller;
 
     public ViewFrame(ViewController controller) {
         this.controller = controller;
@@ -32,8 +32,9 @@ public class ViewFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setVisible(true);
     }
+
     private void createBottomPanel() {
-        this.bottomPanel = new JPanel(new GridLayout(4,2));
+        this.bottomPanel = new JPanel(new GridLayout(4, 2));
         this.fileSelectedLabel = new JLabel("Ready");
 
         JLabel labelPackage = new JLabel("Package: ");

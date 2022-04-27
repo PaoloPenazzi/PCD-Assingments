@@ -1,6 +1,5 @@
 package it.unibo.pcd.assignment.event.report;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PackageReportImpl implements PackageReport {

@@ -42,8 +42,8 @@ public class ClassReportImpl implements ClassReport {
         return this.fieldsInfo;
     }
 
-    public void setInnerClassList(List<ClassReport> newInnerClassList){
-        this.innerClassList = newInnerClassList;
+    public void setFieldsInfo(List<? extends FieldInfo> fieldsInfo) {
+        this.fieldsInfo = new ArrayList<>(fieldsInfo);
     }
 
     @Override
@@ -51,8 +51,8 @@ public class ClassReportImpl implements ClassReport {
         return this.innerClassList;
     }
 
-    public void setFieldsInfo(List<? extends FieldInfo> fieldsInfo) {
-        this.fieldsInfo = new ArrayList<>(fieldsInfo);
+    public void setInnerClassList(List<ClassReport> newInnerClassList) {
+        this.innerClassList = newInnerClassList;
     }
 
     @Override

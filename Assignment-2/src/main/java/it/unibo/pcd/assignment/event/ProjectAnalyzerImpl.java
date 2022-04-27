@@ -19,7 +19,6 @@ import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
 import it.unibo.pcd.assignment.event.report.*;
 import it.unibo.pcd.assignment.event.view.ViewController;
-import javassist.Loader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -32,9 +31,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
-    private final ViewController viewController;
     public static String PATH = "";
-
+    private final ViewController viewController;
     private final List<String> alreadyAnalyzed;
 
 
@@ -84,7 +82,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
                 this.viewController.increaseClassNumber();
 
-                if(!classReport.getInnerClassList().isEmpty()){
+                if (!classReport.getInnerClassList().isEmpty()) {
                     this.addInnerChildClassNodeToFather(classReport, fatherTreeNode);
                 }
 
@@ -96,11 +94,11 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         });
     }
 
-    private void addInnerChildClassNodeToFather(ClassReport classReportFather, SimpleTreeNode fatherTreeNode){
-        for(ClassReport classReport : classReportFather.getInnerClassList()){
-            SimpleTreeNode innerClassChildNode = new SimpleTreeNode("Inner Class child: "+classReport.getFullClassName());
+    private void addInnerChildClassNodeToFather(ClassReport classReportFather, SimpleTreeNode fatherTreeNode) {
+        for (ClassReport classReport : classReportFather.getInnerClassList()) {
+            SimpleTreeNode innerClassChildNode = new SimpleTreeNode("Inner Class child: " + classReport.getFullClassName());
             fatherTreeNode.addChild(innerClassChildNode);
-            if(!classReport.getInnerClassList().isEmpty()){
+            if (!classReport.getInnerClassList().isEmpty()) {
                 this.addInnerChildClassNodeToFather(classReport, innerClassChildNode);
             }
         }
@@ -140,15 +138,15 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 // riempiamo le future in modo tale da sapere in futuro quando saranno pronte le variabili
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     if (declaration.isInterface()) {
-                        SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: "+declaration.getNameAsString());
+                        SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + declaration.getNameAsString());
                         fatherTreeNode.addChild(interfaceNodeChild);
                         futureListInterface.add(this.getInterfaceReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
                                 .replace(".", "/") + ".java", callback));
                     } else {
-                        SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: "+ declaration.getNameAsString());
+                        SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + declaration.getNameAsString());
                         fatherTreeNode.addChild(classNodeChild);
                         futureListClass.add(this.getClassReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java", callback,  classNodeChild));
+                                .replace(".", "/") + ".java", callback, classNodeChild));
                     }
                 }
             }
@@ -205,7 +203,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
-                SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: "+packageDeclaration.getNameAsString());
+                SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
                 futureListPackage.add(getPackageReport(packageDeclaration.getNameAsString(), callback, packageNodeChild));
             }

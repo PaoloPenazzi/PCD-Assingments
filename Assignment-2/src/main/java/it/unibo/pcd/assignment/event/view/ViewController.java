@@ -7,14 +7,14 @@ import java.awt.event.ActionEvent;
 import java.util.Objects;
 
 public class ViewController {
-    private final JTextArea outputConsole;
-    private final ViewFrame view;
-    private final ProjectAnalyzerImpl projectAnalyzer;
     public static int CLASS_NUMBER = 0;
     public static int INTERFACE_NUMBER = 0;
     public static int PACKAGE_NUMBER = 0;
+    private final JTextArea outputConsole;
+    private final ViewFrame view;
+    private final ProjectAnalyzerImpl projectAnalyzer;
 
-    public ViewController (ProjectAnalyzerImpl projectAnalyzer){
+    public ViewController(ProjectAnalyzerImpl projectAnalyzer) {
         this.projectAnalyzer = projectAnalyzer;
         this.view = new ViewFrame(this);
         this.outputConsole = view.getConsoleTextArea();
@@ -47,15 +47,15 @@ public class ViewController {
     public void stopAnalysisPressed(ActionEvent e) {
     }
 
-    public void increasePackageNumber(){
+    public void increasePackageNumber() {
         this.view.getTextPackage().setText(String.valueOf(++PACKAGE_NUMBER));
     }
 
-    public void increaseClassNumber(){
+    public void increaseClassNumber() {
         this.view.getTextClass().setText(String.valueOf(++CLASS_NUMBER));
     }
 
-    public void increaseInterfaceNumber(){
+    public void increaseInterfaceNumber() {
         this.view.getTextInterface().setText(String.valueOf(++INTERFACE_NUMBER));
     }
 

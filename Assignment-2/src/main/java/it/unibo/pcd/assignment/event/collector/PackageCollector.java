@@ -27,10 +27,10 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
 
         // classes/interfaces report
         List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(dec).stream()
-                                                                                      .filter(ParseResult::isSuccessful)
-                                                                                      .filter(r -> r.getResult().isPresent())
-                                                                                      .map(r -> r.getResult().get())
-                                                                                      .collect(Collectors.toList());
+                .filter(ParseResult::isSuccessful)
+                .filter(r -> r.getResult().isPresent())
+                .map(r -> r.getResult().get())
+                .collect(Collectors.toList());
 
         ClassCollector classCollector = new ClassCollector();
         List<ClassReport> classReports = new ArrayList<>();
@@ -63,7 +63,7 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
         collector.setInterfaceReports(interfaceReports);
     }
 
-    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec){
+    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/")).setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList;
         try {

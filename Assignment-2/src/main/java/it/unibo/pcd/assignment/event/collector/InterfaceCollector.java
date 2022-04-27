@@ -16,7 +16,7 @@ public class InterfaceCollector extends VoidVisitorAdapter<InterfaceReportImpl> 
         collector.setMethodNameList(this.createMethodNameList(dec));
     }
 
-    private List<String> createMethodNameList(ClassOrInterfaceDeclaration dec){
+    private List<String> createMethodNameList(ClassOrInterfaceDeclaration dec) {
         List<String> methodNameList = new ArrayList<>();
         dec.getMethods().forEach(m -> {
             methodNameList.add(m.getName().asString());
