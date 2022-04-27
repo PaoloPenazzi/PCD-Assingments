@@ -44,9 +44,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, Consumer<ProjectElem> callback) {
         return this.getVertx().executeBlocking(promise -> {
-            if(!this.alreadyAnalyzed.contains(srcInterfacePath)) {
+            if (!this.alreadyAnalyzed.contains(srcInterfacePath)) {
                 this.alreadyAnalyzed.add(srcInterfacePath);
-                System.out.println("INTERFACCIA:   " + srcInterfacePath);
                 CompilationUnit compilationUnit;
                 try {
                     compilationUnit = StaticJavaParser.parse(new File(srcInterfacePath));
@@ -68,9 +67,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback) {
         return this.getVertx().executeBlocking(promise -> {
-            if(!this.alreadyAnalyzed.contains(srcClassPath)) {
+            if (!this.alreadyAnalyzed.contains(srcClassPath)) {
                 this.alreadyAnalyzed.add(srcClassPath);
-                System.out.println(srcClassPath);
                 CompilationUnit compilationUnit;
                 try {
                     compilationUnit = StaticJavaParser.parse(new File(srcClassPath));
@@ -97,8 +95,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             PackageReportImpl packageReport = new PackageReportImpl();
             packageReport.setFullPackageName(packageDeclaration.getNameAsString());
 
-            System.out.println("PACKAGE REPORT: " + packageDeclaration.getNameAsString());
-
             // ci salviamo le unita di memoria che contengono i dati rilevanti sulle classi e interfacce
             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
                     .filter(r -> r.isSuccessful() && r.getResult().isPresent())
@@ -112,7 +108,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             List<Future> futureListClass = new ArrayList<>();
             List<Future> futureListInterface = new ArrayList<>();
 
-            System.out.println(classesOrInterfacesUnit.size());
 
             // analizziamo le classi o le interfacce in maniera asincrona
             for (CompilationUnit cu : classesOrInterfacesUnit) {
