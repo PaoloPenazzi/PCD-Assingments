@@ -31,6 +31,8 @@ public class ViewController {
 
     public void startAnalysisPressed(ActionEvent e) {
         if (!Objects.equals(ProjectAnalyzerImpl.PATH, "")) {
+            this.view.getConsoleTextArea().selectAll();
+            this.view.getConsoleTextArea().replaceSelection("");
             ViewController.CLASS_NUMBER = 0;
             ViewController.INTERFACE_NUMBER = 0;
             ViewController.PACKAGE_NUMBER = 0;

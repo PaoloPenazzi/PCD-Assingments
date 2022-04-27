@@ -214,7 +214,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             CompositeFuture.all(futureListPackage).onComplete(res -> {
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
-                ListingTreePrinter.builder().ascii().build().print(rootProject);
+                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+
                 // callback.accept(projectReport);
                 //this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
                 //this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
