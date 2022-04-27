@@ -31,6 +31,10 @@ public class ViewController {
 
     public void startAnalysisPressed(ActionEvent e) {
         if (!Objects.equals(ProjectAnalyzerImpl.PATH, "")) {
+            this.view.getTextClass().setText("0");
+            this.view.getTextInterface().setText("0");
+            this.view.getTextPackage().setText("0");
+            this.projectAnalyzer.getAlreadyAnalyzed().clear();
             this.projectAnalyzer.analyzeProject(ProjectAnalyzerImpl.PATH, (k) -> this.log(k.toString()));
         }
     }
