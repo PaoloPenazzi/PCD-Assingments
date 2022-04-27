@@ -42,6 +42,9 @@ public class ViewController {
         }
     }
 
+    public void stopAnalysisPressed(ActionEvent e) {
+    }
+
     public void increasePackageNumber(){
         this.view.getTextPackage().setText(String.valueOf(++PACKAGE_NUMBER));
     }
