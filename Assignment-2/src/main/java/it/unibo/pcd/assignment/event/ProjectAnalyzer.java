@@ -1,5 +1,6 @@
 package it.unibo.pcd.assignment.event;
 
+import hu.webarticum.treeprinter.SimpleTreeNode;
 import io.vertx.core.Future;
 import it.unibo.pcd.assignment.event.report.ClassReport;
 import it.unibo.pcd.assignment.event.report.InterfaceReport;
@@ -26,7 +27,7 @@ public interface ProjectAnalyzer {
      * @param srcClassPath
      * @return
      */
-    Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback);
+    Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode);
 
     /**
      * Async method to retrieve the report about a package,
@@ -35,7 +36,7 @@ public interface ProjectAnalyzer {
      * @param srcPackagePath
      * @return
      */
-    Future<PackageReport> getPackageReport(String srcPackagePath, Consumer<ProjectElem> callback);
+    Future<PackageReport> getPackageReport(String srcPackagePath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode);
 
     /**
      * Async function that analyze a project given the full path of the project folder,
