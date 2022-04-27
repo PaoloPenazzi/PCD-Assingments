@@ -35,45 +35,58 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     private final ViewController viewController;
     public static String PATH = "";
 
+    private final List<String> alreadyAnalyzed;
+
 
     public ProjectAnalyzerImpl() {
         this.viewController = new ViewController(this);
+        this.alreadyAnalyzed = new ArrayList<>();
         Vertx.vertx().deployVerticle(this);
     }
 
     @Override
-    public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode) {
+    public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, Consumer<ProjectElem> callback) {
         return this.getVertx().executeBlocking(promise -> {
-            CompilationUnit compilationUnit;
-            try {
-                compilationUnit = StaticJavaParser.parse(new File(srcInterfacePath));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            if (!this.alreadyAnalyzed.contains(srcInterfacePath)) {
+                this.alreadyAnalyzed.add(srcInterfacePath);
+                CompilationUnit compilationUnit;
+                try {
+                    compilationUnit = StaticJavaParser.parse(new File(srcInterfacePath));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
+                InterfaceCollector interfaceCollector = new InterfaceCollector();
+                interfaceCollector.visit(compilationUnit, interfaceReport);
+                this.viewController.increaseInterfaceNumber();
+                callback.accept(interfaceReport);
+                promise.complete(interfaceReport);
+            } else {
+                promise.complete();
             }
-            InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
-            InterfaceCollector interfaceCollector = new InterfaceCollector();
-            interfaceCollector.visit(compilationUnit, interfaceReport);
-            this.viewController.increaseInterfaceNumber();
-            callback.accept(interfaceReport);
-            promise.complete(interfaceReport);
         });
     }
 
     @Override
     public Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            CompilationUnit compilationUnit;
-            try {
-                compilationUnit = StaticJavaParser.parse(new File(srcClassPath));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+            if (!this.alreadyAnalyzed.contains(srcClassPath)) {
+                this.alreadyAnalyzed.add(srcClassPath);
+                CompilationUnit compilationUnit;
+                try {
+                    compilationUnit = StaticJavaParser.parse(new File(srcClassPath));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+                ClassReportImpl classReport = new ClassReportImpl();
+                ClassCollector classCollector = new ClassCollector();
+                classCollector.visit(compilationUnit, classReport);
+                this.viewController.increaseClassNumber();
+                callback.accept(classReport);
+                promise.complete(classReport);
+            } else {
+                promise.complete();
             }
-            ClassReportImpl classReport = new ClassReportImpl();
-            ClassCollector classCollector = new ClassCollector();
-            classCollector.visit(compilationUnit, classReport);
-            this.viewController.increaseClassNumber();
-            callback.accept(classReport);
-            promise.complete(classReport);
         });
     }
 
@@ -83,8 +96,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             PackageDeclaration packageDeclaration;
             packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + srcPackagePath + ";");
             PackageReportImpl packageReport = new PackageReportImpl();
-
-            // salviamo il  nome del package
             packageReport.setFullPackageName(packageDeclaration.getNameAsString());
 
             // ci salviamo le unita di memoria che contengono i dati rilevanti sulle classi e interfacce
@@ -100,6 +111,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             List<Future> futureListClass = new ArrayList<>();
             List<Future> futureListInterface = new ArrayList<>();
 
+
             // analizziamo le classi o le interfacce in maniera asincrona
             for (CompilationUnit cu : classesOrInterfacesUnit) {
                 // prendiamo tutte le dichiarazione delle classi/interface
@@ -113,13 +125,14 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                     if (declaration.isInterface()) {
                         SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: "+declaration.getNameAsString());
                         fatherTreeNode.addChild(interfaceNodeChild);
-                        futureListInterface.add(this.getInterfaceReport("src/main/java/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java", callback, null));
+                        futureListInterface.add(this.getInterfaceReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
+                                .replace(".", "/") + ".java", callback));
                     } else {
+                        // TODO il father non dovrà essere null nel caso di inner class
                         SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: "+ declaration.getNameAsString());
                         fatherTreeNode.addChild(classNodeChild);
-                        futureListClass.add(this.getClassReport("src/main/java/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java", callback, null));
+                        futureListClass.add(this.getClassReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
+                                .replace(".", "/") + ".java", callback,  null));
                     }
                 }
             }
@@ -196,7 +209,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
-        SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/")).setParserConfiguration(new ParserConfiguration());
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(ProjectAnalyzerImpl.PATH)).setParserConfiguration(new ParserConfiguration());
+
         List<ParseResult<CompilationUnit>> parseResultList;
         try {
             parseResultList = sourceRoot.tryToParse(dec.getNameAsString());
@@ -204,5 +218,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             throw new RuntimeException(e);
         }
         return parseResultList;
+    }
+
+    public List<String> getAlreadyAnalyzed() {
+        return alreadyAnalyzed;
     }
 }

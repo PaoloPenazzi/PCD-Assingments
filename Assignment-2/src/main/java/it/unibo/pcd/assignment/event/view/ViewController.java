@@ -31,20 +31,27 @@ public class ViewController {
 
     public void startAnalysisPressed(ActionEvent e) {
         if (!Objects.equals(ProjectAnalyzerImpl.PATH, "")) {
+            ViewController.CLASS_NUMBER = 0;
+            ViewController.INTERFACE_NUMBER = 0;
+            ViewController.PACKAGE_NUMBER = 0;
+            this.view.getTextClass().setText("0");
+            this.view.getTextInterface().setText("0");
+            this.view.getTextPackage().setText("0");
+            this.projectAnalyzer.getAlreadyAnalyzed().clear();
             this.projectAnalyzer.analyzeProject(ProjectAnalyzerImpl.PATH, (k) -> this.log(k.toString()));
         }
     }
 
     public void increasePackageNumber(){
-        this.view.getTextPackage().setText(String.valueOf(PACKAGE_NUMBER++));
+        this.view.getTextPackage().setText(String.valueOf(++PACKAGE_NUMBER));
     }
 
     public void increaseClassNumber(){
-        this.view.getTextClass().setText(String.valueOf(CLASS_NUMBER++));
+        this.view.getTextClass().setText(String.valueOf(++CLASS_NUMBER));
     }
 
     public void increaseInterfaceNumber(){
-        this.view.getTextInterface().setText(String.valueOf(INTERFACE_NUMBER++));
+        this.view.getTextInterface().setText(String.valueOf(++INTERFACE_NUMBER));
     }
 
     public void log(String message) {

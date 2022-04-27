@@ -19,7 +19,8 @@ public class ViewFrame extends JFrame {
 
     public ViewFrame(ViewController controller) {
         this.controller = controller;
-        this.setSize(620, 620);
+        this.setSize(1200, 620);
+        this.setLocationRelativeTo(null);
         this.setTitle("Project Analyzer");
         this.setLayout(new BorderLayout());
         this.createNorthPanel();
