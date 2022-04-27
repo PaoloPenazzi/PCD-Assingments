@@ -13,4 +13,6 @@ public interface ClassReport extends ProjectElem {
 
     List<FieldInfo> getFieldsInfo();
 
+    List<ClassReport> getInnerClassList();
+
 }

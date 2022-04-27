@@ -8,6 +8,7 @@ public class ClassReportImpl implements ClassReport {
     private String srcFullFileName;
     private List<MethodInfo> methodsInfo;
     private List<FieldInfo> fieldsInfo;
+    private List<ClassReport> innerClassList;
 
     @Override
     public String getFullClassName() {
@@ -39,6 +40,15 @@ public class ClassReportImpl implements ClassReport {
     @Override
     public List<FieldInfo> getFieldsInfo() {
         return this.fieldsInfo;
+    }
+
+    public void setInnerClassList(List<ClassReport> newInnerClassList){
+        this.innerClassList = newInnerClassList;
+    }
+
+    @Override
+    public List<ClassReport> getInnerClassList() {
+        return this.innerClassList;
     }
 
     public void setFieldsInfo(List<? extends FieldInfo> fieldsInfo) {
