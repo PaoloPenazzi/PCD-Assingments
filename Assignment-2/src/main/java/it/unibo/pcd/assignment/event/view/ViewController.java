@@ -31,6 +31,9 @@ public class ViewController {
 
     public void startAnalysisPressed(ActionEvent e) {
         if (!Objects.equals(ProjectAnalyzerImpl.PATH, "")) {
+            ViewController.CLASS_NUMBER = 0;
+            ViewController.INTERFACE_NUMBER = 0;
+            ViewController.PACKAGE_NUMBER = 0;
             this.view.getTextClass().setText("0");
             this.view.getTextInterface().setText("0");
             this.view.getTextPackage().setText("0");
