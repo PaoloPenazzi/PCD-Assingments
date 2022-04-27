@@ -64,6 +64,7 @@ public class ViewFrame extends JFrame {
         this.stopAnalysisButton = new JButton("Stop");
         this.startAnalysisButton.addActionListener(controller::startAnalysisPressed);
         this.openProjectButton.addActionListener(controller::openProjectPressed);
+        this.stopAnalysisButton.addActionListener(controller::stopAnalysisPressed);
         this.northPanel.add(this.openProjectButton);
         this.northPanel.add(this.startAnalysisButton);
         this.northPanel.add(this.stopAnalysisButton);
