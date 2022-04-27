@@ -9,6 +9,8 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.utils.SourceRoot;
+import hu.webarticum.treeprinter.SimpleTreeNode;
+import hu.webarticum.treeprinter.printer.listing.ListingTreePrinter;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -17,6 +19,7 @@ import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
 import it.unibo.pcd.assignment.event.report.*;
 import it.unibo.pcd.assignment.event.view.ViewController;
+import javassist.Loader;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -39,7 +42,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     }
 
     @Override
-    public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, Consumer<ProjectElem> callback) {
+    public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
             CompilationUnit compilationUnit;
             try {
@@ -57,7 +60,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     }
 
     @Override
-    public Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback) {
+    public Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
             CompilationUnit compilationUnit;
             try {
@@ -75,7 +78,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     }
 
     @Override
-    public Future<PackageReport> getPackageReport(String srcPackagePath, Consumer<ProjectElem> callback) {
+    public Future<PackageReport> getPackageReport(String srcPackagePath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
             PackageDeclaration packageDeclaration;
             packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + srcPackagePath + ";");
@@ -108,13 +111,15 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 // riempiamo le future in modo tale da sapere in futuro quando saranno pronte le variabili
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     if (declaration.isInterface()) {
-
+                        SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: "+declaration.getNameAsString());
+                        fatherTreeNode.addChild(interfaceNodeChild);
                         futureListInterface.add(this.getInterfaceReport("src/main/java/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java", callback));
+                                .replace(".", "/") + ".java", callback, null));
                     } else {
-
+                        SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: "+ declaration.getNameAsString());
+                        fatherTreeNode.addChild(classNodeChild);
                         futureListClass.add(this.getClassReport("src/main/java/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java", callback));
+                                .replace(".", "/") + ".java", callback, null));
                     }
                 }
             }
@@ -167,15 +172,20 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                     .distinct()
                     .collect(Collectors.toList());
 
+            SimpleTreeNode rootProject = new SimpleTreeNode("Root Project: " + srcProjectFolderName);
+
             // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
-                futureListPackage.add(getPackageReport(packageDeclaration.getNameAsString(), callback));
+                SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: "+packageDeclaration.getNameAsString());
+                rootProject.addChild(packageNodeChild);
+                futureListPackage.add(getPackageReport(packageDeclaration.getNameAsString(), callback, packageNodeChild));
             }
 
             // aspetto che tutte le future siano pronte e restituisco il project report
             CompositeFuture.all(futureListPackage).onComplete(res -> {
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
+                ListingTreePrinter.builder().ascii().build().print(rootProject);
                 // callback.accept(projectReport);
                 //this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
                 //this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
