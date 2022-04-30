@@ -1,6 +1,5 @@
 package it.unibo.pcd.assignment.event.view;
 
-import io.vertx.core.Vertx;
 import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
 
 import javax.swing.*;
@@ -47,21 +46,21 @@ public class ViewController {
 
     public void stopAnalysisPressed(ActionEvent e) {
         try {
-            this.projectAnalyzer.getVertx().undeploy(projectAnalyzer.deploymentID());
+            this.projectAnalyzer.getVertx().close();
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
-    public void increasePackageNumber() {
+    synchronized public void increasePackageNumber() {
         this.view.getTextPackage().setText(String.valueOf(++PACKAGE_NUMBER));
     }
 
-    public void increaseClassNumber() {
+    synchronized public void increaseClassNumber() {
         this.view.getTextClass().setText(String.valueOf(++CLASS_NUMBER));
     }
 
-    public void increaseInterfaceNumber() {
+    synchronized public void increaseInterfaceNumber() {
         this.view.getTextInterface().setText(String.valueOf(++INTERFACE_NUMBER));
     }
 
