@@ -35,7 +35,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     private final ViewController viewController;
     private final List<String> alreadyAnalyzed;
 
-
     public ProjectAnalyzerImpl() {
         this.viewController = new ViewController(this);
         this.alreadyAnalyzed = new ArrayList<>();
@@ -45,8 +44,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, Consumer<ProjectElem> callback) {
         return this.getVertx().executeBlocking(promise -> {
-            if (!this.alreadyAnalyzed.contains(srcInterfacePath)) {
-                this.alreadyAnalyzed.add(srcInterfacePath);
+            if (!this.controlFileAnalyzed(srcInterfacePath)) {
+                this.addFileAnalyzed(srcInterfacePath);
                 CompilationUnit compilationUnit;
                 try {
                     compilationUnit = StaticJavaParser.parse(new File(srcInterfacePath));
@@ -68,41 +67,41 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<ClassReport> getClassReport(String srcClassPath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            if (!this.alreadyAnalyzed.contains(srcClassPath)) {
-                this.alreadyAnalyzed.add(srcClassPath);
+            if (!this.controlFileAnalyzed(srcClassPath)) {
+                this.addFileAnalyzed(srcClassPath);
                 CompilationUnit compilationUnit;
+
                 try {
                     compilationUnit = StaticJavaParser.parse(new File(srcClassPath));
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 }
+
                 ClassReportImpl classReport = new ClassReportImpl();
                 ClassCollector classCollector = new ClassCollector();
                 classCollector.visit(compilationUnit, classReport);
 
                 this.viewController.increaseClassNumber();
 
-                if (!classReport.getInnerClassList().isEmpty()) {
+                /*if (!classReport.getInnerClassList().isEmpty()) {
                     this.addInnerChildClassNodeToFather(classReport, fatherTreeNode);
-                }
+                }*/
 
                 callback.accept(classReport);
                 promise.complete(classReport);
+
             } else {
                 promise.complete();
             }
         });
     }
 
-    private void addInnerChildClassNodeToFather(ClassReport classReportFather, SimpleTreeNode fatherTreeNode) {
-        for (ClassReport classReport : classReportFather.getInnerClassList()) {
-            SimpleTreeNode innerClassChildNode = new SimpleTreeNode("Inner Class child: " + classReport.getFullClassName());
-            fatherTreeNode.addChild(innerClassChildNode);
-            if (!classReport.getInnerClassList().isEmpty()) {
-                this.addInnerChildClassNodeToFather(classReport, innerClassChildNode);
-            }
+    private void addInnerChildClassNodeToFather(ClassReport classReport, SimpleTreeNode fatherTreeNode) {
+        SimpleTreeNode innerClassChildNode = new SimpleTreeNode("Inner Class child: " + classReport.getFullClassName());
+        fatherTreeNode.addChild(innerClassChildNode);
+        if (!classReport.getInnerClassList().isEmpty()) {
+            this.addInnerChildClassNodeToFather(classReport, fatherTreeNode);
         }
-
     }
 
     @Override
@@ -135,17 +134,22 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                         .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                         .map(x -> (ClassOrInterfaceDeclaration) x)
                         .collect(Collectors.toList());
+
                 // riempiamo le future in modo tale da sapere in futuro quando saranno pronte le variabili
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     if (declaration.isInterface()) {
-                        SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + declaration.getNameAsString());
+                        SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " +
+                                declaration.getNameAsString());
                         fatherTreeNode.addChild(interfaceNodeChild);
-                        futureListInterface.add(this.getInterfaceReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
+                        futureListInterface.add(this.getInterfaceReport(ProjectAnalyzerImpl.PATH +
+                                "/" + declaration.getFullyQualifiedName().get()
                                 .replace(".", "/") + ".java", callback));
                     } else {
-                        SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + declaration.getNameAsString());
+                        SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " +
+                                declaration.getNameAsString());
                         fatherTreeNode.addChild(classNodeChild);
-                        futureListClass.add(this.getClassReport(ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
+                        futureListClass.add(this.getClassReport(ProjectAnalyzerImpl.PATH +
+                                "/" + declaration.getFullyQualifiedName().get()
                                 .replace(".", "/") + ".java", callback, classNodeChild));
                     }
                 }
@@ -166,9 +170,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             CompositeFuture.all(futureListClassInterface).onComplete(res -> {
                 callback.accept(packageReport);
+                this.viewController.increasePackageNumber();
                 promise.complete(packageReport);
             });
-            this.viewController.increasePackageNumber();
         });
     }
 
@@ -183,12 +187,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             // mi preparo il path da cui deve partire l'analisi
             SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
             List<ParseResult<CompilationUnit>> parseResultList;
+            parseResultList = sourceRoot.tryToParseParallelized();
 
-            try {
-                parseResultList = sourceRoot.tryToParse("");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
 
             // mi prendo i vari package che compongono il progetto
             List<PackageDeclaration> allCus = parseResultList.stream()
@@ -213,11 +213,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-
-                // callback.accept(projectReport);
-                //this.viewController.log("Package Number: " + ProjectAnalyzerImpl.PACKAGE_NUMBER + "\n");
-                //this.viewController.log("Class Number: " + ProjectAnalyzerImpl.CLASS_NUMBER + "\n");
-                //this.viewController.log("Interface Number: " + ProjectAnalyzerImpl.INTERFACE_NUMBER + "\n");
                 promise.complete(projectReport);
             });
         });
@@ -225,14 +220,17 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get(ProjectAnalyzerImpl.PATH)).setParserConfiguration(new ParserConfiguration());
-
         List<ParseResult<CompilationUnit>> parseResultList;
-        try {
-            parseResultList = sourceRoot.tryToParse(dec.getNameAsString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        parseResultList = sourceRoot.tryToParseParallelized(dec.getNameAsString());
         return parseResultList;
+    }
+
+    private synchronized boolean controlFileAnalyzed(String srcFilePath) {
+        return this.alreadyAnalyzed.contains(srcFilePath);
+    }
+
+    private synchronized void addFileAnalyzed(String srcFilePath) {
+        this.alreadyAnalyzed.add(srcFilePath);
     }
 
     public List<String> getAlreadyAnalyzed() {
