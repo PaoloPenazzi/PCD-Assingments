@@ -1,13 +1,8 @@
 package it.unibo.pcd.assignment.reactive.view;
 
-import io.reactivex.rxjava3.subjects.PublishSubject;
-import io.reactivex.rxjava3.subjects.Subject;
-import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
 import it.unibo.pcd.assignment.reactive.model.DummyModel;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.Objects;
 
 public class ViewController {
     private final ViewFrame view;
@@ -16,14 +11,14 @@ public class ViewController {
     public ViewController(DummyModel dummyModel) {
         this.dummyModel = dummyModel;
         this.view = new ViewFrame(this);
-        this.setupObserver();
+        this.setupClassNumberObserver();
     }
 
     public void incrementPressed(ActionEvent actionEvent) {
-        this.dummyModel.increment();
+        this.dummyModel.incrementClassNumber();
     }
 
-    public void setupObserver(){
-        dummyModel.getClassNumberObservable().subscribe(num -> view.getTextClass().setText("" + num));
+    public void setupClassNumberObserver(){
+        dummyModel.getClassNumberObservable().subscribe(num -> view.getClassCounterTextField().setText("" + num));
     }
 }
