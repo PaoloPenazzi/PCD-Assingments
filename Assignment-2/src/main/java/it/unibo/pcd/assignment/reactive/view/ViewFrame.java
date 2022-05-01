@@ -9,9 +9,9 @@ public class ViewFrame extends JFrame {
     private JButton startAnalysisButton;
     private JButton stopAnalysisButton;
     private JTextArea consoleTextArea;
-    private JTextField textPackage;
-    private JTextField textClass;
-    private JTextField textInterface;
+    private JTextField packageCounterTextField;
+    private JTextField classCounterTextField;
+    private JTextField interfaceCounterTextField;
     private JLabel fileSelectedLabel;
     private JPanel northPanel;
     private JScrollPane centralPanel;
@@ -23,38 +23,38 @@ public class ViewFrame extends JFrame {
         this.setLocationRelativeTo(null);
         this.setTitle("Project Analyzer");
         this.setLayout(new BorderLayout());
+        this.createAndAddPanels();
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
+    }
+
+    private void createAndAddPanels() {
         this.createNorthPanel();
         this.createCentralPanel();
         this.createBottomPanel();
         this.getContentPane().add(BorderLayout.NORTH, this.northPanel);
         this.getContentPane().add(BorderLayout.CENTER, this.centralPanel);
         this.getContentPane().add(BorderLayout.SOUTH, this.bottomPanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
     }
 
     private void createBottomPanel() {
         this.bottomPanel = new JPanel(new GridLayout(4, 2));
         this.fileSelectedLabel = new JLabel("Ready");
-
         JLabel labelPackage = new JLabel("Package: ");
-        this.textPackage = new JTextField();
-        this.textPackage.setEditable(false);
-
+        this.packageCounterTextField = new JTextField();
+        this.packageCounterTextField.setEditable(false);
         JLabel labelClass = new JLabel("Class: ");
-        this.textClass = new JTextField();
-        this.textClass.setEditable(false);
-
+        this.classCounterTextField = new JTextField();
+        this.classCounterTextField.setEditable(false);
         JLabel labelInterface = new JLabel("Interface: ");
-        this.textInterface = new JTextField();
-        this.textInterface.setEditable(false);
-
+        this.interfaceCounterTextField = new JTextField();
+        this.interfaceCounterTextField.setEditable(false);
         this.bottomPanel.add(labelPackage);
-        this.bottomPanel.add(textPackage);
+        this.bottomPanel.add(packageCounterTextField);
         this.bottomPanel.add(labelClass);
-        this.bottomPanel.add(textClass);
+        this.bottomPanel.add(classCounterTextField);
         this.bottomPanel.add(labelInterface);
-        this.bottomPanel.add(textInterface);
+        this.bottomPanel.add(interfaceCounterTextField);
         this.bottomPanel.add(this.fileSelectedLabel);
     }
 
@@ -86,15 +86,15 @@ public class ViewFrame extends JFrame {
         return consoleTextArea;
     }
 
-    public JTextField getTextPackage() {
-        return this.textPackage;
+    public JTextField getPackageCounterTextField() {
+        return this.packageCounterTextField;
     }
 
-    public JTextField getTextClass() {
-        return this.textClass;
+    public JTextField getClassCounterTextField() {
+        return this.classCounterTextField;
     }
 
-    public JTextField getTextInterface() {
-        return this.textInterface;
+    public JTextField getInterfaceCounterTextField() {
+        return this.interfaceCounterTextField;
     }
 }
