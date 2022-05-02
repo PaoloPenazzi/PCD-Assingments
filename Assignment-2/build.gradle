@@ -19,7 +19,7 @@ repositories {
 dependencies {
 
     /* module 2.2 - async programming with event-loops - vert.x */
-    implementation 'io.vertx:vertx-core:4.2.6'
+    implementation 'io.vertx:vertx-core:4.2.7'
     implementation 'io.vertx:vertx-web:4.2.6'
     implementation 'io.vertx:vertx-web-client:4.2.6'
     implementation 'io.reactivex.rxjava3:rxjava:3.1.4'
