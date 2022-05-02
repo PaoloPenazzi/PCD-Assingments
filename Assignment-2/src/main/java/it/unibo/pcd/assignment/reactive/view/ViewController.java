@@ -1,9 +1,7 @@
 package it.unibo.pcd.assignment.reactive.view;
 
 import io.reactivex.rxjava3.disposables.Disposable;
-import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
 import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzer;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
@@ -16,6 +14,7 @@ public class ViewController {
 
     public ViewController() {
         this.view = new ViewFrame(this);
+        this.reactiveAnalyzer = new ReactiveAnalyzer();
         this.setupPackageNumberObserver();
         this.setupClassNumberObserver();
         this.setupInterfaceNumberObserver();
@@ -32,10 +31,23 @@ public class ViewController {
 
     public void startPressed(ActionEvent actionEvent) {
         if (!this.reactiveAnalyzer.getPath().equals("")) {
-            this.reactiveAnalyzer = new ReactiveAnalyzer();
             this.clearConsoleOutput();
+            this.createObservers();
             this.reactiveAnalyzer.analyzeProject();
         }
+    }
+
+    // TODO check if this method is working correctly.
+    public void stopPressed(ActionEvent actionEvent) {
+        this.packageObserver.dispose();
+        this.classObserver.dispose();
+        this.interfaceObserver.dispose();
+    }
+
+    private void createObservers() {
+        this.setupInterfaceNumberObserver();
+        this.setupClassNumberObserver();
+        this.setupPackageNumberObserver();
     }
 
     private void clearConsoleOutput() {

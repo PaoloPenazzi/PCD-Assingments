@@ -19,7 +19,8 @@ public class ReactiveAnalyzer {
         this.path = "";
     }
 
-    public void analyzeProject() { }
+    public void analyzeProject() {
+    }
 
     public void incrementPackageNumber() {
         packageNumberObservable.onNext(++this.packageNumber);
