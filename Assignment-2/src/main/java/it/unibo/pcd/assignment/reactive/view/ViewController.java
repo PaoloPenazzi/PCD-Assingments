@@ -9,11 +9,7 @@ import java.awt.event.ActionEvent;
 
 public class ViewController {
     private final ViewFrame view;
-    private ReactiveAnalyzerImpl reactiveAnalyzerImpl;
-    private Disposable packageObserver;
-    private Disposable classObserver;
-    private Disposable interfaceObserver;
-    private Disposable reportObserver;
+    private final ReactiveAnalyzerImpl reactiveAnalyzerImpl;
     private Disposable runningProcess;
     private boolean isStopped;
 
@@ -64,29 +60,29 @@ public class ViewController {
     }
 
     private void setupReportObserver() {
-        this.reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
+        Disposable reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> view.getConsoleTextArea().append(res + "\n"));
     }
 
     private void setupPackageNumberObserver() {
-        this.packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
+        Disposable packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
-                    if(!this.isStopped) {
+                    if (!this.isStopped) {
                         view.getPackageCounterTextField().setText(res + "");
                     }
                 });
     }
 
     private void setupClassNumberObserver() {
-        this.classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
+        Disposable classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(num -> view.getClassCounterTextField().setText("" + num));
     }
 
     private void setupInterfaceNumberObserver() {
-        this.interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
+        Disposable interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(num -> view.getInterfaceCounterTextField().setText("" + num));
     }

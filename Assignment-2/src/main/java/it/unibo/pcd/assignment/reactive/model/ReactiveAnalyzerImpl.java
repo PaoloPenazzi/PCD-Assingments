@@ -2,6 +2,7 @@ package it.unibo.pcd.assignment.reactive.model;
 
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
+import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.utils.SourceRoot;
@@ -59,14 +60,21 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
             SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
             rootProject.addChild(packageNodeChild);
             packageList.add(packageDeclaration.getNameAsString());
+        }
+        this.packageReport(packageList);
+    }
+
+    private void packageReport(List<String> packageList) {
+        for (String packageName : packageList) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(100);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             incrementPackageNumber();
-            this.report = packageDeclaration.getNameAsString();
-            this.newReport();
+            setReport(packageName);
+            PackageDeclaration packageDeclaration = StaticJavaParser
+                    .parsePackageDeclaration("package " + packageName + ";");
         }
     }
 
@@ -82,7 +90,8 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.interfaceNumberObservable.onNext(++this.interfaceNumber);
     }
 
-    public void newReport() {
+    public void setReport(String report) {
+        this.report = report;
         reportObservable.onNext(report);
     }
 
