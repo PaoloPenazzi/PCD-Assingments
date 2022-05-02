@@ -7,10 +7,11 @@ public class DummyModel {
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
+
     private final Subject<Integer> packageNumberObservable = PublishSubject.create();
+
     private final Subject<Integer> classNumberObservable = PublishSubject.create();
     private final Subject<Integer> interfaceNumberObservable = PublishSubject.create();
-
     public DummyModel() {
         this.packageNumber = 0;
         this.classNumber = 0;
@@ -18,18 +19,15 @@ public class DummyModel {
     }
 
     public void incrementPackageNumber() {
-        packageNumber++;
-        packageNumberObservable.onNext(this.packageNumber);
+        packageNumberObservable.onNext(++this.packageNumber);
     }
 
     public void incrementClassNumber() {
-        classNumber++;
-        classNumberObservable.onNext(this.classNumber);
+        classNumberObservable.onNext(++this.classNumber);
     }
 
     public void incrementInterfaceNumber() {
-        interfaceNumber++;
-        interfaceNumberObservable.onNext(this.interfaceNumber);
+        interfaceNumberObservable.onNext(++this.interfaceNumber);
     }
 
     public int getPackageNumber() {
@@ -44,7 +42,15 @@ public class DummyModel {
         return interfaceNumber;
     }
 
+    public Subject<Integer> getPackageNumberObservable() {
+        return packageNumberObservable;
+    }
+
     public Subject<Integer> getClassNumberObservable() {
         return classNumberObservable;
+    }
+
+    public Subject<Integer> getInterfaceNumberObservable() {
+        return interfaceNumberObservable;
     }
 }

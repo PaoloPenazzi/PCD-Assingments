@@ -11,14 +11,34 @@ public class ViewController {
     public ViewController(DummyModel dummyModel) {
         this.dummyModel = dummyModel;
         this.view = new ViewFrame(this);
+        this.setupPackageNumberObserver();
         this.setupClassNumberObserver();
+        this.setupInterfaceNumberObserver();
     }
 
+    /**
+     * Dummy method to simulate an increase in class number.
+     * @param actionEvent
+     */
     public void incrementPressed(ActionEvent actionEvent) {
         this.dummyModel.incrementClassNumber();
     }
 
-    public void setupClassNumberObserver(){
-        dummyModel.getClassNumberObservable().subscribe(num -> view.getClassCounterTextField().setText("" + num));
+    public void startPressed(ActionEvent actionEvent) {
+    }
+
+    private void setupClassNumberObserver(){
+        dummyModel.getClassNumberObservable()
+                .subscribe(num -> view.getClassCounterTextField().setText("" + num));
+    }
+
+    private void setupPackageNumberObserver() {
+        this.dummyModel.getPackageNumberObservable()
+                .subscribe(num -> view.getPackageCounterTextField().setText("" + num));
+    }
+
+    private void setupInterfaceNumberObserver() {
+        this.dummyModel.getInterfaceNumberObservable()
+                .subscribe(num -> view.getInterfaceCounterTextField().setText("" + num));
     }
 }

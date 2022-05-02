@@ -61,9 +61,14 @@ public class ViewFrame extends JFrame {
     private void createNorthPanel() {
         this.northPanel = new JPanel();
         this.openProjectButton = new JButton("Open Project");
-        this.startAnalysisButton = new JButton("Increment");
+        this.startAnalysisButton = new JButton("Start");
         this.stopAnalysisButton = new JButton("Stop");
-        this.startAnalysisButton.addActionListener(controller::incrementPressed);
+        // Increment simulator
+        JButton increase = new JButton("Increment");
+        increase.addActionListener(controller::incrementPressed);
+        this.northPanel.add(increase);
+        //
+        this.startAnalysisButton.addActionListener(controller::startPressed);
         this.northPanel.add(this.openProjectButton);
         this.northPanel.add(this.startAnalysisButton);
         this.northPanel.add(this.stopAnalysisButton);
