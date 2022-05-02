@@ -63,12 +63,8 @@ public class ViewFrame extends JFrame {
         this.openProjectButton = new JButton("Open Project");
         this.startAnalysisButton = new JButton("Start");
         this.stopAnalysisButton = new JButton("Stop");
-        // Increment simulator
-        JButton increase = new JButton("Increment");
-        increase.addActionListener(controller::incrementPressed);
-        this.northPanel.add(increase);
-        //
         this.startAnalysisButton.addActionListener(controller::startPressed);
+        this.openProjectButton.addActionListener(controller::openProjectPressed);
         this.northPanel.add(this.openProjectButton);
         this.northPanel.add(this.startAnalysisButton);
         this.northPanel.add(this.stopAnalysisButton);

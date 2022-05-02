@@ -3,20 +3,23 @@ package it.unibo.pcd.assignment.reactive.model;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 
-public class DummyModel {
+public class ReactiveAnalyzer {
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
-
     private final Subject<Integer> packageNumberObservable = PublishSubject.create();
-
     private final Subject<Integer> classNumberObservable = PublishSubject.create();
     private final Subject<Integer> interfaceNumberObservable = PublishSubject.create();
-    public DummyModel() {
+    private String path;
+
+    public ReactiveAnalyzer() {
         this.packageNumber = 0;
         this.classNumber = 0;
         this.interfaceNumber = 0;
+        this.path = "";
     }
+
+    public void analyzeProject() { }
 
     public void incrementPackageNumber() {
         packageNumberObservable.onNext(++this.packageNumber);
@@ -30,18 +33,6 @@ public class DummyModel {
         interfaceNumberObservable.onNext(++this.interfaceNumber);
     }
 
-    public int getPackageNumber() {
-        return packageNumber;
-    }
-
-    public int getClassNumber() {
-        return this.classNumber;
-    }
-
-    public int getInterfaceNumber() {
-        return interfaceNumber;
-    }
-
     public Subject<Integer> getPackageNumberObservable() {
         return packageNumberObservable;
     }
@@ -52,5 +43,13 @@ public class DummyModel {
 
     public Subject<Integer> getInterfaceNumberObservable() {
         return interfaceNumberObservable;
+    }
+
+    public String getPath() {
+        return this.path;
+    }
+
+    public void setPath(String newPath) {
+        this.path = newPath;
     }
 }
