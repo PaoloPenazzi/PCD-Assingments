@@ -17,9 +17,7 @@ public class ViewController {
     public ViewController() {
         this.view = new ViewFrame(this);
         this.reactiveAnalyzerImpl = new ReactiveAnalyzerImpl();
-        this.setupPackageNumberObserver();
-        this.setupClassNumberObserver();
-        this.setupInterfaceNumberObserver();
+        this.createObservers();
     }
 
     public void openProjectPressed(ActionEvent actionEvent) {
@@ -36,7 +34,7 @@ public class ViewController {
             this.isStopped = false;
             this.clearOutput();
             this.createObservers();
-            this.runningProcess = Schedulers.computation().scheduleDirect( () ->
+            this.runningProcess = Schedulers.computation().scheduleDirect(() ->
                     this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath())
             );
         }
@@ -78,12 +76,20 @@ public class ViewController {
     private void setupClassNumberObserver() {
         Disposable classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
                 .subscribeOn(Schedulers.computation())
-                .subscribe(num -> view.getClassCounterTextField().setText("" + num));
+                .subscribe(res -> {
+                    if (!this.isStopped) {
+                        view.getClassCounterTextField().setText(res + "");
+                    }
+                });
     }
 
     private void setupInterfaceNumberObserver() {
         Disposable interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
                 .subscribeOn(Schedulers.computation())
-                .subscribe(num -> view.getInterfaceCounterTextField().setText("" + num));
+                .subscribe(res -> {
+                    if (!this.isStopped) {
+                        view.getInterfaceCounterTextField().setText(res + "");
+                    }
+                });
     }
 }
