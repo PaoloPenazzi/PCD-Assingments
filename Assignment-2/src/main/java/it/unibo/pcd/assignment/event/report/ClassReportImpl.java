@@ -8,7 +8,7 @@ public class ClassReportImpl implements ClassReport {
     private String srcFullFileName;
     private List<MethodInfo> methodsInfo;
     private List<FieldInfo> fieldsInfo;
-    private List<ClassReport> innerClassList = new ArrayList<>();
+    private ClassReportImpl innerClass;
 
     @Override
     public String getFullClassName() {
@@ -47,12 +47,12 @@ public class ClassReportImpl implements ClassReport {
     }
 
     @Override
-    public List<ClassReport> getInnerClassList() {
-        return this.innerClassList;
+    public ClassReportImpl getInnerClass() {
+        return this.innerClass;
     }
 
-    public void setInnerClassList(List<ClassReport> newInnerClassList) {
-        this.innerClassList = newInnerClassList;
+    public void setInnerClass(ClassReportImpl newInnerClass) {
+        this.innerClass = newInnerClass;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ClassReportImpl implements ClassReport {
                 ", srcFullFileName='" + srcFullFileName + '\'' +
                 ", methodsInfo=" + methodsInfo +
                 ", fieldsInfo=" + fieldsInfo +
-                ", innerClassList=" + innerClassList +
+                ", innerClass=" + innerClass +
                 '}';
     }
 }

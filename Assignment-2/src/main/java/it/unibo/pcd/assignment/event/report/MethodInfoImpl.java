@@ -65,29 +65,4 @@ public class MethodInfoImpl implements MethodInfo {
     public String toString() {
         return this.name;
     }
-
-    class Test1 {
-        int zero = 0;
-
-        int metodo() {
-            return 1;
-        }
-
-        class Test2 {
-            int zero1 = 1;
-
-            int metodo1() {
-                return 2;
-            }
-        }
-    }
-
-    class Test3 {
-        int numero = 2;
-
-        int metodo3() {
-            return 3;
-        }
-    }
-
 }

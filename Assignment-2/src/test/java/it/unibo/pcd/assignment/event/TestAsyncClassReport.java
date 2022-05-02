@@ -8,8 +8,7 @@ public class TestAsyncClassReport {
     public static void main(String[] args) {
         ProjectAnalyzer projectAnalyzer = new ProjectAnalyzerImpl();
         Future<ClassReport> classReportFuture = projectAnalyzer.getClassReport("src/main/java/" +
-                        "it/unibo/pcd/assignment/event/report/MethodInfoImpl.java",
-                        System.out::println, null);
+                        "it/unibo/pcd/assignment/event/report/MethodInfoImpl.java", null);
     }
 
 }
