@@ -1,8 +1,9 @@
-package it.unibo.pcd.assignment.reactive.view;
+package it.unibo.pcd.assignment.reactive.controller;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzerImpl;
+import it.unibo.pcd.assignment.reactive.view.ViewFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -32,16 +33,15 @@ public class ViewController {
 
     public void startPressed(ActionEvent actionEvent) {
         if (!this.reactiveAnalyzerImpl.getPath().equals("")) {
+            this.isStopped = false;
             this.clearOutput();
             this.createObservers();
-            this.isStopped = false;
             this.runningProcess = Schedulers.computation().scheduleDirect( () ->
                     this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath())
             );
         }
     }
 
-    // TODO check if this method is working correctly.
     public void stopPressed(ActionEvent actionEvent) {
         this.runningProcess.dispose();
     }

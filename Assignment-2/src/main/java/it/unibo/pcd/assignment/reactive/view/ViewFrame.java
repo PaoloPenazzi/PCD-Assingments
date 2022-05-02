@@ -1,5 +1,7 @@
 package it.unibo.pcd.assignment.reactive.view;
 
+import it.unibo.pcd.assignment.reactive.controller.ViewController;
+
 import javax.swing.*;
 import java.awt.*;
 
