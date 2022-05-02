@@ -36,20 +36,16 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private final Subject<String> reportObservable = PublishSubject.create();
     private String path;
     private final List<String> filesAlreadyAnalyzed;
-    private String report;
 
     public ReactiveAnalyzerImpl() {
         this.path = "";
-        this.report = "";
         this.filesAlreadyAnalyzed = new ArrayList<>();
     }
 
     @Override
     public void analyzeProject(String srcProjectFolderName) {
-        List<String> packageList = new ArrayList<>();
         SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
-        List<ParseResult<CompilationUnit>> parseResultList;
-        parseResultList = sourceRoot.tryToParseParallelized();
+        List<ParseResult<CompilationUnit>> parseResultList  = sourceRoot.tryToParseParallelized();
         List<PackageDeclaration> allCus = parseResultList.stream()
                 .filter(r -> r.getResult().isPresent() && r.isSuccessful())
                 .map(r -> r.getResult().get())
@@ -57,44 +53,36 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                 .map(c -> c.getPackageDeclaration().get())
                 .distinct()
                 .collect(Collectors.toList());
-        SimpleTreeNode rootProject = new SimpleTreeNode("Root Project: " + srcProjectFolderName);
         for (PackageDeclaration packageDeclaration : allCus) {
-            SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
-            rootProject.addChild(packageNodeChild);
-            packageList.add(packageDeclaration.getNameAsString());
             this.analyzePackage(packageDeclaration.getNameAsString());
-            System.out.println(packageDeclaration.getNameAsString());
         }
     }
 
     private void analyzePackage(String packageName) {
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        incrementPackageNumber();
-        setReport(packageName);
-        PackageDeclaration packageDeclaration = StaticJavaParser
-                .parsePackageDeclaration("package " + packageName + ";");
-
-        List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
-                .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                .map(r -> r.getResult().get())
-                .collect(Collectors.toList());
-
-        for (CompilationUnit cu : classesOrInterfacesUnit) {
-            // prendiamo tutte le dichiarazione delle classi/interface
-            List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
-                    .map(TypeDeclaration::asTypeDeclaration)
-                    .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                    .map(ClassOrInterfaceDeclaration.class::cast)
+        if(!filesAlreadyAnalyzed.contains(packageName)) {
+            this.filesAlreadyAnalyzed.add(packageName);
+            incrementPackageNumber();
+            setReport(packageName);
+            PackageDeclaration packageDeclaration = StaticJavaParser
+                    .parsePackageDeclaration("package " + packageName + ";");
+            List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
+                    .filter(r -> r.isSuccessful() && r.getResult().isPresent())
+                    .map(r -> r.getResult().get())
                     .collect(Collectors.toList());
-            for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                if (declaration.isInterface()) {
-                    this.analyzeInterface(declaration.getNameAsString());
-                } else {
-                    this.analyzeClass(declaration.getNameAsString());
+
+            for (CompilationUnit cu : classesOrInterfacesUnit) {
+                // prendiamo tutte le dichiarazione delle classi/interface
+                List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
+                        .map(TypeDeclaration::asTypeDeclaration)
+                        .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                        .map(ClassOrInterfaceDeclaration.class::cast)
+                        .collect(Collectors.toList());
+                for (ClassOrInterfaceDeclaration declaration : declarationList) {
+                    if (declaration.isInterface()) {
+                        this.analyzeInterface(declaration.getFullyQualifiedName().get());
+                    } else {
+                        this.analyzeClass(declaration.getFullyQualifiedName().get());
+                    }
                 }
             }
         }
@@ -108,13 +96,20 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     private void analyzeClass(String className) {
-        incrementClassNumber();
-        setReport(className);
+        if(!this.filesAlreadyAnalyzed.contains(className)) {
+            this.filesAlreadyAnalyzed.add(className);
+            incrementClassNumber();
+            setReport(className);
+        }
     }
 
     private void analyzeInterface(String interfaceName) {
-        incrementInterfaceNumber();
-        setReport(interfaceName);
+        if(!this.filesAlreadyAnalyzed.contains(interfaceName)) {
+            System.out.println(this.filesAlreadyAnalyzed);
+            this.filesAlreadyAnalyzed.add(interfaceName);
+            incrementInterfaceNumber();
+            setReport(interfaceName);
+        }
     }
 
     public void incrementPackageNumber() {
@@ -130,7 +125,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     public void setReport(String report) {
-        this.report = report;
         reportObservable.onNext(report);
     }
 
@@ -146,7 +140,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         return interfaceNumberObservable;
     }
 
-    public Subject<String> getReportObservable() {
+    public Observable<String> getReportObservable() {
         return reportObservable;
     }
 
@@ -165,5 +159,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.classNumberObservable.onNext(this.classNumber);
         this.interfaceNumber = 0;
         this.interfaceNumberObservable.onNext(this.interfaceNumber);
+        this.setReport("");
     }
 }
