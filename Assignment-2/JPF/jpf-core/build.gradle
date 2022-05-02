@@ -19,7 +19,7 @@ buildscript {
 }
 
 dependencies {
-    testImplementation "junit:junit:4.12"
+    testImplementation "junit:junit:4.13.2"
 }
 
 apply plugin: "com.palantir.git-version"
