@@ -19,9 +19,9 @@ repositories {
 dependencies {
 
     /* module 2.2 - async programming with event-loops - vert.x */
-    implementation 'io.vertx:vertx-core:4.2.6'
-    implementation 'io.vertx:vertx-web:4.2.6'
-    implementation 'io.vertx:vertx-web-client:4.2.6'
+    implementation 'io.vertx:vertx-core:4.2.7'
+    implementation 'io.vertx:vertx-web:4.2.7'
+    implementation 'io.vertx:vertx-web-client:4.2.7'
     implementation 'io.reactivex.rxjava3:rxjava:3.1.4'
     implementation 'com.github.javaparser:javaparser-symbol-solver-core:3.24.2'
 
@@ -29,7 +29,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
 
     // This dependency is used by the application.
-    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation 'com.google.guava:guava:31.1-jre'
 
     implementation 'hu.webarticum:tree-printer:2.0.0'
 }
