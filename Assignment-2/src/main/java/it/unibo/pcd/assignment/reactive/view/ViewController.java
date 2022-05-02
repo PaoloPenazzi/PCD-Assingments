@@ -1,14 +1,11 @@
 package it.unibo.pcd.assignment.reactive.view;
 
-import io.reactivex.rxjava3.annotations.NonNull;
-import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzerImpl;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.function.Supplier;
 
 public class ViewController {
     private final ViewFrame view;
@@ -17,6 +14,8 @@ public class ViewController {
     private Disposable classObserver;
     private Disposable interfaceObserver;
     private Disposable reportObserver;
+    private Disposable runningProcess;
+    private boolean isStopped;
 
     public ViewController() {
         this.view = new ViewFrame(this);
@@ -37,19 +36,18 @@ public class ViewController {
 
     public void startPressed(ActionEvent actionEvent) {
         if (!this.reactiveAnalyzerImpl.getPath().equals("")) {
-            this.clearConsoleOutput();
+            this.clearOutput();
             this.createObservers();
+            this.isStopped = false;
+            this.runningProcess = Schedulers.computation().scheduleDirect( () ->
+                    this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath())
+            );
         }
-        Schedulers.computation().scheduleDirect( () ->
-                this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath())
-        );
     }
 
     // TODO check if this method is working correctly.
     public void stopPressed(ActionEvent actionEvent) {
-        this.packageObserver.dispose();
-        this.classObserver.dispose();
-        this.interfaceObserver.dispose();
+        this.runningProcess.dispose();
     }
 
     private void createObservers() {
@@ -59,7 +57,8 @@ public class ViewController {
         this.setupReportObserver();
     }
 
-    private void clearConsoleOutput() {
+    private void clearOutput() {
+        this.reactiveAnalyzerImpl.resetCounters();
         this.view.getConsoleTextArea().selectAll();
         this.view.getConsoleTextArea().replaceSelection("");
     }
@@ -73,7 +72,11 @@ public class ViewController {
     private void setupPackageNumberObserver() {
         this.packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
                 .subscribeOn(Schedulers.computation())
-                .subscribe(res -> view.getPackageCounterTextField().setText(res + ""));
+                .subscribe(res -> {
+                    if(!this.isStopped) {
+                        view.getPackageCounterTextField().setText(res + "");
+                    }
+                });
     }
 
     private void setupClassNumberObserver() {

@@ -5,10 +5,8 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.utils.SourceRoot;
-import com.sun.jdi.ThreadReference;
 import hu.webarticum.treeprinter.SimpleTreeNode;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 import it.unibo.pcd.assignment.event.report.PackageReport;
@@ -20,7 +18,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
-
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
@@ -33,9 +30,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private String report;
 
     public ReactiveAnalyzerImpl() {
-        this.packageNumber = 0;
-        this.classNumber = 0;
-        this.interfaceNumber = 0;
         this.path = "";
         this.report = "";
         this.filesAlreadyAnalyzed = new ArrayList<>();
@@ -66,8 +60,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
             rootProject.addChild(packageNodeChild);
             packageList.add(packageDeclaration.getNameAsString());
             try {
-                Thread.sleep(10);
-                System.out.println(this.packageNumber);
+                Thread.sleep(50);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -115,5 +108,11 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     public void setPath(String newPath) {
         this.path = newPath;
+    }
+
+    public void resetCounters() {
+        this.packageNumber = 0;
+        this.classNumber = 0;
+        this.interfaceNumber = 0;
     }
 }
