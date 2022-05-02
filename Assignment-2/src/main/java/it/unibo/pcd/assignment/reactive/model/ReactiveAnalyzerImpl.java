@@ -5,7 +5,10 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.utils.SourceRoot;
+import com.sun.jdi.ThreadReference;
 import hu.webarticum.treeprinter.SimpleTreeNode;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 import it.unibo.pcd.assignment.event.report.PackageReport;
@@ -17,6 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
+
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
@@ -33,8 +37,8 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.classNumber = 0;
         this.interfaceNumber = 0;
         this.path = "";
-        this.filesAlreadyAnalyzed = new ArrayList<>();
         this.report = "";
+        this.filesAlreadyAnalyzed = new ArrayList<>();
     }
 
     @Override
@@ -61,24 +65,35 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
             SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
             rootProject.addChild(packageNodeChild);
             packageList.add(packageDeclaration.getNameAsString());
+            try {
+                Thread.sleep(10);
+                System.out.println(this.packageNumber);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             incrementPackageNumber();
             this.report = packageDeclaration.getNameAsString();
+            this.newReport();
         }
     }
 
     public void incrementPackageNumber() {
-        packageNumberObservable.onNext(++this.packageNumber);
+        this.packageNumberObservable.onNext(++this.packageNumber);
     }
 
     public void incrementClassNumber() {
-        classNumberObservable.onNext(++this.classNumber);
+        this.classNumberObservable.onNext(++this.classNumber);
     }
 
     public void incrementInterfaceNumber() {
-        interfaceNumberObservable.onNext(++this.interfaceNumber);
+        this.interfaceNumberObservable.onNext(++this.interfaceNumber);
     }
 
-    public Subject<Integer> getPackageNumberObservable() {
+    public void newReport() {
+        reportObservable.onNext(report);
+    }
+
+    public Observable<Integer> getPackageNumberObservable() {
         return packageNumberObservable;
     }
 
@@ -88,6 +103,10 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     public Subject<Integer> getInterfaceNumberObservable() {
         return interfaceNumberObservable;
+    }
+
+    public Subject<String> getReportObservable() {
+        return reportObservable;
     }
 
     public String getPath() {

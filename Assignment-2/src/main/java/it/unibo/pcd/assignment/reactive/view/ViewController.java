@@ -1,12 +1,14 @@
 package it.unibo.pcd.assignment.reactive.view;
 
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
-import io.reactivex.rxjava3.internal.schedulers.NewThreadScheduler;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzerImpl;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.function.Supplier;
 
 public class ViewController {
     private final ViewFrame view;
@@ -14,6 +16,7 @@ public class ViewController {
     private Disposable packageObserver;
     private Disposable classObserver;
     private Disposable interfaceObserver;
+    private Disposable reportObserver;
 
     public ViewController() {
         this.view = new ViewFrame(this);
@@ -36,8 +39,10 @@ public class ViewController {
         if (!this.reactiveAnalyzerImpl.getPath().equals("")) {
             this.clearConsoleOutput();
             this.createObservers();
-            this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
         }
+        Schedulers.computation().scheduleDirect( () ->
+                this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath())
+        );
     }
 
     // TODO check if this method is working correctly.
@@ -51,6 +56,7 @@ public class ViewController {
         this.setupInterfaceNumberObserver();
         this.setupClassNumberObserver();
         this.setupPackageNumberObserver();
+        this.setupReportObserver();
     }
 
     private void clearConsoleOutput() {
@@ -58,20 +64,27 @@ public class ViewController {
         this.view.getConsoleTextArea().replaceSelection("");
     }
 
-    private void setupPackageNumberObserver() {
-        this.packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
-                .observeOn(Schedulers.newThread())
-                .subscribeOn(Schedulers.newThread())
-                .subscribe(num -> view.getPackageCounterTextField().setText("" + num));
+    private void setupReportObserver() {
+        this.reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
+                .subscribeOn(Schedulers.computation())
+                .subscribe(res -> view.getConsoleTextArea().append(res + "\n"));
     }
 
-    private void setupClassNumberObserver(){
+    private void setupPackageNumberObserver() {
+        this.packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
+                .subscribeOn(Schedulers.computation())
+                .subscribe(res -> view.getPackageCounterTextField().setText(res + ""));
+    }
+
+    private void setupClassNumberObserver() {
         this.classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
+                .subscribeOn(Schedulers.computation())
                 .subscribe(num -> view.getClassCounterTextField().setText("" + num));
     }
 
     private void setupInterfaceNumberObserver() {
         this.interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
+                .subscribeOn(Schedulers.computation())
                 .subscribe(num -> view.getInterfaceCounterTextField().setText("" + num));
     }
 }
