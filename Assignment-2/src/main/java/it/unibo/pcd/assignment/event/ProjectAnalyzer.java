@@ -18,7 +18,7 @@ public interface ProjectAnalyzer {
      * @param srcInterfacePath
      * @return
      */
-    Future<InterfaceReport> getInterfaceReport(String srcInterfacePath);
+    Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, SimpleTreeNode fatherTreeNode);
 
     /**
      * Async method to retrieve the report about a specific class,
@@ -36,7 +36,16 @@ public interface ProjectAnalyzer {
      * @param srcPackagePath
      * @return
      */
-    Future<PackageReport> getPackageReport(String srcPackagePath, Consumer<ProjectElem> callback, SimpleTreeNode fatherTreeNode);
+    Future<PackageReport> getPackageReport(String srcPackagePath, SimpleTreeNode fatherTreeNode);
+
+    /**
+     * Async method to retrieve the report about a project,
+     * given the full path of the project folder
+     *
+     * @param srcProjectpath
+     * @return
+     */
+    Future<ProjectReport> getProjectReport(String srcProjectpath);
 
     /**
      * Async function that analyze a project given the full path of the project folder,
