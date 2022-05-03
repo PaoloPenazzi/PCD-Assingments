@@ -11,7 +11,7 @@ import java.awt.event.ActionEvent;
 public class ViewController {
     private final ViewFrame view;
     private final ReactiveAnalyzerImpl reactiveAnalyzerImpl;
-    private Disposable runningProcess = Disposable.empty();
+    private Disposable runningProcess;
     private boolean isStopped;
     private Disposable reportObserver;
     private Disposable packageObserver;
@@ -40,7 +40,6 @@ public class ViewController {
             this.runningProcess = Schedulers.computation().scheduleDirect(() ->
                     this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath())
             );
-
         }
     }
 
