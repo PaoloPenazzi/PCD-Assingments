@@ -27,7 +27,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
-    private String lastReport = "";
+    private final String lastReport = "";
     private String path;
 
     public ReactiveAnalyzerImpl() {

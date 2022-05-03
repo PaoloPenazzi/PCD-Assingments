@@ -17,8 +17,6 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         // faccio la visita di evenutali classi innestate e nel caso mi salvo le info sul nuovo class report creato
         super.visit(dec, collector);
 
-
-
         if (dec.isInnerClass()) {
             ClassReportImpl myInnerReport = this.createClassReport(new ClassReportImpl(), dec);
             if (collector.getInnerClass() == null) {

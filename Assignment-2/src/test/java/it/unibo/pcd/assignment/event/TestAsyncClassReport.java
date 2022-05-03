@@ -1,8 +1,6 @@
 package it.unibo.pcd.assignment.event;
 
 import hu.webarticum.treeprinter.SimpleTreeNode;
-import io.vertx.core.Future;
-import it.unibo.pcd.assignment.event.report.ClassReport;
 
 public class TestAsyncClassReport {
 

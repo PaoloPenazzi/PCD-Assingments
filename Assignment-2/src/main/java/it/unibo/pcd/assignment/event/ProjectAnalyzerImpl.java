@@ -54,6 +54,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
                 InterfaceCollector interfaceCollector = new InterfaceCollector();
                 interfaceCollector.visit(compilationUnit, interfaceReport);
+                // TODO Controllare che non ci siano classsi innestate
                 this.viewController.increaseInterfaceNumber();
                 promise.complete(interfaceReport);
             } else {
@@ -119,19 +120,24 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
                 // riempiamo le future in modo tale da sapere in futuro quando saranno pronte le variabili
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                    if (declaration.isInterface()) {
-                        SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " +
-                                declaration.getNameAsString());
-                        fatherTreeNode.addChild(interfaceNodeChild);
-                        futureListInterface.add(this.getInterfaceReport(ProjectAnalyzerImpl.PATH +
-                                "/" + declaration.getFullyQualifiedName().get().replace(".", "/") + ".java", interfaceNodeChild));
+                    if (declaration.getFullyQualifiedName().isPresent()) {
+                        if (declaration.isInterface()) {
+                            SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " +
+                                    declaration.getNameAsString());
+                            fatherTreeNode.addChild(interfaceNodeChild);
+                            futureListInterface.add(this.getInterfaceReport(ProjectAnalyzerImpl.PATH +
+                                            "/" + declaration.getFullyQualifiedName().get().replace(".", "/") + ".java",
+                                    interfaceNodeChild));
+                        } else {
+                            SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " +
+                                    declaration.getNameAsString());
+                            fatherTreeNode.addChild(classNodeChild);
+                            futureListClass.add(this.getClassReport(ProjectAnalyzerImpl.PATH +
+                                    "/" + declaration.getFullyQualifiedName().get()
+                                    .replace(".", "/") + ".java", classNodeChild));
+                        }
                     } else {
-                        SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " +
-                                declaration.getNameAsString());
-                        fatherTreeNode.addChild(classNodeChild);
-                        futureListClass.add(this.getClassReport(ProjectAnalyzerImpl.PATH +
-                                "/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java", classNodeChild));
+                        throw new NameDeclarationException();
                     }
                 }
             }
@@ -147,10 +153,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 packageReport.setInterfaceReports(interfaceReports);
             });
 
-            List<Future> futureListClassInterface = Stream.concat(futureListClass.stream(), futureListInterface.stream()).collect(Collectors.toList());
+            List<Future> futureListClassInterface = Stream.concat(futureListClass.stream(),
+                    futureListInterface.stream()).collect(Collectors.toList());
 
             CompositeFuture.all(futureListClassInterface).onComplete(res -> {
                 this.viewController.increasePackageNumber();
+                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(fatherTreeNode));
                 promise.complete(packageReport);
             });
         });
@@ -199,7 +207,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     }
 
     @Override
-    public void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback) throws NameDeclarationException {
+    public void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback) {
         this.getVertx().executeBlocking(promise -> {
             // mi preparo il path da cui deve partire l'analisi
             SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
@@ -241,12 +249,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             .collect(Collectors.toList());
 
                     for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                        if (declaration.isInterface()) {
-                            SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " +
-                                    declaration.getNameAsString());
-                            packageNodeChild.addChild(interfaceNodeChild);
-                            this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                            if (declaration.getFullyQualifiedName().isPresent()) {
+                        if (declaration.getFullyQualifiedName().isPresent()) {
+                            if (declaration.isInterface()) {
+                                SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " +
+                                        declaration.getNameAsString());
+                                packageNodeChild.addChild(interfaceNodeChild);
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
                                 this.getInterfaceReport(ProjectAnalyzerImpl.PATH +
                                         "/" + declaration.getFullyQualifiedName().get().
                                         replace(".", "/") + ".java", interfaceNodeChild).onComplete(res -> {
@@ -255,14 +263,10 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                                     }
                                 });
                             } else {
-                                throw new NameDeclarationException();
-                            }
-                        } else {
-                            SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " +
-                                    declaration.getNameAsString());
-                            packageNodeChild.addChild(classNodeChild);
-                            this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                            if (declaration.getFullyQualifiedName().isPresent()) {
+                                SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " +
+                                        declaration.getNameAsString());
+                                packageNodeChild.addChild(classNodeChild);
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
                                 this.getClassReport(ProjectAnalyzerImpl.PATH +
                                         "/" + declaration.getFullyQualifiedName().get()
                                         .replace(".", "/") + ".java", classNodeChild).onComplete(res -> {
@@ -270,9 +274,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                                         callback.accept(res.result());
                                     }
                                 });
-                            } else {
-                                throw new NameDeclarationException();
                             }
+                        } else {
+                            throw new NameDeclarationException();
                         }
                     }
                 }
