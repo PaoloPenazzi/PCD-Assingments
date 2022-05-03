@@ -17,28 +17,31 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         // faccio la visita di evenutali classi innestate e nel caso mi salvo le info sul nuovo class report creato
         super.visit(dec, collector);
 
-        ClassReportImpl myInnerReport = this.createClassReport(new ClassReportImpl(), dec);
+
 
         if (dec.isInnerClass()) {
-            if(collector.getInnerClass() == null){
+            ClassReportImpl myInnerReport = this.createClassReport(new ClassReportImpl(), dec);
+            if (collector.getInnerClass() == null) {
                 collector.setInnerClass(myInnerReport);
             } else {
                 ClassReportImpl innerClassino = collector.getInnerClass();
                 this.addInnerClassReportToTail(myInnerReport, innerClassino);
                 collector.setInnerClass(innerClassino);
             }
+        } else {
+            this.createClassReport(collector, dec);
         }
     }
 
-    private void addInnerClassReportToTail(ClassReportImpl classReportToAdd, ClassReportImpl classReport){
-        if(classReport.getInnerClass() == null){
+    private void addInnerClassReportToTail(ClassReportImpl classReportToAdd, ClassReportImpl classReport) {
+        if (classReport.getInnerClass() == null) {
             classReport.setInnerClass(classReportToAdd);
         } else {
-            addInnerClassReportToTail(classReportToAdd, classReport.getInnerClass() );
+            addInnerClassReportToTail(classReportToAdd, classReport.getInnerClass());
         }
     }
 
-    private ClassReportImpl createClassReport(ClassReportImpl classReportToFill, ClassOrInterfaceDeclaration classDec){
+    private ClassReportImpl createClassReport(ClassReportImpl classReportToFill, ClassOrInterfaceDeclaration classDec) {
 
         classReportToFill.setFullClassName(classDec.getNameAsString());
         classReportToFill.setSrcFullFileName(classDec.getFullyQualifiedName().orElse("NULL!"));
