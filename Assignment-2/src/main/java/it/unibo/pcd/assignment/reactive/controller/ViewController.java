@@ -60,7 +60,7 @@ public class ViewController {
         Disposable reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
-                    if(!this.isStopped) {
+                    if (!this.isStopped) {
                         view.getConsoleTextArea().append(res + "\n");
                     }
                 });

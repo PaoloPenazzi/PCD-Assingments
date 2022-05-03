@@ -19,16 +19,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
-    private int packageNumber;
-    private int classNumber;
-    private int interfaceNumber;
-    private String lastReport = "";
     private final Subject<Integer> packageNumberObservable = PublishSubject.create();
     private final Subject<Integer> classNumberObservable = PublishSubject.create();
     private final Subject<Integer> interfaceNumberObservable = PublishSubject.create();
     private final Subject<String> reportObservable = PublishSubject.create();
-    private String path;
     private final List<String> filesAlreadyAnalyzed;
+    private int packageNumber;
+    private int classNumber;
+    private int interfaceNumber;
+    private String lastReport = "";
+    private String path;
 
     public ReactiveAnalyzerImpl() {
         this.path = "";
@@ -38,7 +38,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     @Override
     public void analyzeProject(String srcProjectFolderName) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
-        List<ParseResult<CompilationUnit>> parseResultList  = sourceRoot.tryToParseParallelized();
+        List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
         List<PackageDeclaration> allCus = parseResultList.stream()
                 .filter(r -> r.getResult().isPresent() && r.isSuccessful())
                 .map(r -> r.getResult().get())
@@ -52,7 +52,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     private void analyzePackage(String packageName) {
-        if(!filesAlreadyAnalyzed.contains(packageName)) {
+        if (!filesAlreadyAnalyzed.contains(packageName)) {
             this.filesAlreadyAnalyzed.add(packageName);
             incrementPackageNumber();
             this.lastReport = packageName;
@@ -91,14 +91,14 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     private void analyzeClass(String className) {
-        if(!this.filesAlreadyAnalyzed.contains(className)) {
+        if (!this.filesAlreadyAnalyzed.contains(className)) {
             this.filesAlreadyAnalyzed.add(className);
             incrementClassNumber();
         }
     }
 
     private void analyzeInterface(String interfaceName) {
-        if(!this.filesAlreadyAnalyzed.contains(interfaceName)) {
+        if (!this.filesAlreadyAnalyzed.contains(interfaceName)) {
             this.filesAlreadyAnalyzed.add(interfaceName);
             incrementInterfaceNumber();
         }
