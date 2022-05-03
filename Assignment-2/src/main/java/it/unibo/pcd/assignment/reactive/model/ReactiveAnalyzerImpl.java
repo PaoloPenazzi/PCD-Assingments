@@ -55,8 +55,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         if (!filesAlreadyAnalyzed.contains(packageName)) {
             this.filesAlreadyAnalyzed.add(packageName);
             incrementPackageNumber();
-            this.lastReport = packageName;
-            this.setReportObservable();
+            this.addReport(packageName);
             PackageDeclaration packageDeclaration = StaticJavaParser
                     .parsePackageDeclaration("package " + packageName + ";");
             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
@@ -93,6 +92,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private void analyzeClass(String className) {
         if (!this.filesAlreadyAnalyzed.contains(className)) {
             this.filesAlreadyAnalyzed.add(className);
+            addReport(className);
             incrementClassNumber();
         }
     }
@@ -100,6 +100,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private void analyzeInterface(String interfaceName) {
         if (!this.filesAlreadyAnalyzed.contains(interfaceName)) {
             this.filesAlreadyAnalyzed.add(interfaceName);
+            addReport(interfaceName);
             incrementInterfaceNumber();
         }
     }
@@ -116,8 +117,8 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.interfaceNumberObservable.onNext(++this.interfaceNumber);
     }
 
-    public void setReportObservable() {
-        reportObservable.onNext(this.lastReport);
+    public void addReport(String report) {
+        reportObservable.onNext(report);
     }
 
     public Observable<Integer> getPackageNumberObservable() {
