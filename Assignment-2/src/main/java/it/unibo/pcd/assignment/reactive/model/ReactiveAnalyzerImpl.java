@@ -146,11 +146,11 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     public void resetCounters() {
         this.packageNumber = 0;
-        this.packageNumberObservable.onNext(this.packageNumber);
         this.classNumber = 0;
-        this.classNumberObservable.onNext(this.classNumber);
         this.interfaceNumber = 0;
+        this.packageNumberObservable.onNext(this.packageNumber);
+        this.classNumberObservable.onNext(this.classNumber);
         this.interfaceNumberObservable.onNext(this.interfaceNumber);
-        this.reportObservable.onNext("");
+        this.filesAlreadyAnalyzed.clear();
     }
 }
