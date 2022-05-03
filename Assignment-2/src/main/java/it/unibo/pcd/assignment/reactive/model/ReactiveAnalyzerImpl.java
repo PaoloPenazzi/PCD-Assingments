@@ -9,20 +9,12 @@ import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.utils.SourceRoot;
-import hu.webarticum.treeprinter.SimpleTreeNode;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
-import io.vertx.core.Future;
-import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
-import it.unibo.pcd.assignment.event.report.ClassReport;
-import it.unibo.pcd.assignment.event.report.InterfaceReport;
-import it.unibo.pcd.assignment.event.report.PackageReport;
-import it.unibo.pcd.assignment.event.report.ProjectReportImpl;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +22,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
+    private String lastReport = "";
     private final Subject<Integer> packageNumberObservable = PublishSubject.create();
     private final Subject<Integer> classNumberObservable = PublishSubject.create();
     private final Subject<Integer> interfaceNumberObservable = PublishSubject.create();
@@ -62,7 +55,8 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         if(!filesAlreadyAnalyzed.contains(packageName)) {
             this.filesAlreadyAnalyzed.add(packageName);
             incrementPackageNumber();
-            setReport(packageName);
+            this.lastReport = packageName;
+            this.setReportObservable();
             PackageDeclaration packageDeclaration = StaticJavaParser
                     .parsePackageDeclaration("package " + packageName + ";");
             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
@@ -80,6 +74,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     if (declaration.isInterface()) {
                         this.analyzeInterface(declaration.getFullyQualifiedName().get());
+
                     } else {
                         this.analyzeClass(declaration.getFullyQualifiedName().get());
                     }
@@ -99,16 +94,13 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         if(!this.filesAlreadyAnalyzed.contains(className)) {
             this.filesAlreadyAnalyzed.add(className);
             incrementClassNumber();
-            setReport(className);
         }
     }
 
     private void analyzeInterface(String interfaceName) {
         if(!this.filesAlreadyAnalyzed.contains(interfaceName)) {
-            System.out.println(this.filesAlreadyAnalyzed);
             this.filesAlreadyAnalyzed.add(interfaceName);
             incrementInterfaceNumber();
-            setReport(interfaceName);
         }
     }
 
@@ -124,8 +116,8 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.interfaceNumberObservable.onNext(++this.interfaceNumber);
     }
 
-    public void setReport(String report) {
-        reportObservable.onNext(report);
+    public void setReportObservable() {
+        reportObservable.onNext(this.lastReport);
     }
 
     public Observable<Integer> getPackageNumberObservable() {
@@ -159,6 +151,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.classNumberObservable.onNext(this.classNumber);
         this.interfaceNumber = 0;
         this.interfaceNumberObservable.onNext(this.interfaceNumber);
-        this.setReport("");
+        this.reportObservable.onNext("");
     }
 }

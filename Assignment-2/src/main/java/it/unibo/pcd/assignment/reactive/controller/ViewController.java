@@ -17,7 +17,6 @@ public class ViewController {
     public ViewController() {
         this.view = new ViewFrame(this);
         this.reactiveAnalyzerImpl = new ReactiveAnalyzerImpl();
-        this.createObservers();
     }
 
     public void openProjectPressed(ActionEvent actionEvent) {
