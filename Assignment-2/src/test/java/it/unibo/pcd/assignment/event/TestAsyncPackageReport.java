@@ -9,7 +9,7 @@ public class TestAsyncPackageReport {
     public static void main(String[] args) {
         ProjectAnalyzer projectAnalyzer = new ProjectAnalyzerImpl();
         Future<PackageReport> reportFuture = projectAnalyzer.getPackageReport("it.unibo.pcd." +
-                "assignment.event.report", System.out::println, new SimpleTreeNode("Test"));
+                "assignment.event.report", new SimpleTreeNode("Test"));
     }
 
 }
