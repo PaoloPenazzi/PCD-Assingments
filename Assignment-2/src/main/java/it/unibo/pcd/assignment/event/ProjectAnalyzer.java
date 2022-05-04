@@ -45,7 +45,7 @@ public interface ProjectAnalyzer {
      * @param srcProjectpath
      * @return
      */
-    Future<ProjectReport> getProjectReport(String srcProjectpath);
+    Future<ProjectReport> getProjectReport(String srcProjectPath);
 
     /**
      * Async function that analyze a project given the full path of the project folder,
