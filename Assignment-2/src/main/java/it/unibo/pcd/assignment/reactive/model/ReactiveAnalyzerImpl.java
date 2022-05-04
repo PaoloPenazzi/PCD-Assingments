@@ -42,7 +42,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                 .distinct()
                 .collect(Collectors.toList());
         for (PackageDeclaration packageDeclaration : allCus) {
-            System.out.println("Analyzing Package: " + packageDeclaration.getNameAsString());
             this.analyzePackage(packageDeclaration.getNameAsString());
         }
     }
@@ -85,18 +84,14 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private void analyzeClass(String packageName, ClassOrInterfaceDeclaration declaration) {
         String className = declaration.getFullyQualifiedName().get();
         if (this.isRightPackage(packageName, declaration)) {
-            System.out.println("Analyzing class: " + declaration.getFullyQualifiedName().get());
             this.buildClassReport(className, declaration);
             incrementClassNumber();
-
         }
     }
 
     private void analyzeInterface(String packageName, ClassOrInterfaceDeclaration declaration) {
         String interfaceName = declaration.getFullyQualifiedName().get();
         if (this.isRightPackage(packageName, declaration)) {
-            System.out.println("DENTROOOO");
-            System.out.println("Analyzing interface: " + declaration.getFullyQualifiedName().get());
             incrementInterfaceNumber();
             buildInterfaceReport(interfaceName, declaration);
 
@@ -107,7 +102,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         String classFullName = declaration.getFullyQualifiedName().get();
         String className = declaration.getNameAsString();
         classFullName = classFullName.replace("." + className, "");
-        System.out.println(classFullName);
         return classFullName.equals(packageName);
     }
 

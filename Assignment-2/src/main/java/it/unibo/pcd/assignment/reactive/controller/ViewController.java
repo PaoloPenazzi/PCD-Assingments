@@ -40,9 +40,6 @@ public class ViewController {
             this.worker.schedule(() -> {
                 this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
             });
-            /*this.runningProcess = Schedulers.from(Executors.newCachedThreadPool()).scheduleDirect(() -> {
-                this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
-            });*/
         }
     }
 
@@ -66,7 +63,7 @@ public class ViewController {
 
     private void setupReportObserver() {
         Disposable reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
                         view.getConsoleTextArea().append(res + "");
@@ -76,7 +73,7 @@ public class ViewController {
 
     private void setupPackageNumberObserver() {
         Disposable packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
                         view.getPackageCounterTextField().setText(res + "");
@@ -86,7 +83,7 @@ public class ViewController {
 
     private void setupClassNumberObserver() {
         Disposable classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
                         view.getClassCounterTextField().setText(res + "");
@@ -96,7 +93,7 @@ public class ViewController {
 
     private void setupInterfaceNumberObserver() {
         Disposable interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
-                .subscribeOn(Schedulers.newThread())
+                .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
                         view.getInterfaceCounterTextField().setText(res + "");
