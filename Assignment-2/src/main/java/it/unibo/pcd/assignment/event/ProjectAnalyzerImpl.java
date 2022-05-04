@@ -32,13 +32,9 @@ import java.util.stream.Stream;
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
     public static String PATH = "";
     private final ViewController viewController;
-    private final List<String> alreadyAnalyzed;
-
-    //TODO SISTEMARE LA LISTA DEI FILE GIÀ ANALIZZATI MERDAAA
 
     public ProjectAnalyzerImpl() {
         this.viewController = new ViewController(this);
-        this.alreadyAnalyzed = new ArrayList<>();
         Vertx.vertx().deployVerticle(this);
     }
 
@@ -96,8 +92,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     String srcFilePath = ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
                             .replace(".", "/") + ".java";
-                    if (declaration.getFullyQualifiedName().isPresent() && !this.isFileAlreadyAnalyzed(srcFilePath)) {
-                        this.addFileAnalyzed(srcFilePath);
+                    if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(srcPackagePath, declaration)) {
                         if (declaration.isInterface()) {
                             SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                             fatherTreeNode.addChild(interfaceNodeChild);
@@ -168,7 +163,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             CompositeFuture.all(futureListPackage).onComplete(res -> {
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
-                this.viewController.log(projectReport.toString());
                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
                 promise.complete(projectReport);
             });
@@ -251,23 +245,18 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         });
     }
 
+    private boolean isRightPackage(String packageName, ClassOrInterfaceDeclaration declaration) {
+        String classFullName = declaration.getFullyQualifiedName().isPresent() ? declaration.getFullyQualifiedName().get() : "ERROR!";
+        String className = declaration.getNameAsString();
+        classFullName = classFullName.replace("." + className, "");
+        return classFullName.equals(packageName);
+    }
+
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get(ProjectAnalyzerImpl.PATH)).setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList;
         parseResultList = sourceRoot.tryToParseParallelized(dec.getNameAsString());
         return parseResultList;
-    }
-
-    private synchronized boolean isFileAlreadyAnalyzed(String srcFilePath) {
-        return this.alreadyAnalyzed.contains(srcFilePath);
-    }
-
-    private synchronized void addFileAnalyzed(String srcFilePath) {
-        this.alreadyAnalyzed.add(srcFilePath);
-    }
-
-    public List<String> getAlreadyAnalyzed() {
-        return alreadyAnalyzed;
     }
 
     private void addInnerChildClassNodeToFather(ClassReport classReport, SimpleTreeNode fatherTreeNode) {
