@@ -5,9 +5,7 @@ import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.utils.SourceRoot;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
@@ -72,10 +70,10 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                         .collect(Collectors.toList());
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     if (declaration.isInterface()) {
-                        this.analyzeInterface(declaration.getFullyQualifiedName().get());
+                        this.analyzeInterface(declaration);
 
                     } else {
-                        this.analyzeClass(declaration.getFullyQualifiedName().get());
+                        this.analyzeClass(declaration);
                     }
                 }
             }
@@ -89,20 +87,61 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         return parseResultList;
     }
 
-    private void analyzeClass(String className) {
+    private void analyzeClass(ClassOrInterfaceDeclaration declaration) {
+        String className = declaration.getFullyQualifiedName().get();
         if (!this.filesAlreadyAnalyzed.contains(className)) {
             this.filesAlreadyAnalyzed.add(className);
-            addReport(className);
+            this.buildClassReport(className, declaration);
             incrementClassNumber();
         }
     }
 
-    private void analyzeInterface(String interfaceName) {
+    private void analyzeInterface(ClassOrInterfaceDeclaration declaration) {
+        String interfaceName = declaration.getFullyQualifiedName().get();
         if (!this.filesAlreadyAnalyzed.contains(interfaceName)) {
             this.filesAlreadyAnalyzed.add(interfaceName);
-            addReport(interfaceName);
             incrementInterfaceNumber();
+            buildInterfaceReport(interfaceName, declaration);
         }
+    }
+
+    private void buildClassReport(String className, ClassOrInterfaceDeclaration declaration) {
+        String fieldsString = "";
+        String methodsString = "";
+        List<FieldDeclaration> fieldDeclarationList = declaration.getFields();
+        for (FieldDeclaration fieldDeclaration : fieldDeclarationList) {
+            fieldsString = fieldsString.concat(
+                    "\t\t" +
+                    fieldDeclaration.toString()
+                    + "\n");
+        }
+        List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
+        for(MethodDeclaration methodDeclaration : methodDeclarationList) {
+            methodsString = methodsString.concat(
+                    "\t\t" +
+                    methodDeclaration.getDeclarationAsString(true, false, true)
+                            + "\n");
+        }
+        String report =
+                "\t" + className + "\n"
+                        + fieldsString
+                        + methodsString;
+        addReport(report);
+    }
+
+    private void buildInterfaceReport(String interfaceName, ClassOrInterfaceDeclaration declaration) {
+        String methodsString = "";
+        List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
+        for(MethodDeclaration methodDeclaration : methodDeclarationList) {
+            methodsString = methodsString.concat(
+                    "\t\t" +
+                            methodDeclaration.getDeclarationAsString(true, false, true)
+                            + "\n");
+        }
+        String report =
+                "\t" + interfaceName + "\n"
+                        + methodsString;
+        addReport(report);
     }
 
     public void incrementPackageNumber() {
