@@ -75,7 +75,7 @@ public class ViewController {
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(res -> {
                     if (!this.isStopped) {
-                        view.getConsoleTextArea().append(res + "\n");
+                        view.getConsoleTextArea().append(res + "");
                     }
                 });
     }

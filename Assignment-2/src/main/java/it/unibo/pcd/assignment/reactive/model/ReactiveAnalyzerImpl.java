@@ -25,7 +25,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
-    private final String lastReport = "";
     private String path;
 
     public ReactiveAnalyzerImpl() {
@@ -53,7 +52,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         if (!filesAlreadyAnalyzed.contains(packageName)) {
             this.filesAlreadyAnalyzed.add(packageName);
             incrementPackageNumber();
-            this.addReport(packageName);
+            this.addReport("PACKAGE:  " + packageName + "\n");
             PackageDeclaration packageDeclaration = StaticJavaParser
                     .parsePackageDeclaration("package " + packageName + ";");
             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
@@ -111,19 +110,19 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         List<FieldDeclaration> fieldDeclarationList = declaration.getFields();
         for (FieldDeclaration fieldDeclaration : fieldDeclarationList) {
             fieldsString = fieldsString.concat(
-                    "\t\t" +
+                    "\t\t" + "FIELD:  " +
                     fieldDeclaration.toString()
                     + "\n");
         }
         List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
         for(MethodDeclaration methodDeclaration : methodDeclarationList) {
             methodsString = methodsString.concat(
-                    "\t\t" +
+                    "\t\t" +  "METHOD:  " +
                     methodDeclaration.getDeclarationAsString(true, false, true)
                             + "\n");
         }
         String report =
-                "\t" + className + "\n"
+                "\t" + "CLASS:  " + className + "\n"
                         + fieldsString
                         + methodsString;
         addReport(report);
@@ -134,12 +133,12 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
         for(MethodDeclaration methodDeclaration : methodDeclarationList) {
             methodsString = methodsString.concat(
-                    "\t\t" +
+                    "\t\t" + "METHOD:  " +
                             methodDeclaration.getDeclarationAsString(true, false, true)
                             + "\n");
         }
         String report =
-                "\t" + interfaceName + "\n"
+                "\t" + "INTERFACE:  " + interfaceName + "\n"
                         + methodsString;
         addReport(report);
     }
