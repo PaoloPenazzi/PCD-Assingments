@@ -45,12 +45,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            CompilationUnit compilationUnit;
-            try {
-                compilationUnit = StaticJavaParser.parse(new File(srcInterfacePath));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            CompilationUnit compilationUnit = this.parseSingleFile(srcInterfacePath);
             InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
             InterfaceCollector interfaceCollector = new InterfaceCollector();
             interfaceCollector.visit(compilationUnit, interfaceReport);
@@ -62,12 +57,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<ClassReport> getClassReport(String srcClassPath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            CompilationUnit compilationUnit;
-            try {
-                compilationUnit = StaticJavaParser.parse(new File(srcClassPath));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
-            }
+            CompilationUnit compilationUnit = this.parseSingleFile(srcClassPath);
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
             classCollector.visit(compilationUnit, classReport);
@@ -82,27 +72,21 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<PackageReport> getPackageReport(String srcPackagePath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + srcPackagePath + ";");
+            List<ClassReport> classReports = new ArrayList<>();
+            List<InterfaceReport> interfaceReports = new ArrayList<>();
+            List<Future> futureListClass = new ArrayList<>();
+            List<Future> futureListInterface = new ArrayList<>();
             PackageReportImpl packageReport = new PackageReportImpl();
+
+            PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + srcPackagePath + ";");
             packageReport.setFullPackageName(srcPackagePath);
 
-            // ci salviamo le unita di memoria che contengono i dati rilevanti sulle classi e interfacce
             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
                     .filter(r -> r.isSuccessful() && r.getResult().isPresent())
                     .map(r -> r.getResult().get())
                     .collect(Collectors.toList());
 
-            // ci salviamo le strutture dati con cui riempiremo il nostro packageReport
-            List<ClassReport> classReports = new ArrayList<>();
-            List<InterfaceReport> interfaceReports = new ArrayList<>();
-
-            List<Future> futureListClass = new ArrayList<>();
-            List<Future> futureListInterface = new ArrayList<>();
-
-
-            // analizziamo le classi o le interfacce in maniera asincrona
             for (CompilationUnit cu : classesOrInterfacesUnit) {
-                // prendiamo tutte le dichiarazione delle classi/interface
                 List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
                         .map(TypeDeclaration::asTypeDeclaration)
                         .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
@@ -110,15 +94,14 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                         .collect(Collectors.toList());
 
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                    String srcFilePath = ProjectAnalyzerImpl.PATH +
-                            "/" + declaration.getFullyQualifiedName().get().replace(".", "/") + ".java";
+                    String srcFilePath = ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
+                            .replace(".", "/") + ".java";
                     if (declaration.getFullyQualifiedName().isPresent() && !this.isFileAlreadyAnalyzed(srcFilePath)) {
                         this.addFileAnalyzed(srcFilePath);
                         if (declaration.isInterface()) {
                             SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                             fatherTreeNode.addChild(interfaceNodeChild);
-                            futureListInterface.add(this.getInterfaceReport(srcFilePath,
-                                    interfaceNodeChild));
+                            futureListInterface.add(this.getInterfaceReport(srcFilePath,interfaceNodeChild));
                         } else {
                             SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                             fatherTreeNode.addChild(classNodeChild);
@@ -185,6 +168,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             CompositeFuture.all(futureListPackage).onComplete(res -> {
                 futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
                 projectReport.setPackageReports(packageReports);
+                this.viewController.log(projectReport.toString());
                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
                 promise.complete(projectReport);
             });
@@ -294,6 +278,16 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         if (innerClass.getInnerClass() != null) {
             this.addInnerChildClassNodeToFather(innerClass, fatherTreeNode);
         }
+    }
+
+    private CompilationUnit parseSingleFile(String srcFilePath) {
+        CompilationUnit compilationUnit;
+        try {
+            compilationUnit = StaticJavaParser.parse(new File(srcFilePath));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return compilationUnit;
     }
 
     private void log(String msg) {
