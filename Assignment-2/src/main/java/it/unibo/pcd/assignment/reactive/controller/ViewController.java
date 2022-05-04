@@ -1,6 +1,5 @@
 package it.unibo.pcd.assignment.reactive.controller;
 
-import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -9,16 +8,11 @@ import it.unibo.pcd.assignment.reactive.view.ViewFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.util.concurrent.Executors;
 
 public class ViewController {
     private final ViewFrame view;
     private final ReactiveAnalyzerImpl reactiveAnalyzerImpl;
     private boolean isStopped;
-    private Disposable reportObserver;
-    private Disposable packageObserver;
-    private Disposable classObserver;
-    private Disposable interfaceObserver;
     Scheduler scheduler;
     Scheduler.Worker worker;
 
@@ -71,7 +65,7 @@ public class ViewController {
     }
 
     private void setupReportObserver() {
-        this.reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
+        Disposable reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(res -> {
                     if (!this.isStopped) {
@@ -81,7 +75,7 @@ public class ViewController {
     }
 
     private void setupPackageNumberObserver() {
-        this.packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
+        Disposable packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(res -> {
                     if (!this.isStopped) {
@@ -91,7 +85,7 @@ public class ViewController {
     }
 
     private void setupClassNumberObserver() {
-        this.classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
+        Disposable classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(res -> {
                     if (!this.isStopped) {
@@ -101,7 +95,7 @@ public class ViewController {
     }
 
     private void setupInterfaceNumberObserver() {
-        this.interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
+        Disposable interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
                 .subscribeOn(Schedulers.newThread())
                 .subscribe(res -> {
                     if (!this.isStopped) {
