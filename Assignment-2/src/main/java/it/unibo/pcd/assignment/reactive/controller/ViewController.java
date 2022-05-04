@@ -26,6 +26,7 @@ public class ViewController {
         this.view = new ViewFrame(this);
         this.reactiveAnalyzerImpl = new ReactiveAnalyzerImpl();
         this.scheduler = Schedulers.computation();
+        this.createObservers();
     }
 
     public void openProjectPressed(ActionEvent actionEvent) {
@@ -41,7 +42,6 @@ public class ViewController {
         if (!this.reactiveAnalyzerImpl.getPath().equals("")) {
             this.isStopped = false;
             this.clearOutput();
-            this.createObservers();
             this.worker = this.scheduler.createWorker();
             this.worker.schedule(() -> {
                 this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());

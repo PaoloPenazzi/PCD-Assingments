@@ -7,7 +7,6 @@ import java.util.List;
 
 public class ProjectReportImpl implements ProjectReport {
     private List<PackageReport> packageReports;
-    // TODO NELLA PARTE ASYNC
     private List<Pair<String, String>> pairList;
 
     public void setPackageReports(List<PackageReport> packageReports) {
