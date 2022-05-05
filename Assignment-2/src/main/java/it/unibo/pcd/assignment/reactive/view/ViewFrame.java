@@ -7,7 +7,10 @@ import java.awt.*;
 
 public class ViewFrame extends JFrame {
     private final ViewController controller;
-    private JButton openProjectButton;
+    private JButton analyzeProjectButton;
+    private JButton analyzePackageButton;
+    private JButton analyzeClassButton;
+    private JButton analyzeInterfaceButton;
     private JButton startAnalysisButton;
     private JButton stopAnalysisButton;
     private JTextArea consoleTextArea;
@@ -66,14 +69,23 @@ public class ViewFrame extends JFrame {
 
     private void createNorthPanel() {
         this.northPanel = new JPanel();
-        this.openProjectButton = new JButton("Open Project");
+        this.analyzeClassButton = new JButton("Analyze Class");
+        this.analyzeClassButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.analyzeClassButton);
+        this.analyzeInterfaceButton = new JButton("Analyze Interface");
+        this.analyzeInterfaceButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.analyzeInterfaceButton);
+        this.analyzePackageButton = new JButton("Analyze Package");
+        this.analyzePackageButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.analyzePackageButton);
+        this.analyzeProjectButton = new JButton("Analyze Project");
+        this.analyzeProjectButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.analyzeProjectButton);
         this.startAnalysisButton = new JButton("Start");
-        this.stopAnalysisButton = new JButton("Stop");
         this.startAnalysisButton.addActionListener(controller::startPressed);
-        this.openProjectButton.addActionListener(controller::openProjectPressed);
-        this.stopAnalysisButton.addActionListener(controller::stopPressed);
-        this.northPanel.add(this.openProjectButton);
         this.northPanel.add(this.startAnalysisButton);
+        this.stopAnalysisButton = new JButton("Stop");
+        this.stopAnalysisButton.addActionListener(controller::stopPressed);
         this.northPanel.add(this.stopAnalysisButton);
     }
 

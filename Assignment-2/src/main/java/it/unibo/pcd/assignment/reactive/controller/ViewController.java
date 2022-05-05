@@ -15,6 +15,7 @@ public class ViewController {
     private boolean isStopped;
     Scheduler scheduler;
     Scheduler.Worker worker;
+    private String analysisType;
 
     public ViewController() {
         this.view = new ViewFrame(this);
@@ -23,9 +24,28 @@ public class ViewController {
         this.createObservers();
     }
 
-    public void openProjectPressed(ActionEvent actionEvent) {
+    public void analyzePressed(ActionEvent actionEvent) {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        JButton source = (JButton) actionEvent.getSource();
+        switch (source.getText()) {
+            case "Analyze Class" -> {
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                this.analysisType = "class";
+            }
+            case "Analyze Interface" -> {
+                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                this.analysisType = "interface";
+            }
+            case "Analyze Package" -> {
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                this.analysisType = "package";
+            }
+            case "Analyze Project" -> {
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                this.analysisType = "project";
+            }
+            default -> throw new IllegalStateException("Unexpected behaviour");
+        }
         fileChooser.showSaveDialog(fileChooser);
         String path = fileChooser.getSelectedFile().getPath();
         this.reactiveAnalyzerImpl.setPath(path);
