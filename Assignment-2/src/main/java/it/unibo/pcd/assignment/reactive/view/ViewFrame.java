@@ -40,7 +40,8 @@ public class ViewFrame extends JFrame {
     }
 
     private void createBottomPanel() {
-        this.bottomPanel = new JPanel(new GridLayout(4, 2));
+        JPanel subPanelNorth = new JPanel(new GridLayout(3, 2));
+        JPanel subPanelSouth = new JPanel();
         this.fileSelectedLabel = new JLabel("Ready");
         JLabel labelPackage = new JLabel("Package: ");
         this.packageCounterTextField = new JTextField();
@@ -51,13 +52,16 @@ public class ViewFrame extends JFrame {
         JLabel labelInterface = new JLabel("Interface: ");
         this.interfaceCounterTextField = new JTextField();
         this.interfaceCounterTextField.setEditable(false);
-        this.bottomPanel.add(labelPackage);
-        this.bottomPanel.add(packageCounterTextField);
-        this.bottomPanel.add(labelClass);
-        this.bottomPanel.add(classCounterTextField);
-        this.bottomPanel.add(labelInterface);
-        this.bottomPanel.add(interfaceCounterTextField);
-        this.bottomPanel.add(this.fileSelectedLabel);
+        subPanelNorth.add(labelPackage);
+        subPanelNorth.add(packageCounterTextField);
+        subPanelNorth.add(labelClass);
+        subPanelNorth.add(classCounterTextField);
+        subPanelNorth.add(labelInterface);
+        subPanelNorth.add(interfaceCounterTextField);
+        subPanelSouth.add(this.fileSelectedLabel);
+        this.bottomPanel = new JPanel(new BorderLayout());
+        this.bottomPanel.add(BorderLayout.NORTH, subPanelNorth);
+        this.bottomPanel.add(BorderLayout.SOUTH, subPanelSouth);
     }
 
     private void createNorthPanel() {
