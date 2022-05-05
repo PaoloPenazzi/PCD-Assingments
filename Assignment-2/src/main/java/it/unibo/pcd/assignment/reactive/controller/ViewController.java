@@ -57,9 +57,23 @@ public class ViewController {
             this.isStopped = false;
             this.clearOutput();
             this.worker = this.scheduler.createWorker();
-            this.worker.schedule(() -> {
-                this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
-            });
+            switch (this.analysisType) {
+                case "class" -> {
+                    // TODO
+                }
+                case "interface" -> {
+                    // TODO
+                }
+                case "package" -> {
+                    // TODO
+                }
+                case "project" -> {
+                    this.worker.schedule(() -> {
+                        this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
+                    });
+                }
+                default -> throw new IllegalStateException("Unexpected behaviour");
+            }
         } else {
             JDialog dialog = new JDialog();
             dialog.add(new JLabel("Please select a file or a directory"));
