@@ -13,13 +13,15 @@ public class ViewController {
     private final ViewFrame view;
     private final ReactiveAnalyzerImpl reactiveAnalyzerImpl;
     private boolean isStopped;
+    private String analysisType;
     Scheduler scheduler;
     Scheduler.Worker worker;
-    private String analysisType;
 
     public ViewController() {
         this.view = new ViewFrame(this);
         this.reactiveAnalyzerImpl = new ReactiveAnalyzerImpl();
+        this.isStopped = false;
+        this.analysisType = "";
         this.scheduler = Schedulers.computation();
         this.createObservers();
     }
@@ -61,10 +63,14 @@ public class ViewController {
             this.worker = this.scheduler.createWorker();
             switch (this.analysisType) {
                 case "class" -> {
-                    // TODO
+                    this.worker.schedule(() -> {
+                        this.reactiveAnalyzerImpl.analyzeClass(this.reactiveAnalyzerImpl.getPath());
+                    });
                 }
                 case "interface" -> {
-                    // TODO
+                    this.worker.schedule(() -> {
+                        this.reactiveAnalyzerImpl.analyzeInterface(this.reactiveAnalyzerImpl.getPath());
+                    });
                 }
                 case "package" -> {
                     this.worker.schedule(() -> {

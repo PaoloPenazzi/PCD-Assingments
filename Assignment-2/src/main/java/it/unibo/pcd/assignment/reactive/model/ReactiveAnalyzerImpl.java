@@ -33,13 +33,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     public void analyzeProject(String srcProjectFolderName) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
-        List<PackageDeclaration> allCus = parseResultList.stream()
-                .filter(r -> r.getResult().isPresent() && r.isSuccessful())
-                .map(r -> r.getResult().get())
-                .filter(c -> c.getPackageDeclaration().isPresent())
-                .map(c -> c.getPackageDeclaration().get())
-                .distinct()
-                .collect(Collectors.toList());
+        List<PackageDeclaration> allCus = parseResultList.stream().filter(r -> r.getResult().isPresent() && r.isSuccessful()).map(r -> r.getResult().get()).filter(c -> c.getPackageDeclaration().isPresent()).map(c -> c.getPackageDeclaration().get()).distinct().collect(Collectors.toList());
         for (PackageDeclaration packageDeclaration : allCus) {
             this.analyzePackage(packageDeclaration.getNameAsString());
         }
@@ -49,19 +43,11 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     public void analyzePackage(String packagePath) {
         this.addReport("PACKAGE:  " + packagePath + "\n");
         incrementPackageNumber();
-        PackageDeclaration packageDeclaration = StaticJavaParser
-                .parsePackageDeclaration("package " + packagePath + ";");
-        List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
-                .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                .map(r -> r.getResult().get())
-                .collect(Collectors.toList());
+        PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packagePath + ";");
+        List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream().filter(r -> r.isSuccessful() && r.getResult().isPresent()).map(r -> r.getResult().get()).collect(Collectors.toList());
         for (CompilationUnit cu : classesOrInterfacesUnit) {
             // prendiamo tutte le dichiarazione delle classi/interface
-            List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
-                    .map(TypeDeclaration::asTypeDeclaration)
-                    .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                    .map(ClassOrInterfaceDeclaration.class::cast)
-                    .collect(Collectors.toList());
+            List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream().map(TypeDeclaration::asTypeDeclaration).filter(BodyDeclaration::isClassOrInterfaceDeclaration).map(ClassOrInterfaceDeclaration.class::cast).collect(Collectors.toList());
             for (ClassOrInterfaceDeclaration declaration : declarationList) {
                 if (declaration.isInterface()) {
                     this.analyzeInterface(packagePath, declaration);
@@ -70,6 +56,16 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                 }
             }
         }
+    }
+
+    @Override
+    public void analyzeClass(String classPath) {
+
+    }
+
+    @Override
+    public void analyzeInterface(String interfacePath) {
+
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration) {
@@ -108,22 +104,13 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         String methodsString = "";
         List<FieldDeclaration> fieldDeclarationList = declaration.getFields();
         for (FieldDeclaration fieldDeclaration : fieldDeclarationList) {
-            fieldsString = fieldsString.concat(
-                    "\t\t" + "FIELD:  " +
-                            fieldDeclaration.toString()
-                            + "\n");
+            fieldsString = fieldsString.concat("\t\t" + "FIELD:  " + fieldDeclaration.toString() + "\n");
         }
         List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
         for (MethodDeclaration methodDeclaration : methodDeclarationList) {
-            methodsString = methodsString.concat(
-                    "\t\t" + "METHOD:  " +
-                            methodDeclaration.getDeclarationAsString(true, false, true)
-                            + "\n");
+            methodsString = methodsString.concat("\t\t" + "METHOD:  " + methodDeclaration.getDeclarationAsString(true, false, true) + "\n");
         }
-        String report =
-                "\t" + "CLASS:  " + className + "\n"
-                        + fieldsString
-                        + methodsString;
+        String report = "\t" + "CLASS:  " + className + "\n" + fieldsString + methodsString;
         addReport(report);
     }
 
@@ -131,14 +118,9 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         String methodsString = "";
         List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
         for (MethodDeclaration methodDeclaration : methodDeclarationList) {
-            methodsString = methodsString.concat(
-                    "\t\t" + "METHOD:  " +
-                            methodDeclaration.getDeclarationAsString(true, false, true)
-                            + "\n");
+            methodsString = methodsString.concat("\t\t" + "METHOD:  " + methodDeclaration.getDeclarationAsString(true, false, true) + "\n");
         }
-        String report =
-                "\t" + "INTERFACE:  " + interfaceName + "\n"
-                        + methodsString;
+        String report = "\t" + "INTERFACE:  " + interfaceName + "\n" + methodsString;
         addReport(report);
     }
 
