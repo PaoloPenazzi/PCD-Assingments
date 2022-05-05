@@ -47,9 +47,11 @@ public class ViewController {
             default -> throw new IllegalStateException("Unexpected behaviour");
         }
         fileChooser.showSaveDialog(fileChooser);
-        String path = fileChooser.getSelectedFile().getPath();
-        this.reactiveAnalyzerImpl.setPath(path);
-        view.getFileSelectedLabel().setText(path);
+        if (fileChooser.getSelectedFile() != null) {
+            String path = fileChooser.getSelectedFile().getPath();
+            this.reactiveAnalyzerImpl.setPath(path);
+            view.getFileSelectedLabel().setText(path);
+        }
     }
 
     public void startPressed(ActionEvent actionEvent) {
