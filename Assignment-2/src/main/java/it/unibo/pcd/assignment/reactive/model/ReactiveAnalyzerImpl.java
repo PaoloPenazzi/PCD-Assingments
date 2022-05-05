@@ -12,7 +12,6 @@ import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,16 +45,16 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         }
     }
 
-    private void analyzePackage(String packageName) {
+    @Override
+    public void analyzePackage(String packagePath) {
+        this.addReport("PACKAGE:  " + packagePath + "\n");
         incrementPackageNumber();
-        this.addReport("PACKAGE:  " + packageName + "\n");
         PackageDeclaration packageDeclaration = StaticJavaParser
-                .parsePackageDeclaration("package " + packageName + ";");
+                .parsePackageDeclaration("package " + packagePath + ";");
         List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
                 .filter(r -> r.isSuccessful() && r.getResult().isPresent())
                 .map(r -> r.getResult().get())
                 .collect(Collectors.toList());
-
         for (CompilationUnit cu : classesOrInterfacesUnit) {
             // prendiamo tutte le dichiarazione delle classi/interface
             List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
@@ -65,10 +64,9 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                     .collect(Collectors.toList());
             for (ClassOrInterfaceDeclaration declaration : declarationList) {
                 if (declaration.isInterface()) {
-                    this.analyzeInterface(packageName, declaration);
-
+                    this.analyzeInterface(packagePath, declaration);
                 } else {
-                    this.analyzeClass(packageName, declaration);
+                    this.analyzeClass(packagePath, declaration);
                 }
             }
         }

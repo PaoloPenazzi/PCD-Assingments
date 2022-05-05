@@ -67,7 +67,9 @@ public class ViewController {
                     // TODO
                 }
                 case "package" -> {
-                    // TODO
+                    this.worker.schedule(() -> {
+                        this.reactiveAnalyzerImpl.analyzePackage(this.reactiveAnalyzerImpl.getPath());
+                    });
                 }
                 case "project" -> {
                     this.worker.schedule(() -> {
