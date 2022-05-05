@@ -60,6 +60,12 @@ public class ViewController {
             this.worker.schedule(() -> {
                 this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
             });
+        } else {
+            JDialog dialog = new JDialog();
+            dialog.add(new JLabel("Please select a file or a directory"));
+            dialog.setSize(250, 100);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
         }
     }
 
