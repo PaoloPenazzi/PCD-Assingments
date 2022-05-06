@@ -212,27 +212,23 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             .collect(Collectors.toList());
 
                     for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                        if (declaration.getFullyQualifiedName().isPresent()) {
+                        String srcFilePath = ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
+                                .replace(".", "/") + ".java";
+                        if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(packageDeclaration.getNameAsString(), declaration)) {
                             if (declaration.isInterface()) {
-                                SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " +
-                                        declaration.getNameAsString());
+                                SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                                 packageNodeChild.addChild(interfaceNodeChild);
                                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                                this.getInterfaceReport(ProjectAnalyzerImpl.PATH +
-                                        "/" + declaration.getFullyQualifiedName().get().
-                                        replace(".", "/") + ".java", interfaceNodeChild).onComplete(res -> {
+                                this.getInterfaceReport(srcFilePath,interfaceNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
                                     }
                                 });
                             } else {
-                                SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " +
-                                        declaration.getNameAsString());
+                                SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                                 packageNodeChild.addChild(classNodeChild);
                                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                                this.getClassReport(ProjectAnalyzerImpl.PATH +
-                                        "/" + declaration.getFullyQualifiedName().get()
-                                        .replace(".", "/") + ".java", classNodeChild).onComplete(res -> {
+                                this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
                                     }
