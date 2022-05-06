@@ -42,17 +42,28 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     @Override
     public void analyzePackage(String packagePath) {
         this.addReport("PACKAGE:  " + packagePath + "\n");
+        String packageName = "";
+        String sourceRootPath = "";
+        if(!packagePath.contains("src/main/java")) {
+            packageName = packagePath;
+            sourceRootPath = this.path;
+        } else {
+            packageName = packagePath.replaceAll(".*src/main/java/", "");
+            packageName = packageName.replaceAll("/", ".");
+            sourceRootPath = packagePath.replaceAll("src/main/java.*", "");
+            sourceRootPath = sourceRootPath + "src/main/java";
+        }
+        PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packageName + ";");
+        List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath).stream().filter(r -> r.isSuccessful() && r.getResult().isPresent()).map(r -> r.getResult().get()).collect(Collectors.toList());
         incrementPackageNumber();
-        PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packagePath + ";");
-        List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream().filter(r -> r.isSuccessful() && r.getResult().isPresent()).map(r -> r.getResult().get()).collect(Collectors.toList());
         for (CompilationUnit cu : classesOrInterfacesUnit) {
             // prendiamo tutte le dichiarazione delle classi/interface
             List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream().map(TypeDeclaration::asTypeDeclaration).filter(BodyDeclaration::isClassOrInterfaceDeclaration).map(ClassOrInterfaceDeclaration.class::cast).collect(Collectors.toList());
             for (ClassOrInterfaceDeclaration declaration : declarationList) {
                 if (declaration.isInterface()) {
-                    this.analyzeInterface(packagePath, declaration);
+                    this.analyzeInterface(packageName, declaration);
                 } else {
-                    this.analyzeClass(packagePath, declaration);
+                    this.analyzeClass(packageName, declaration);
                 }
             }
         }
@@ -68,8 +79,8 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     }
 
-    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration) {
-        SourceRoot sourceRoot = new SourceRoot(Paths.get(this.path)).setParserConfiguration(new ParserConfiguration());
+    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration, String sourceRootPath) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList;
         parseResultList = sourceRoot.tryToParseParallelized(packageDeclaration.getNameAsString());
         return parseResultList;
