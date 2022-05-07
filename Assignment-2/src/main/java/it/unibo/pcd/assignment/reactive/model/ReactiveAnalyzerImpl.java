@@ -13,7 +13,6 @@ import io.reactivex.rxjava3.subjects.Subject;
 import it.unibo.pcd.assignment.event.ProjectElem;
 import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
-import it.unibo.pcd.assignment.event.report.ClassReport;
 import it.unibo.pcd.assignment.event.report.ClassReportImpl;
 import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
 
@@ -77,6 +76,13 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         }
     }
 
+    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration, String sourceRootPath) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
+        List<ParseResult<CompilationUnit>> parseResultList;
+        parseResultList = sourceRoot.tryToParseParallelized(packageDeclaration.getNameAsString());
+        return parseResultList;
+    }
+
     @Override
     public void analyzeClass(String classPath) {
         CompilationUnit compilationUnit = this.parseSingleFile(classPath);
@@ -105,28 +111,27 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         return compilationUnit;
     }
 
-    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration, String sourceRootPath) {
-        SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
-        List<ParseResult<CompilationUnit>> parseResultList;
-        parseResultList = sourceRoot.tryToParseParallelized(packageDeclaration.getNameAsString());
-        return parseResultList;
-    }
-
     private void createClassReport(String packageName, ClassOrInterfaceDeclaration declaration) {
-        if (this.isRightPackage(packageName, declaration)) {
-            this.buildClassReport(declaration);
+        if (this.isTheRightPackage(packageName, declaration)) {
+            ClassReportImpl classReport = new ClassReportImpl();
+            ClassCollector classCollector = new ClassCollector();
+            classCollector.visit(declaration, classReport);
+            addReport(classReport);
             incrementClassNumber();
         }
     }
 
     private void createInterfaceReport(String packageName, ClassOrInterfaceDeclaration declaration) {
-        if (this.isRightPackage(packageName, declaration)) {
+        if (this.isTheRightPackage(packageName, declaration)) {
+            InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
+            InterfaceCollector interfaceCollector = new InterfaceCollector();
+            interfaceCollector.visit(declaration, interfaceReport);
+            addReport(interfaceReport);
             incrementInterfaceNumber();
-            buildInterfaceReport(declaration);
         }
     }
 
-    private boolean isRightPackage(String packageName, ClassOrInterfaceDeclaration declaration) {
+    private boolean isTheRightPackage(String packageName, ClassOrInterfaceDeclaration declaration) {
         String classFullName = declaration.getFullyQualifiedName().get();
         String className = declaration.getNameAsString();
         classFullName = classFullName.replace("." + className, "");
@@ -136,10 +141,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     private void buildClassReport(ClassOrInterfaceDeclaration declaration) {
-        ClassReportImpl classReport = new ClassReportImpl();
-        ClassCollector classCollector = new ClassCollector();
-        classCollector.visit(declaration, classReport);
-        addReport(classReport);
         /*String className = declaration.getFullyQualifiedName().get();
         String fieldsString = "";
         String methodsString = "";
@@ -156,10 +157,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     private void buildInterfaceReport(ClassOrInterfaceDeclaration declaration) {
-        InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
-        InterfaceCollector interfaceCollector = new InterfaceCollector();
-        interfaceCollector.visit(declaration, interfaceReport);
-        addReport(interfaceReport);
         /*String interfaceName = declaration.getFullyQualifiedName().get();
         String methodsString = "";
         List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
