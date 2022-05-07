@@ -11,6 +11,8 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -61,9 +63,9 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
             List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream().map(TypeDeclaration::asTypeDeclaration).filter(BodyDeclaration::isClassOrInterfaceDeclaration).map(ClassOrInterfaceDeclaration.class::cast).collect(Collectors.toList());
             for (ClassOrInterfaceDeclaration declaration : declarationList) {
                 if (declaration.isInterface()) {
-                    this.analyzeInterface(packageName, declaration);
+                    this.createInterfaceReport(packageName, declaration);
                 } else {
-                    this.analyzeClass(packageName, declaration);
+                    this.createClassReport(packageName, declaration);
                 }
             }
         }
@@ -71,12 +73,30 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     @Override
     public void analyzeClass(String classPath) {
-
+        CompilationUnit compilationUnit = this.parseSingleFile(classPath);
+        ClassOrInterfaceDeclaration declaration = compilationUnit.getTypes().stream().map(TypeDeclaration::asTypeDeclaration)
+                .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                .map(ClassOrInterfaceDeclaration.class::cast).findFirst().get();
+        this.createClassReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
     }
 
     @Override
     public void analyzeInterface(String interfacePath) {
+        CompilationUnit compilationUnit = this.parseSingleFile(interfacePath);
+        ClassOrInterfaceDeclaration declaration = compilationUnit.getTypes().stream().map(TypeDeclaration::asTypeDeclaration)
+                .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                .map(ClassOrInterfaceDeclaration.class::cast).findFirst().get();
+        this.createInterfaceReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
+    }
 
+    private CompilationUnit parseSingleFile(String srcFilePath) {
+        CompilationUnit compilationUnit;
+        try {
+            compilationUnit = StaticJavaParser.parse(new File(srcFilePath));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        return compilationUnit;
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration, String sourceRootPath) {
@@ -86,7 +106,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         return parseResultList;
     }
 
-    private void analyzeClass(String packageName, ClassOrInterfaceDeclaration declaration) {
+    private void createClassReport(String packageName, ClassOrInterfaceDeclaration declaration) {
         String className = declaration.getFullyQualifiedName().get();
         if (this.isRightPackage(packageName, declaration)) {
             this.buildClassReport(className, declaration);
@@ -94,9 +114,10 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         }
     }
 
-    private void analyzeInterface(String packageName, ClassOrInterfaceDeclaration declaration) {
+    private void createInterfaceReport(String packageName, ClassOrInterfaceDeclaration declaration) {
         String interfaceName = declaration.getFullyQualifiedName().get();
         if (this.isRightPackage(packageName, declaration)) {
+            System.out.println("Dentris");
             incrementInterfaceNumber();
             buildInterfaceReport(interfaceName, declaration);
 
@@ -107,6 +128,8 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         String classFullName = declaration.getFullyQualifiedName().get();
         String className = declaration.getNameAsString();
         classFullName = classFullName.replace("." + className, "");
+        System.out.println("PACKAGE: " + packageName);
+        System.out.println("INTERFACE FULL: " + classFullName);
         return classFullName.equals(packageName);
     }
 
