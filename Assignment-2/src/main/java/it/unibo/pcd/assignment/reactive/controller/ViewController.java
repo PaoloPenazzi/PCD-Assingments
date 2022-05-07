@@ -7,6 +7,8 @@ import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzerImpl;
 import it.unibo.pcd.assignment.reactive.view.ViewFrame;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 
 public class ViewController {
@@ -28,25 +30,31 @@ public class ViewController {
 
     public void analyzePressed(ActionEvent actionEvent) {
         JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setAcceptAllFileFilterUsed(false);
         JButton source = (JButton) actionEvent.getSource();
         switch (source.getText()) {
-            case "Analyze Class" -> {
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            case "Analyze Class": {
                 this.analysisType = "class";
+                FileFilter filter = new FileNameExtensionFilter("", "java");
+                fileChooser.setFileFilter(filter);
+                break;
             }
-            case "Analyze Interface" -> {
-                fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            case "Analyze Interface": {
                 this.analysisType = "interface";
+                FileFilter filter = new FileNameExtensionFilter("", "java");
+                fileChooser.setFileFilter(filter);
+                break;
             }
-            case "Analyze Package" -> {
+            case "Analyze Package": {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "package";
+                break;
             }
-            case "Analyze Project" -> {
+            case "Analyze Project": {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "project";
+                break;
             }
-            default -> throw new IllegalStateException("Unexpected behaviour");
         }
         fileChooser.showSaveDialog(fileChooser);
         if (fileChooser.getSelectedFile() != null) {
@@ -62,27 +70,30 @@ public class ViewController {
             this.clearOutput();
             this.worker = this.scheduler.createWorker();
             switch (this.analysisType) {
-                case "class" -> {
+                case "class": {
                     this.worker.schedule(() -> {
                         this.reactiveAnalyzerImpl.analyzeClass(this.reactiveAnalyzerImpl.getPath());
                     });
+                    break;
                 }
-                case "interface" -> {
+                case "interface": {
                     this.worker.schedule(() -> {
                         this.reactiveAnalyzerImpl.analyzeInterface(this.reactiveAnalyzerImpl.getPath());
                     });
+                    break;
                 }
-                case "package" -> {
+                case "package": {
                     this.worker.schedule(() -> {
                         this.reactiveAnalyzerImpl.analyzePackage(this.reactiveAnalyzerImpl.getPath());
                     });
+                    break;
                 }
-                case "project" -> {
+                case "project": {
                     this.worker.schedule(() -> {
                         this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
                     });
+                    break;
                 }
-                default -> throw new IllegalStateException("Unexpected behaviour");
             }
         } else {
             JDialog dialog = new JDialog();
