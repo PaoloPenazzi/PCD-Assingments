@@ -41,6 +41,7 @@ public class ProjectCollector {
 
         PackageCollector packageCollector = new PackageCollector();
         List<PackageReport> packageReportList = new ArrayList<>();
+        packageCollector.setPath(srcProjectFolderPath);
 
         for (PackageDeclaration pckDec : cuPack) {
             PackageReportImpl report = new PackageReportImpl();

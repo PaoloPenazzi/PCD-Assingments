@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
+    private String path;
 
     @Override
     public void visit(PackageDeclaration dec, PackageReportImpl collector) {
@@ -63,14 +64,25 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
         collector.setInterfaceReports(interfaceReports);
     }
 
+    public void setPath(String path) {
+        this.path = path;
+    }
+
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
-        SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/")).setParserConfiguration(new ParserConfiguration());
-        List<ParseResult<CompilationUnit>> parseResultList;
-        try {
-            parseResultList = sourceRoot.tryToParse(dec.getNameAsString());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(!this.path.equals("")) {
+            SourceRoot sourceRoot = new SourceRoot(Paths.get(this.path)).setParserConfiguration(new ParserConfiguration());
+            List<ParseResult<CompilationUnit>> parseResultList;
+            parseResultList = sourceRoot.tryToParseParallelized(dec.getNameAsString());
+            return parseResultList;
+        } else {
+            SourceRoot sourceRoot = new SourceRoot(Paths.get("src/main/java/")).setParserConfiguration(new ParserConfiguration());
+            List<ParseResult<CompilationUnit>> parseResultList;
+            try {
+                parseResultList = sourceRoot.tryToParse(dec.getNameAsString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            return parseResultList;
         }
-        return parseResultList;
     }
 }

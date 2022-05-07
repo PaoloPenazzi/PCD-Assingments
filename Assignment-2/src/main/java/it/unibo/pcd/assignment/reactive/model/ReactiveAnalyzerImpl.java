@@ -13,8 +13,9 @@ import io.reactivex.rxjava3.subjects.Subject;
 import it.unibo.pcd.assignment.event.ProjectElem;
 import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
-import it.unibo.pcd.assignment.event.report.ClassReportImpl;
-import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
+import it.unibo.pcd.assignment.event.collector.PackageCollector;
+import it.unibo.pcd.assignment.event.collector.ProjectCollector;
+import it.unibo.pcd.assignment.event.report.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -42,14 +43,52 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
         List<PackageDeclaration> allCus = parseResultList.stream().filter(r -> r.getResult().isPresent() && r.isSuccessful()).map(r -> r.getResult().get()).filter(c -> c.getPackageDeclaration().isPresent()).map(c -> c.getPackageDeclaration().get()).distinct().collect(Collectors.toList());
         for (PackageDeclaration packageDeclaration : allCus) {
-            this.analyzePackage(packageDeclaration.getNameAsString());
+            this.getPackageReport(packageDeclaration.getNameAsString());
         }
     }
 
     @Override
-    public void analyzePackage(String packagePath) {
+    public void getProjectReport(String projectPath) {
+        ProjectReportImpl projectReport = new ProjectReportImpl();
+        ProjectCollector projectCollector = new ProjectCollector();
+        projectCollector.visit(projectPath, projectReport);
+        incrementPackageNumber(projectReport.getPackageReport().size());
+        for (PackageReport packageReport : projectReport.getPackageReport()) {
+            incrementInterfaceNumber(packageReport.getInterfacesReport().size());
+            incrementClassNumber(packageReport.getClassesReport().size());
+            // TODO print each file 2 times.
+        }
+        this.addReport(projectReport);
+    }
+
+    @Override
+    public void getPackageReport(String packagePath) {
+        String packageName = packagePath;
+        String sourceRootPath = "";
+        if(packageName.contains("\\")) {
+            packageName = packageName.replace("\\", "/");
+        }
+        if (!packagePath.contains("src/main/java")) {
+            packageName = packagePath;
+            sourceRootPath = this.path;
+        } else {
+            packageName = packagePath.replaceAll(".*src/main/java/", "");
+            packageName = packageName.replaceAll("/", ".");
+            sourceRootPath = packagePath.replaceAll("src/main/java.*", "");
+            sourceRootPath = sourceRootPath + "src/main/java";
+        }
+        PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packageName + ";");
+        PackageReportImpl packageReport = new PackageReportImpl();
+        PackageCollector packageCollector = new PackageCollector();
+        System.out.println(packageDeclaration);
+        packageCollector.setPath(sourceRootPath);
+        packageCollector.visit(packageDeclaration, packageReport);
+        this.addReport(packageReport);
+        this.incrementClassNumber(packageReport.getClassesReport().size());
+        this.incrementInterfaceNumber(packageReport.getInterfacesReport().size());
+
         // TODO this.addReport("PACKAGE:  " + packagePath + "\n");
-        String packageName = "";
+        /*String packageName = "";
         String sourceRootPath = "";
         if(!packagePath.contains("src/main/java")) {
             packageName = packagePath;
@@ -73,7 +112,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                     this.createClassReport(packageName, declaration);
                 }
             }
-        }
+        }*/
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration, String sourceRootPath) {
@@ -84,7 +123,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     @Override
-    public void analyzeClass(String classPath) {
+    public void getClassReport(String classPath) {
         CompilationUnit compilationUnit = this.parseSingleFile(classPath);
         ClassOrInterfaceDeclaration declaration = compilationUnit.getTypes().stream().map(TypeDeclaration::asTypeDeclaration)
                 .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
@@ -92,13 +131,33 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.createClassReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
     }
 
+    private void createClassReport(String packageName, ClassOrInterfaceDeclaration declaration) {
+        if (this.isTheRightPackage(packageName, declaration)) {
+            ClassReportImpl classReport = new ClassReportImpl();
+            ClassCollector classCollector = new ClassCollector();
+            classCollector.visit(declaration, classReport);
+            addReport(classReport);
+            incrementClassNumber(1);
+        }
+    }
+
     @Override
-    public void analyzeInterface(String interfacePath) {
+    public void getInterfaceReport(String interfacePath) {
         CompilationUnit compilationUnit = this.parseSingleFile(interfacePath);
         ClassOrInterfaceDeclaration declaration = compilationUnit.getTypes().stream().map(TypeDeclaration::asTypeDeclaration)
                 .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                 .map(ClassOrInterfaceDeclaration.class::cast).findFirst().get();
         this.createInterfaceReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
+    }
+
+    private void createInterfaceReport(String packageName, ClassOrInterfaceDeclaration declaration) {
+        if (this.isTheRightPackage(packageName, declaration)) {
+            InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
+            InterfaceCollector interfaceCollector = new InterfaceCollector();
+            interfaceCollector.visit(declaration, interfaceReport);
+            addReport(interfaceReport);
+            incrementInterfaceNumber(1);
+        }
     }
 
     private CompilationUnit parseSingleFile(String srcFilePath) {
@@ -109,26 +168,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
             throw new RuntimeException(e);
         }
         return compilationUnit;
-    }
-
-    private void createClassReport(String packageName, ClassOrInterfaceDeclaration declaration) {
-        if (this.isTheRightPackage(packageName, declaration)) {
-            ClassReportImpl classReport = new ClassReportImpl();
-            ClassCollector classCollector = new ClassCollector();
-            classCollector.visit(declaration, classReport);
-            addReport(classReport);
-            incrementClassNumber();
-        }
-    }
-
-    private void createInterfaceReport(String packageName, ClassOrInterfaceDeclaration declaration) {
-        if (this.isTheRightPackage(packageName, declaration)) {
-            InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
-            InterfaceCollector interfaceCollector = new InterfaceCollector();
-            interfaceCollector.visit(declaration, interfaceReport);
-            addReport(interfaceReport);
-            incrementInterfaceNumber();
-        }
     }
 
     private boolean isTheRightPackage(String packageName, ClassOrInterfaceDeclaration declaration) {
@@ -167,16 +206,16 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         addReport(report);*/
     }
 
-    public void incrementPackageNumber() {
-        this.packageNumberObservable.onNext(++this.packageNumber);
+    public void incrementPackageNumber(int variation) {
+        this.packageNumberObservable.onNext(this.packageNumber += variation);
     }
 
-    public void incrementClassNumber() {
-        this.classNumberObservable.onNext(++this.classNumber);
+    public void incrementClassNumber(int variation) {
+        this.classNumberObservable.onNext(this.classNumber += variation);
     }
 
-    public void incrementInterfaceNumber() {
-        this.interfaceNumberObservable.onNext(++this.interfaceNumber);
+    public void incrementInterfaceNumber(int variation) {
+        this.interfaceNumberObservable.onNext(this.interfaceNumber += variation);
     }
 
     public void addReport(ProjectElem report) {
