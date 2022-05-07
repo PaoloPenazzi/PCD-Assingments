@@ -33,26 +33,31 @@ public class ViewController {
         fileChooser.setAcceptAllFileFilterUsed(false);
         JButton source = (JButton) actionEvent.getSource();
         switch (source.getText()) {
-            case "Analyze Class": {
+            case "Class Report": {
                 this.analysisType = "class";
                 FileFilter filter = new FileNameExtensionFilter("", "java");
                 fileChooser.setFileFilter(filter);
                 break;
             }
-            case "Analyze Interface": {
+            case "Interface Report": {
                 this.analysisType = "interface";
                 FileFilter filter = new FileNameExtensionFilter("", "java");
                 fileChooser.setFileFilter(filter);
                 break;
             }
-            case "Analyze Package": {
+            case "Package Report": {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "package";
                 break;
             }
-            case "Analyze Project": {
+            case "Project Report": {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "project";
+                break;
+            }
+            case "Analyze Project": {
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                this.analysisType = "analysis";
                 break;
             }
         }
@@ -72,23 +77,29 @@ public class ViewController {
             switch (this.analysisType) {
                 case "class": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.analyzeClass(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getPath());
                     });
                     break;
                 }
                 case "interface": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.analyzeInterface(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.getInterfaceReport(this.reactiveAnalyzerImpl.getPath());
                     });
                     break;
                 }
                 case "package": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.analyzePackage(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.getPackageReport(this.reactiveAnalyzerImpl.getPath());
                     });
                     break;
                 }
                 case "project": {
+                    this.worker.schedule(() -> {
+                        this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getPath());
+                    });
+                    break;
+                }
+                case "analysis": {
                     this.worker.schedule(() -> {
                         this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
                     });
@@ -127,7 +138,7 @@ public class ViewController {
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
-                        view.getConsoleTextArea().append(res.toString() + "\n");
+                        view.getConsoleTextArea().append(res.toString() + "\n\n");
                     }
                 });
     }

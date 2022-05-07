@@ -8,9 +8,10 @@ import java.awt.*;
 public class ViewFrame extends JFrame {
     private final ViewController controller;
     private JButton analyzeProjectButton;
-    private JButton analyzePackageButton;
-    private JButton analyzeClassButton;
-    private JButton analyzeInterfaceButton;
+    private JButton getProjectButton;
+    private JButton getPackageButton;
+    private JButton getClassButton;
+    private JButton getInterfaceButton;
     private JButton startAnalysisButton;
     private JButton stopAnalysisButton;
     private JTextArea consoleTextArea;
@@ -69,15 +70,18 @@ public class ViewFrame extends JFrame {
 
     private void createNorthPanel() {
         this.northPanel = new JPanel();
-        this.analyzeClassButton = new JButton("Analyze Class");
-        this.analyzeClassButton.addActionListener(controller::analyzePressed);
-        this.northPanel.add(this.analyzeClassButton);
-        this.analyzeInterfaceButton = new JButton("Analyze Interface");
-        this.analyzeInterfaceButton.addActionListener(controller::analyzePressed);
-        this.northPanel.add(this.analyzeInterfaceButton);
-        this.analyzePackageButton = new JButton("Analyze Package");
-        this.analyzePackageButton.addActionListener(controller::analyzePressed);
-        this.northPanel.add(this.analyzePackageButton);
+        this.getClassButton = new JButton("Class Report");
+        this.getClassButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.getClassButton);
+        this.getInterfaceButton = new JButton("Interface Report");
+        this.getInterfaceButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.getInterfaceButton);
+        this.getPackageButton = new JButton("Package Report");
+        this.getPackageButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.getPackageButton);
+        this.getProjectButton = new JButton("Project Report");
+        this.getProjectButton.addActionListener(controller::analyzePressed);
+        this.northPanel.add(this.getProjectButton);
         this.analyzeProjectButton = new JButton("Analyze Project");
         this.analyzeProjectButton.addActionListener(controller::analyzePressed);
         this.northPanel.add(this.analyzeProjectButton);
