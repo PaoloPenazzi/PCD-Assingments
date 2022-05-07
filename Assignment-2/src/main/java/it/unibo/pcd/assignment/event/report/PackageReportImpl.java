@@ -1,8 +1,10 @@
 package it.unibo.pcd.assignment.event.report;
 
+import it.unibo.pcd.assignment.event.ProjectElem;
+
 import java.util.List;
 
-public class PackageReportImpl implements PackageReport {
+public class PackageReportImpl implements PackageReport, ProjectElem {
     private String fullPackageName;
     private List<ClassReport> classReports;
     private List<InterfaceReport> interfaceReports;

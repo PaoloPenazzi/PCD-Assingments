@@ -1,11 +1,12 @@
 package it.unibo.pcd.assignment.event.report;
 
 import com.github.javaparser.utils.Pair;
+import it.unibo.pcd.assignment.event.ProjectElem;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProjectReportImpl implements ProjectReport {
+public class ProjectReportImpl implements ProjectReport, ProjectElem {
     private List<PackageReport> packageReports;
     private List<Pair<String, String>> pairList;
 

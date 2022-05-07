@@ -1,9 +1,11 @@
 package it.unibo.pcd.assignment.event.report;
 
+import it.unibo.pcd.assignment.event.ProjectElem;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class ClassReportImpl implements ClassReport {
+public class ClassReportImpl implements ClassReport, ProjectElem {
     private String fullClassName;
     private String srcFullFileName;
     private List<MethodInfo> methodsInfo;

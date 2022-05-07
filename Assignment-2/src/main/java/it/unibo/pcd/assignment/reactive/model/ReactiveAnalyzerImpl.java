@@ -10,6 +10,12 @@ import com.github.javaparser.utils.SourceRoot;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import it.unibo.pcd.assignment.event.ProjectElem;
+import it.unibo.pcd.assignment.event.collector.ClassCollector;
+import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
+import it.unibo.pcd.assignment.event.report.ClassReport;
+import it.unibo.pcd.assignment.event.report.ClassReportImpl;
+import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,7 +27,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private final Subject<Integer> packageNumberObservable = PublishSubject.create();
     private final Subject<Integer> classNumberObservable = PublishSubject.create();
     private final Subject<Integer> interfaceNumberObservable = PublishSubject.create();
-    private final Subject<String> reportObservable = PublishSubject.create();
+    private final Subject<ProjectElem> reportObservable = PublishSubject.create();
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
@@ -43,7 +49,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     @Override
     public void analyzePackage(String packagePath) {
-        this.addReport("PACKAGE:  " + packagePath + "\n");
+        // TODO this.addReport("PACKAGE:  " + packagePath + "\n");
         String packageName = "";
         String sourceRootPath = "";
         if(!packagePath.contains("src/main/java")) {
@@ -107,20 +113,16 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     private void createClassReport(String packageName, ClassOrInterfaceDeclaration declaration) {
-        String className = declaration.getFullyQualifiedName().get();
         if (this.isRightPackage(packageName, declaration)) {
-            this.buildClassReport(className, declaration);
+            this.buildClassReport(declaration);
             incrementClassNumber();
         }
     }
 
     private void createInterfaceReport(String packageName, ClassOrInterfaceDeclaration declaration) {
-        String interfaceName = declaration.getFullyQualifiedName().get();
         if (this.isRightPackage(packageName, declaration)) {
-            System.out.println("Dentris");
             incrementInterfaceNumber();
-            buildInterfaceReport(interfaceName, declaration);
-
+            buildInterfaceReport(declaration);
         }
     }
 
@@ -133,7 +135,12 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         return classFullName.equals(packageName);
     }
 
-    private void buildClassReport(String className, ClassOrInterfaceDeclaration declaration) {
+    private void buildClassReport(ClassOrInterfaceDeclaration declaration) {
+        ClassReportImpl classReport = new ClassReportImpl();
+        ClassCollector classCollector = new ClassCollector();
+        classCollector.visit(declaration, classReport);
+        addReport(classReport);
+        /*String className = declaration.getFullyQualifiedName().get();
         String fieldsString = "";
         String methodsString = "";
         List<FieldDeclaration> fieldDeclarationList = declaration.getFields();
@@ -145,17 +152,22 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
             methodsString = methodsString.concat("\t\t" + "METHOD:  " + methodDeclaration.getDeclarationAsString(true, false, true) + "\n");
         }
         String report = "\t" + "CLASS:  " + className + "\n" + fieldsString + methodsString;
-        addReport(report);
+        addReport(report);*/
     }
 
-    private void buildInterfaceReport(String interfaceName, ClassOrInterfaceDeclaration declaration) {
+    private void buildInterfaceReport(ClassOrInterfaceDeclaration declaration) {
+        InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
+        InterfaceCollector interfaceCollector = new InterfaceCollector();
+        interfaceCollector.visit(declaration, interfaceReport);
+        addReport(interfaceReport);
+        /*String interfaceName = declaration.getFullyQualifiedName().get();
         String methodsString = "";
         List<MethodDeclaration> methodDeclarationList = declaration.getMethods();
         for (MethodDeclaration methodDeclaration : methodDeclarationList) {
             methodsString = methodsString.concat("\t\t" + "METHOD:  " + methodDeclaration.getDeclarationAsString(true, false, true) + "\n");
         }
         String report = "\t" + "INTERFACE:  " + interfaceName + "\n" + methodsString;
-        addReport(report);
+        addReport(report);*/
     }
 
     public void incrementPackageNumber() {
@@ -170,7 +182,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.interfaceNumberObservable.onNext(++this.interfaceNumber);
     }
 
-    public void addReport(String report) {
+    public void addReport(ProjectElem report) {
         reportObservable.onNext(report);
     }
 
@@ -186,7 +198,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         return interfaceNumberObservable;
     }
 
-    public Observable<String> getReportObservable() {
+    public Observable<ProjectElem> getReportObservable() {
         return reportObservable;
     }
 

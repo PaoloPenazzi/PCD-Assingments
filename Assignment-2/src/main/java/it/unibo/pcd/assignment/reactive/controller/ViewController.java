@@ -127,7 +127,7 @@ public class ViewController {
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
-                        view.getConsoleTextArea().append(res + "");
+                        view.getConsoleTextArea().append(res.toString() + "\n");
                     }
                 });
     }
