@@ -30,18 +30,20 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
-    public static String PATH = "";
+    private String PATH;
     private final ViewController viewController;
+    private final String SysOpSeparator = System.getProperty("file.separator"); //
 
     public ProjectAnalyzerImpl() {
+        this.PATH = "";
         this.viewController = new ViewController(this);
         Vertx.vertx().deployVerticle(this);
     }
 
     @Override
-    public Future<InterfaceReport> getInterfaceReport(String srcInterfacePath, SimpleTreeNode fatherTreeNode) {
+    public Future<InterfaceReport> getInterfaceReport(String interfacePath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            CompilationUnit compilationUnit = this.parseSingleFile(srcInterfacePath);
+            CompilationUnit compilationUnit = this.parseSingleFile(interfacePath);
             InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
             InterfaceCollector interfaceCollector = new InterfaceCollector();
             interfaceCollector.visit(compilationUnit, interfaceReport);
@@ -51,9 +53,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     }
 
     @Override
-    public Future<ClassReport> getClassReport(String srcClassPath, SimpleTreeNode fatherTreeNode) {
+    public Future<ClassReport> getClassReport(String classPath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            CompilationUnit compilationUnit = this.parseSingleFile(srcClassPath);
+            CompilationUnit compilationUnit = this.parseSingleFile(classPath);
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
             classCollector.visit(compilationUnit, classReport);
@@ -66,18 +68,33 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     }
 
     @Override
-    public Future<PackageReport> getPackageReport(String srcPackagePath, SimpleTreeNode fatherTreeNode) {
+    public Future<PackageReport> getPackageReport(String packagePath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
             List<ClassReport> classReports = new ArrayList<>();
             List<InterfaceReport> interfaceReports = new ArrayList<>();
             List<Future> futureListClass = new ArrayList<>();
             List<Future> futureListInterface = new ArrayList<>();
             PackageReportImpl packageReport = new PackageReportImpl();
+            String srcPackagePath = packagePath.replace("\\", "/");
 
-            PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + srcPackagePath + ";");
+            String packageName = "";
+            String sourceRootPath = "";
+            String srcMainJavaString = "src/main/java";
+
+            if(!srcPackagePath.contains(srcMainJavaString)) {
+                packageName = packagePath;
+                sourceRootPath = this.PATH;
+            } else {
+                packageName = srcPackagePath.replaceAll(".*src/main/java/", "");
+                packageName = packageName.replaceAll("/", ".");
+                sourceRootPath = srcPackagePath.replaceAll(srcMainJavaString+".*", "");
+                sourceRootPath = sourceRootPath + srcMainJavaString; // C:/Users/angel/Desktop/Assignment-2/src/main/java
+            }
+
+            PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packageName + ";");
             packageReport.setFullPackageName(srcPackagePath);
 
-            List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
+            List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath).stream()
                     .filter(r -> r.isSuccessful() && r.getResult().isPresent())
                     .map(r -> r.getResult().get())
                     .collect(Collectors.toList());
@@ -90,9 +107,10 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                         .collect(Collectors.toList());
 
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                    String srcFilePath = ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
+                    String srcFilePath = sourceRootPath + "/" + declaration.getFullyQualifiedName().get()
                             .replace(".", "/") + ".java";
-                    if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(srcPackagePath, declaration)) {
+                    srcFilePath = srcFilePath.replace("/", "\\");
+                    if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(packageName, declaration)) {
                         if (declaration.isInterface()) {
                             SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                             fatherTreeNode.addChild(interfaceNodeChild);
@@ -186,18 +204,18 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                     .collect(Collectors.toList());
 
             SimpleTreeNode rootProject = new SimpleTreeNode("Root Project: " + srcProjectFolderName);
-            this.viewController.log("Root Project: " + srcProjectFolderName);
             this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
 
             // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
+                this.viewController.increasePackageNumber();
                 SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
-                this.viewController.log("\t Package Name: " + packageDeclaration.getNameAsString());
-                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                //this.viewController.log("\t Package Name: " + packageDeclaration.getNameAsString());
+                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(packageNodeChild));
 
                 // ci salviamo le unita di memoria che contengono i dati rilevanti sulle classi e interfacce
-                List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration).stream()
+                List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, this.PATH).stream()
                         .filter(r -> r.isSuccessful() && r.getResult().isPresent())
                         .map(r -> r.getResult().get())
                         .collect(Collectors.toList());
@@ -212,13 +230,13 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             .collect(Collectors.toList());
 
                     for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                        String srcFilePath = ProjectAnalyzerImpl.PATH + "/" + declaration.getFullyQualifiedName().get()
-                                .replace(".", "/") + ".java";
+                        String srcFilePath = this.PATH + this.SysOpSeparator + declaration.getFullyQualifiedName().get()
+                                .replace(".", this.SysOpSeparator) + ".java";
                         if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(packageDeclaration.getNameAsString(), declaration)) {
                             if (declaration.isInterface()) {
                                 SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                                 packageNodeChild.addChild(interfaceNodeChild);
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(interfaceNodeChild));
                                 this.getInterfaceReport(srcFilePath,interfaceNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
@@ -227,7 +245,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             } else {
                                 SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                                 packageNodeChild.addChild(classNodeChild);
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(classNodeChild));
                                 this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
@@ -248,8 +266,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         return classFullName.equals(packageName);
     }
 
-    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
-        SourceRoot sourceRoot = new SourceRoot(Paths.get(ProjectAnalyzerImpl.PATH)).setParserConfiguration(new ParserConfiguration());
+    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec, String sourceRootPath) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList;
         parseResultList = sourceRoot.tryToParseParallelized(dec.getNameAsString());
         return parseResultList;
@@ -277,5 +295,17 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
     private void log(String msg) {
         System.out.println("[THREAD] " + Thread.currentThread() + msg);
+    }
+
+    public String getPATH() {
+        return this.PATH;
+    }
+
+    public void setPATH(String PATH) {
+        this.PATH = PATH;
+    }
+
+    public ViewController getViewController() {
+        return this.viewController;
     }
 }

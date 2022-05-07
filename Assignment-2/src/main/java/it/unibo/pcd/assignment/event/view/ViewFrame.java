@@ -5,13 +5,16 @@ import java.awt.*;
 
 public class ViewFrame extends JFrame {
     private final ViewController controller;
-    private JButton openProjectButton;
+    private JButton analyzeProjectButton;
+    private JButton analyzePackageButton;
+    private JButton analyzeClassButton;
+    private JButton analyzeInterfaceButton;
     private JButton startAnalysisButton;
     private JButton stopAnalysisButton;
     private JTextArea consoleTextArea;
-    private JTextField textPackage;
-    private JTextField textClass;
-    private JTextField textInterface;
+    private JTextField packageCounterTextField;
+    private JTextField classCounterTextField;
+    private JTextField interfaceCounterTextField;
     private JLabel fileSelectedLabel;
     private JPanel northPanel;
     private JScrollPane centralPanel;
@@ -23,51 +26,64 @@ public class ViewFrame extends JFrame {
         this.setLocationRelativeTo(null);
         this.setTitle("Project Analyzer");
         this.setLayout(new BorderLayout());
+        this.createAndAddPanels();
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setVisible(true);
+    }
+
+    private void createAndAddPanels() {
         this.createNorthPanel();
         this.createCentralPanel();
         this.createBottomPanel();
         this.getContentPane().add(BorderLayout.NORTH, this.northPanel);
         this.getContentPane().add(BorderLayout.CENTER, this.centralPanel);
         this.getContentPane().add(BorderLayout.SOUTH, this.bottomPanel);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
     }
 
     private void createBottomPanel() {
-        this.bottomPanel = new JPanel(new GridLayout(4, 2));
+        JPanel subPanelNorth = new JPanel(new GridLayout(3, 2));
+        JPanel subPanelSouth = new JPanel();
         this.fileSelectedLabel = new JLabel("Ready");
-
         JLabel labelPackage = new JLabel("Package: ");
-        this.textPackage = new JTextField();
-        this.textPackage.setEditable(false);
-
+        this.packageCounterTextField = new JTextField();
+        this.packageCounterTextField.setEditable(false);
         JLabel labelClass = new JLabel("Class: ");
-        this.textClass = new JTextField();
-        this.textClass.setEditable(false);
-
+        this.classCounterTextField = new JTextField();
+        this.classCounterTextField.setEditable(false);
         JLabel labelInterface = new JLabel("Interface: ");
-        this.textInterface = new JTextField();
-        this.textInterface.setEditable(false);
-
-        this.bottomPanel.add(labelPackage);
-        this.bottomPanel.add(textPackage);
-        this.bottomPanel.add(labelClass);
-        this.bottomPanel.add(textClass);
-        this.bottomPanel.add(labelInterface);
-        this.bottomPanel.add(textInterface);
-        this.bottomPanel.add(this.fileSelectedLabel);
+        this.interfaceCounterTextField = new JTextField();
+        this.interfaceCounterTextField.setEditable(false);
+        subPanelNorth.add(labelPackage);
+        subPanelNorth.add(packageCounterTextField);
+        subPanelNorth.add(labelClass);
+        subPanelNorth.add(classCounterTextField);
+        subPanelNorth.add(labelInterface);
+        subPanelNorth.add(interfaceCounterTextField);
+        subPanelSouth.add(this.fileSelectedLabel);
+        this.bottomPanel = new JPanel(new BorderLayout());
+        this.bottomPanel.add(BorderLayout.NORTH, subPanelNorth);
+        this.bottomPanel.add(BorderLayout.SOUTH, subPanelSouth);
     }
 
     private void createNorthPanel() {
         this.northPanel = new JPanel();
-        this.openProjectButton = new JButton("Open Project");
+        this.analyzeClassButton = new JButton("Analyze Class");
+        this.analyzeClassButton.addActionListener(this.controller::analyzePressed);
+        this.northPanel.add(this.analyzeClassButton);
+        this.analyzeInterfaceButton = new JButton("Analyze Interface");
+        this.analyzeInterfaceButton.addActionListener(this.controller::analyzePressed);
+        this.northPanel.add(this.analyzeInterfaceButton);
+        this.analyzePackageButton = new JButton("Analyze Package");
+        this.analyzePackageButton.addActionListener(this.controller::analyzePressed);
+        this.northPanel.add(this.analyzePackageButton);
+        this.analyzeProjectButton = new JButton("Analyze Project");
+        this.analyzeProjectButton.addActionListener(this.controller::analyzePressed);
+        this.northPanel.add(this.analyzeProjectButton);
         this.startAnalysisButton = new JButton("Start");
-        this.stopAnalysisButton = new JButton("Stop");
-        this.startAnalysisButton.addActionListener(controller::startAnalysisPressed);
-        this.openProjectButton.addActionListener(controller::openProjectPressed);
-        this.stopAnalysisButton.addActionListener(controller::stopAnalysisPressed);
-        this.northPanel.add(this.openProjectButton);
+        this.startAnalysisButton.addActionListener(this.controller::startAnalyses);
         this.northPanel.add(this.startAnalysisButton);
+        this.stopAnalysisButton = new JButton("Stop");
+        this.stopAnalysisButton.addActionListener(this.controller::stopAnalyses);
         this.northPanel.add(this.stopAnalysisButton);
     }
 
@@ -81,22 +97,62 @@ public class ViewFrame extends JFrame {
     }
 
     public JLabel getFileSelectedLabel() {
-        return fileSelectedLabel;
+        return this.fileSelectedLabel;
     }
 
     public JTextArea getConsoleTextArea() {
-        return consoleTextArea;
+        return this.consoleTextArea;
     }
 
-    public JTextField getTextPackage() {
-        return this.textPackage;
+    public JTextField getPackageCounterTextField() {
+        return this.packageCounterTextField;
     }
 
-    public JTextField getTextClass() {
-        return this.textClass;
+    public JTextField getClassCounterTextField() {
+        return this.classCounterTextField;
     }
 
-    public JTextField getTextInterface() {
-        return this.textInterface;
+    public JTextField getInterfaceCounterTextField() {
+        return this.interfaceCounterTextField;
+    }
+
+    public ViewController getController() {
+        return this.controller;
+    }
+
+    public JButton getAnalyzeProjectButton() {
+        return this.analyzeProjectButton;
+    }
+
+    public JButton getAnalyzePackageButton() {
+        return this.analyzePackageButton;
+    }
+
+    public JButton getAnalyzeClassButton() {
+        return this.analyzeClassButton;
+    }
+
+    public JButton getAnalyzeInterfaceButton() {
+        return this.analyzeInterfaceButton;
+    }
+
+    public JButton getStartAnalysisButton() {
+        return this.startAnalysisButton;
+    }
+
+    public JButton getStopAnalysisButton() {
+        return this.stopAnalysisButton;
+    }
+
+    public JPanel getNorthPanel() {
+        return this.northPanel;
+    }
+
+    public JScrollPane getCentralPanel() {
+        return this.centralPanel;
+    }
+
+    public JPanel getBottomPanel() {
+        return this.bottomPanel;
     }
 }
