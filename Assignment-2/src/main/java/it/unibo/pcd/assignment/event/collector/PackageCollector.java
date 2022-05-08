@@ -49,13 +49,14 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
             for (ClassOrInterfaceDeclaration declaration : declarationList) {
                 ClassReportImpl classReport = new ClassReportImpl();
                 InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
-
-                if (declaration.isInterface()) {
-                    interfaceCollector.visit(cu, interfaceReport);
-                    interfaceReports.add(interfaceReport);
-                } else {
-                    classCollector.visit(cu, classReport);
-                    classReports.add(classReport);
+                if (this.isTheRightPackage(dec.getNameAsString(), declaration)) {
+                    if (declaration.isInterface()) {
+                        interfaceCollector.visit(cu, interfaceReport);
+                        interfaceReports.add(interfaceReport);
+                    } else {
+                        classCollector.visit(cu, classReport);
+                        classReports.add(classReport);
+                    }
                 }
             }
         }
@@ -64,12 +65,19 @@ public class PackageCollector extends VoidVisitorAdapter<PackageReportImpl> {
         collector.setInterfaceReports(interfaceReports);
     }
 
+    private boolean isTheRightPackage(String packageName, ClassOrInterfaceDeclaration declaration) {
+        String classFullName = declaration.getFullyQualifiedName().get();
+        String className = declaration.getNameAsString();
+        classFullName = classFullName.replace("." + className, "");
+        return classFullName.equals(packageName);
+    }
+
     public void setPath(String path) {
         this.path = path;
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec) {
-        if(!this.path.equals("")) {
+        if (!this.path.equals("")) {
             SourceRoot sourceRoot = new SourceRoot(Paths.get(this.path)).setParserConfiguration(new ParserConfiguration());
             List<ParseResult<CompilationUnit>> parseResultList;
             parseResultList = sourceRoot.tryToParseParallelized(dec.getNameAsString());
