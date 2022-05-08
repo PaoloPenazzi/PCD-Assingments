@@ -15,7 +15,6 @@ public class ViewController {
     private final ViewFrame view;
     private final ReactiveAnalyzerImpl reactiveAnalyzerImpl;
     private boolean isStopped;
-    private String analysisType;
     Scheduler scheduler;
     Scheduler.Worker worker;
 
@@ -23,7 +22,6 @@ public class ViewController {
         this.view = new ViewFrame(this);
         this.reactiveAnalyzerImpl = new ReactiveAnalyzerImpl();
         this.isStopped = false;
-        this.analysisType = "";
         this.scheduler = Schedulers.computation();
         this.createObservers();
     }
@@ -34,30 +32,30 @@ public class ViewController {
         JButton source = (JButton) actionEvent.getSource();
         switch (source.getText()) {
             case "Class Report": {
-                this.analysisType = "class";
+                this.reactiveAnalyzerImpl.setAnalysisType("class");
                 FileFilter filter = new FileNameExtensionFilter("", "java");
                 fileChooser.setFileFilter(filter);
                 break;
             }
             case "Interface Report": {
-                this.analysisType = "interface";
+                this.reactiveAnalyzerImpl.setAnalysisType("interface");
                 FileFilter filter = new FileNameExtensionFilter("", "java");
                 fileChooser.setFileFilter(filter);
                 break;
             }
             case "Package Report": {
+                this.reactiveAnalyzerImpl.setAnalysisType("package");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                this.analysisType = "package";
                 break;
             }
             case "Project Report": {
+                this.reactiveAnalyzerImpl.setAnalysisType("project");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                this.analysisType = "project";
                 break;
             }
             case "Analyze Project": {
+                this.reactiveAnalyzerImpl.setAnalysisType("analysis");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                this.analysisType = "analysis";
                 break;
             }
         }
@@ -74,7 +72,7 @@ public class ViewController {
             this.isStopped = false;
             this.clearOutput();
             this.worker = this.scheduler.createWorker();
-            switch (this.analysisType) {
+            switch (this.reactiveAnalyzerImpl.getAnalysisType()) {
                 case "class": {
                     this.worker.schedule(() -> {
                         this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getPath());

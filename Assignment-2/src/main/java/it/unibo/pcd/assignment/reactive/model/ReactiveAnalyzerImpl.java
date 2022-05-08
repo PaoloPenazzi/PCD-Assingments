@@ -32,6 +32,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private int classNumber;
     private int interfaceNumber;
     private String path;
+    private String analysisType;
 
     public ReactiveAnalyzerImpl() {
         this.path = "";
@@ -65,7 +66,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     public void getPackageReport(String packagePath) {
         String packageName = packagePath;
         String sourceRootPath = "";
-        if(packageName.contains("\\")) {
+        if (packageName.contains("\\")) {
             packageName = packageName.replace("\\", "/");
         }
         if (!packagePath.contains("src/main/java")) {
@@ -78,6 +79,14 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
             sourceRootPath = sourceRootPath + "src/main/java";
         }
         PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packageName + ";");
+        if (this.analysisType.equals("analysis")) {
+            this.analyzePackage(packageDeclaration, sourceRootPath, packageName);
+        } else {
+            visitPackage(packageDeclaration, sourceRootPath);
+        }
+    }
+
+    private void visitPackage(PackageDeclaration packageDeclaration, String sourceRootPath) {
         PackageReportImpl packageReport = new PackageReportImpl();
         PackageCollector packageCollector = new PackageCollector();
         System.out.println(packageDeclaration);
@@ -86,22 +95,11 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.addReport(packageReport);
         this.incrementClassNumber(packageReport.getClassesReport().size());
         this.incrementInterfaceNumber(packageReport.getInterfacesReport().size());
+    }
 
-        // TODO this.addReport("PACKAGE:  " + packagePath + "\n");
-        /*String packageName = "";
-        String sourceRootPath = "";
-        if(!packagePath.contains("src/main/java")) {
-            packageName = packagePath;
-            sourceRootPath = this.path;
-        } else {
-            packageName = packagePath.replaceAll(".*src/main/java/", "");
-            packageName = packageName.replaceAll("/", ".");
-            sourceRootPath = packagePath.replaceAll("src/main/java.*", "");
-            sourceRootPath = sourceRootPath + "src/main/java";
-        }
-        PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packageName + ";");
+    private void analyzePackage(PackageDeclaration packageDeclaration, String sourceRootPath, String packageName) {
         List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath).stream().filter(r -> r.isSuccessful() && r.getResult().isPresent()).map(r -> r.getResult().get()).collect(Collectors.toList());
-        incrementPackageNumber();
+        incrementPackageNumber(1);
         for (CompilationUnit cu : classesOrInterfacesUnit) {
             // prendiamo tutte le dichiarazione delle classi/interface
             List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream().map(TypeDeclaration::asTypeDeclaration).filter(BodyDeclaration::isClassOrInterfaceDeclaration).map(ClassOrInterfaceDeclaration.class::cast).collect(Collectors.toList());
@@ -112,8 +110,9 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                     this.createClassReport(packageName, declaration);
                 }
             }
-        }*/
+        }
     }
+
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration, String sourceRootPath) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
@@ -174,8 +173,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         String classFullName = declaration.getFullyQualifiedName().get();
         String className = declaration.getNameAsString();
         classFullName = classFullName.replace("." + className, "");
-        System.out.println("PACKAGE: " + packageName);
-        System.out.println("INTERFACE FULL: " + classFullName);
         return classFullName.equals(packageName);
     }
 
@@ -244,6 +241,14 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     public void setPath(String newPath) {
         this.path = newPath;
+    }
+
+    public String getAnalysisType() {
+        return analysisType;
+    }
+
+    public void setAnalysisType(String analysisType) {
+        this.analysisType = analysisType;
     }
 
     public void resetCounters() {
