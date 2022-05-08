@@ -9,7 +9,7 @@ public interface ReactiveAnalyzer {
     /**
      * Perform a project analysis non-atomically.
      * Each file of the project is analysed incrementally.
-     * This method is full reactive and can't be stopped at any time.
+     * This method is full reactive and can be stopped at any time.
      * @param projectPath the project path.
      */
     void analyzeProject(String projectPath);

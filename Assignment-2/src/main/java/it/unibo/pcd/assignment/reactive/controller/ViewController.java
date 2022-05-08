@@ -62,44 +62,44 @@ public class ViewController {
         fileChooser.showSaveDialog(fileChooser);
         if (fileChooser.getSelectedFile() != null) {
             String path = fileChooser.getSelectedFile().getPath();
-            this.reactiveAnalyzerImpl.setPath(path);
+            this.reactiveAnalyzerImpl.setAnalysisPath(path);
             view.getFileSelectedLabel().setText(path);
         }
     }
 
     public void startPressed(ActionEvent actionEvent) {
-        if (!this.reactiveAnalyzerImpl.getPath().equals("")) {
+        if (!this.reactiveAnalyzerImpl.getAnalysisPath().equals("")) {
             this.isStopped = false;
             this.clearOutput();
             this.worker = this.scheduler.createWorker();
             switch (this.reactiveAnalyzerImpl.getAnalysisType()) {
                 case "class": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getAnalysisPath());
                     });
                     break;
                 }
                 case "interface": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getInterfaceReport(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.getInterfaceReport(this.reactiveAnalyzerImpl.getAnalysisPath());
                     });
                     break;
                 }
                 case "package": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getPackageReport(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.getPackageReport(this.reactiveAnalyzerImpl.getAnalysisPath());
                     });
                     break;
                 }
                 case "project": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getAnalysisPath());
                     });
                     break;
                 }
                 case "analysis": {
                     this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getPath());
+                        this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath());
                     });
                     break;
                 }
