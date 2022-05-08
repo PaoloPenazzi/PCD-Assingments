@@ -114,7 +114,9 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         ClassOrInterfaceDeclaration declaration = compilationUnit.getTypes().stream().map(TypeDeclaration::asTypeDeclaration)
                 .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                 .map(ClassOrInterfaceDeclaration.class::cast).findFirst().get();
-        this.createClassReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
+        if(!declaration.isInterface()) {
+            this.createClassReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
+        }
     }
 
     @Override
@@ -123,7 +125,9 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         ClassOrInterfaceDeclaration declaration = compilationUnit.getTypes().stream().map(TypeDeclaration::asTypeDeclaration)
                 .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                 .map(ClassOrInterfaceDeclaration.class::cast).findFirst().get();
-        this.createInterfaceReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
+        if(declaration.isInterface()) {
+            this.createInterfaceReport(compilationUnit.getPackageDeclaration().get().getNameAsString(), declaration);
+        }
     }
 
     private void createClassReport(String packageName, ClassOrInterfaceDeclaration declaration) {
