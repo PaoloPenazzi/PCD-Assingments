@@ -44,7 +44,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<InterfaceReport> getInterfaceReport(String interfacePath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            this.sleep(this.DELAY_MILLIS);
+            this.delay(this.DELAY_MILLIS);
             CompilationUnit compilationUnit = this.parseSingleFile(interfacePath);
             InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
             InterfaceCollector interfaceCollector = new InterfaceCollector();
@@ -57,7 +57,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<ClassReport> getClassReport(String classPath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
-            this.sleep(this.DELAY_MILLIS);
+            this.delay(this.DELAY_MILLIS);
             CompilationUnit compilationUnit = this.parseSingleFile(classPath);
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
@@ -245,7 +245,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                                 this.viewController.increaseInterfaceNumber();
                                 this.viewController.clearScreen();
                                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                                this.sleep(this.DELAY_MILLIS);
+                                this.delay(this.DELAY_MILLIS);
                                 this.getInterfaceReport(srcFilePath,interfaceNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
@@ -257,7 +257,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                                 this.viewController.increaseClassNumber();
                                 this.viewController.clearScreen();
                                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                                this.sleep(this.DELAY_MILLIS);
+                                this.delay(this.DELAY_MILLIS);
                                 this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
@@ -283,7 +283,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         return this.viewController;
     }
 
-    private void sleep(int millis){
+    private void delay(int millis){
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {
