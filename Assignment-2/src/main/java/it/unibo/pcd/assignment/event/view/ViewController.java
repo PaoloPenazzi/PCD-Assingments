@@ -56,15 +56,6 @@ public class ViewController {
         }
     }
 
-//    public void openProjectPressed(ActionEvent e) {
-//        JFileChooser fileChooser = new JFileChooser();
-//        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-//        fileChooser.showSaveDialog(fileChooser);
-//        String path = fileChooser.getSelectedFile().getPath();
-//        this.projectAnalyzer.setPATH(path);
-//        view.getFileSelectedLabel().setText(path);
-//    }
-
     public void startAnalyses(ActionEvent e){
         if (!this.projectAnalyzer.getPATH().equals("")) {
             this.view.getConsoleTextArea().selectAll();
@@ -78,7 +69,6 @@ public class ViewController {
             String path =this.projectAnalyzer.getPATH();
             switch (this.analysisType){
                 case "class" : {
-                    this.view.getStopAnalysisButton().setEnabled(false);
                     this.projectAnalyzer.getClassReport(path, new SimpleTreeNode("Class Analyses")).onComplete(res -> {
                         if(res.succeeded()){
                             this.log(res.result().toString());
@@ -87,7 +77,6 @@ public class ViewController {
                     break;
                 }
                 case "interface" : {
-                    this.view.getStopAnalysisButton().setEnabled(false);
                     this.projectAnalyzer.getInterfaceReport(path, new SimpleTreeNode("Interface Analyses")).onComplete(res -> {
                         if(res.succeeded()){
                             this.log(res.result().toString());
@@ -96,7 +85,6 @@ public class ViewController {
                     break;
                 }
                 case "package" : {
-                    this.view.getStopAnalysisButton().setEnabled(false);
                     this.projectAnalyzer.getPackageReport(path, new SimpleTreeNode("Package Analyses")).onComplete(res -> {
                         if(res.succeeded()){
                             this.log(res.result().toString());
@@ -112,20 +100,6 @@ public class ViewController {
             }
         }
     }
-
-//    public void startAnalysisPressed(ActionEvent e) {
-//        if (!Objects.equals(this.projectAnalyzer.getPATH(), "")) {
-//            this.view.getConsoleTextArea().selectAll();
-//            this.view.getConsoleTextArea().replaceSelection("");
-//            ViewController.CLASS_NUMBER = 0;
-//            ViewController.INTERFACE_NUMBER = 0;
-//            ViewController.PACKAGE_NUMBER = 0;
-//            this.view.getClassCounterTextField().setText("0");
-//            this.view.getInterfaceCounterTextField().setText("0");
-//            this.view.getPackageCounterTextField().setText("0");
-//            this.projectAnalyzer.analyzeProject(this.projectAnalyzer.getPATH(), (k) -> this.log(k.toString()));
-//        }
-//    }
 
     public void stopAnalyses(ActionEvent e) {
         try {
@@ -149,5 +123,10 @@ public class ViewController {
 
     public void log(String message) {
         this.outputConsole.append(message + "\n");
+    }
+
+    public void clearScreen(){
+        this.outputConsole.selectAll();
+        this.outputConsole.replaceSelection("");
     }
 }

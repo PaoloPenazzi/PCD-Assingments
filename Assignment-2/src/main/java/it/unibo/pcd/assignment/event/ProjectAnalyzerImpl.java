@@ -212,7 +212,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
                 //this.viewController.log("\t Package Name: " + packageDeclaration.getNameAsString());
-                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(packageNodeChild));
+                this.viewController.clearScreen();
+                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
 
                 // ci salviamo le unita di memoria che contengono i dati rilevanti sulle classi e interfacce
                 List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, this.PATH).stream()
@@ -236,7 +237,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             if (declaration.isInterface()) {
                                 SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                                 packageNodeChild.addChild(interfaceNodeChild);
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(interfaceNodeChild));
+                                this.viewController.clearScreen();
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
                                 this.getInterfaceReport(srcFilePath,interfaceNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
@@ -245,7 +247,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             } else {
                                 SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                                 packageNodeChild.addChild(classNodeChild);
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(classNodeChild));
+                                this.viewController.clearScreen();
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
                                 this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
