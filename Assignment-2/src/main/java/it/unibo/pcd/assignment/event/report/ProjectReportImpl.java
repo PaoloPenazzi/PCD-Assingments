@@ -23,7 +23,7 @@ public class ProjectReportImpl implements ProjectReport, ProjectElem {
     public List<PackageReport> getPackageReport() {
         return this.packageReports;
     }
-    
+
     @Override
     public List<Pair<String, String>> getPackageAndMain() {
         return new ArrayList<>(this.pairList);
@@ -42,7 +42,8 @@ public class ProjectReportImpl implements ProjectReport, ProjectElem {
     public String toString() {
         return "ProjectReportImpl{" +
                 "packageReports=" + packageReports.toString() +
-                // ", pairList=" + pairList.toString() +
+                ", pairList=" + pairList.toString() +
+                ", projectName='" + projectName + '\'' +
                 '}';
     }
 }
