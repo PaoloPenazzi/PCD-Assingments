@@ -59,13 +59,15 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath)
                                     .stream()
                                     .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                                    .map(r -> r.getResult().get()).toList();
+                                    .map(r -> r.getResult().get()).collect(Collectors.toList());
+
                             incrementPackageNumber(1);
                             for (CompilationUnit cu : classesOrInterfacesUnit) {
                                 List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
                                         .map(TypeDeclaration::asTypeDeclaration)
                                         .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                                        .map(x -> (ClassOrInterfaceDeclaration) x).toList();
+                                        .map(x -> (ClassOrInterfaceDeclaration) x).collect(Collectors.toList());
+
                                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                                     if (declaration.isInterface()) {
                                         // TODO check if path is correct

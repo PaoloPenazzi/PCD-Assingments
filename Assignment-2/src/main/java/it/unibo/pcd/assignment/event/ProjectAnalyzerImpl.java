@@ -8,6 +8,7 @@ import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.utils.Pair;
 import com.github.javaparser.utils.SourceRoot;
 import hu.webarticum.treeprinter.SimpleTreeNode;
 import hu.webarticum.treeprinter.printer.listing.ListingTreePrinter;
@@ -95,7 +96,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                     String srcFilePath = this.PATH + "\\" + declaration.getName().toString() + ".java";
-                    // there was an .isRightPackage control...
                     if (declaration.getFullyQualifiedName().isPresent()) {
                         if (declaration.isInterface()) {
                             SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
@@ -136,10 +136,13 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<ProjectReport> getProjectReport(String srcProjectPath) {
         return this.getVertx().executeBlocking(promise -> {
-            // ci creiamo la struttura dati del project report
             ProjectReportImpl projectReport = new ProjectReportImpl();
-            List<Future> futureListPackage = new ArrayList<>();
+            List<Future> futureList = new ArrayList<>();
             List<PackageReport> packageReports = new ArrayList<>();
+            List<Pair<String, Boolean>> pairList = new ArrayList<>();
+            List<Pair<String, String>> pairs = new ArrayList<>();
+
+            projectReport.setProjectName(srcProjectPath);
 
             // mi preparo il path da cui deve partire l'analisi
             SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectPath)).setParserConfiguration(new ParserConfiguration());
@@ -159,15 +162,92 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
-                String packageName = packageDeclaration.getNameAsString();
-                SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageName);
+                List<Future> futureListClass = new ArrayList<>();
+                List<Future> futureListInterface = new ArrayList<>();
+                List<ClassReport> classReports = new ArrayList<>();
+                List<InterfaceReport> interfaceReports = new ArrayList<>();
+                PackageReportImpl packageReport = new PackageReportImpl();
+
+                this.viewController.increasePackageNumber();
+                SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
-                futureListPackage.add(this.getPackageReport(packageName, packageNodeChild));
+                this.viewController.clearScreen();
+                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+
+                List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(this.PATH).stream()
+                        .filter(r -> r.isSuccessful() && r.getResult().isPresent())
+                        .map(r -> r.getResult().get())
+                        .collect(Collectors.toList());
+
+                for (CompilationUnit cu : classesOrInterfacesUnit) {
+                    List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
+                            .map(TypeDeclaration::asTypeDeclaration)
+                            .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                            .map(ClassOrInterfaceDeclaration.class::cast)
+                            .collect(Collectors.toList());
+
+                    for (ClassOrInterfaceDeclaration declaration : declarationList) {
+                        String srcFilePath = this.PATH + this.separator + declaration.getFullyQualifiedName().get()
+                                .replace(".", this.separator) + ".java";
+                        if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(packageDeclaration.getNameAsString(), declaration)) {
+                            if (declaration.isInterface()) {
+                                SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
+                                packageNodeChild.addChild(interfaceNodeChild);
+                                this.viewController.increaseInterfaceNumber();
+                                this.viewController.clearScreen();
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                this.delay(this.DELAY_MILLIS);
+                                futureListInterface.add(this.getInterfaceReport(srcFilePath,interfaceNodeChild));
+                            } else {
+                                SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
+                                packageNodeChild.addChild(classNodeChild);
+                                this.viewController.increaseClassNumber();
+                                this.viewController.clearScreen();
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                this.delay(this.DELAY_MILLIS);
+                                futureListClass.add(this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
+                                    pairList.add(new Pair<>(res.result().getSrcFullFileName(), res.result().getMethodsInfo().stream().anyMatch(MethodInfo::isMain)));
+                                }));
+                            }
+                        }
+                    }
+                }
+
+                CompositeFuture.all(futureListClass).onComplete(res -> {
+                    futureListClass.forEach(c -> classReports.add((ClassReport) c.result()));
+                    packageReport.setClassReports(classReports);
+                });
+
+                // aspetto che tutte le interfacce siano pronte
+                CompositeFuture.all(futureListInterface).onComplete(res -> {
+                    futureListInterface.forEach(c -> interfaceReports.add((InterfaceReport) c.result()));
+                    packageReport.setInterfaceReports(interfaceReports);
+                });
+
+                List<Future> futureListTemp = Stream.concat(futureListInterface.stream(), futureListClass.stream()).collect(Collectors.toList());
+                futureList = Stream.concat(futureListTemp.stream(), futureList.stream()).collect(Collectors.toList());
+
+                // aspetto che tutte le classi e le interfacce siano pronte per caricare il report
+                CompositeFuture.all(Stream.concat(futureListClass.stream(),
+                        futureListInterface.stream()).collect(Collectors.toList())).onComplete(res -> {
+                    packageReports.add(packageReport);
+                });
+
             }
 
             // aspetto che tutte le future siano pronte e restituisco il project report
-            CompositeFuture.all(futureListPackage).onComplete(res -> {
-                futureListPackage.forEach(c -> packageReports.add((PackageReport) c.result()));
+            CompositeFuture.all(futureList).onComplete(res -> {
+                for (Pair<String, Boolean> booleanPair : pairList) {
+                    for (PackageDeclaration packageDeclaration : allCus) {
+                        if (booleanPair.a.contains(packageDeclaration.getNameAsString())) {
+                            if (booleanPair.b) {
+                                Pair<String, String> stringStringPair = new Pair<>(packageDeclaration.getNameAsString(), booleanPair.a);
+                                pairs.add(stringStringPair);
+                            }
+                        }
+                    }
+                }
+                projectReport.setPairList(pairs);
                 projectReport.setPackageReports(packageReports);
                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
                 promise.complete(projectReport);
@@ -178,11 +258,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback) {
         this.getVertx().executeBlocking(promise -> {
-            // mi preparo il path da cui deve partire l'analisi
             SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
             List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
 
-            // mi prendo i vari package che compongono il progetto
             List<PackageDeclaration> allCus = parseResultList.stream()
                     .filter(r -> r.getResult().isPresent() && r.isSuccessful())
                     .map(r -> r.getResult().get())
@@ -194,24 +272,19 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             SimpleTreeNode rootProject = new SimpleTreeNode("Root Project: " + srcProjectFolderName);
             this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
 
-            // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
                 this.viewController.increasePackageNumber();
                 SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
-                //this.viewController.log("\t Package Name: " + packageDeclaration.getNameAsString());
                 this.viewController.clearScreen();
                 this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
 
-                // ci salviamo le unita di memoria che contengono i dati rilevanti sulle classi e interfacce
-                List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, this.PATH).stream()
+                List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(this.PATH).stream()
                         .filter(r -> r.isSuccessful() && r.getResult().isPresent())
                         .map(r -> r.getResult().get())
                         .collect(Collectors.toList());
 
-                // analizziamo le classi o le interfacce in maniera asincrona
                 for (CompilationUnit cu : classesOrInterfacesUnit) {
-                    // prendiamo tutte le dichiarazione delle classi/interface
                     List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
                             .map(TypeDeclaration::asTypeDeclaration)
                             .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
@@ -279,15 +352,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         String className = declaration.getNameAsString();
         classFullName = classFullName.replace("/" + className, "");
         classFullName = classFullName.replace("." + className, "");
-        System.out.println(classFullName);
-        System.out.println(packageName);
         return classFullName.equals(packageName);
-    }
-
-    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec, String sourceRootPath) {
-        System.out.println(sourceRootPath);
-        SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
-        return sourceRoot.tryToParseParallelized(dec.getNameAsString());
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(String sourceRootPath) {
@@ -317,5 +382,10 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
     private void log(String msg) {
         System.out.println("[THREAD] " + Thread.currentThread() + msg);
+    }
+
+    private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec, String sourceRootPath) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
+        return sourceRoot.tryToParseParallelized(dec.getNameAsString());
     }
 }
