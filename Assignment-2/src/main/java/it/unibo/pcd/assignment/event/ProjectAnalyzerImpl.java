@@ -23,7 +23,6 @@ import it.unibo.pcd.assignment.event.view.ViewController;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,15 +31,28 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
-    private String PATH;
     private final ViewController viewController;
     private final String separator = System.getProperty("file.separator");
     private final int DELAY_MILLIS = 50;
+    private String PATH;
 
     public ProjectAnalyzerImpl() {
         this.PATH = "";
         this.viewController = new ViewController(this);
         Vertx.vertx().deployVerticle(this);
+    }
+
+    public static List<PackageDeclaration> getPackageDeclarationList(String srcProjectFolderName) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
+        List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
+
+        return parseResultList.stream()
+                .filter(r -> r.getResult().isPresent() && r.isSuccessful())
+                .map(r -> r.getResult().get())
+                .filter(c -> c.getPackageDeclaration().isPresent())
+                .map(c -> c.getPackageDeclaration().get())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -99,12 +111,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             CompositeFuture.all(Stream.concat(futureListClass.stream(),
                     futureListInterface.stream()).collect(Collectors.toList())).onComplete(res -> {
-                        this.viewController.increasePackageNumber();
-                        futureListClass.forEach(c -> classReports.add((ClassReport) c.result()));
-                        packageReport.setClassReports(classReports);
-                        futureListInterface.forEach(c -> interfaceReports.add((InterfaceReport) c.result()));
-                        packageReport.setInterfaceReports(interfaceReports);
-                        promise.complete(packageReport);
+                this.viewController.increasePackageNumber();
+                futureListClass.forEach(c -> classReports.add((ClassReport) c.result()));
+                packageReport.setClassReports(classReports);
+                futureListInterface.forEach(c -> interfaceReports.add((InterfaceReport) c.result()));
+                packageReport.setInterfaceReports(interfaceReports);
+                promise.complete(packageReport);
             });
         });
     }
@@ -161,7 +173,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                                 this.viewController.increaseInterfaceNumber();
                                 printTree(rootProject);
                                 this.delay(this.DELAY_MILLIS);
-                                futureListInterface.add(this.getInterfaceReport(srcFilePath,interfaceNodeChild));
+                                futureListInterface.add(this.getInterfaceReport(srcFilePath, interfaceNodeChild));
                             } else {
                                 SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                                 packageNodeChild.addChild(classNodeChild);
@@ -272,38 +284,25 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 .collect(Collectors.toList());
     }
 
-    private Future<InterfaceReport> launchInterfaceReport(String srcFilePath, SimpleTreeNode fatherNodeToAttach, SimpleTreeNode rootNodeToPrint){
+    private Future<InterfaceReport> launchInterfaceReport(String srcFilePath, SimpleTreeNode fatherNodeToAttach, SimpleTreeNode rootNodeToPrint) {
         SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
         fatherNodeToAttach.addChild(interfaceNodeChild);
         printTree(rootNodeToPrint);
         this.delay(this.DELAY_MILLIS);
-        return this.getInterfaceReport(srcFilePath,interfaceNodeChild);
+        return this.getInterfaceReport(srcFilePath, interfaceNodeChild);
     }
 
-    private Future<ClassReport> launchClassReport(String srcFilePath, SimpleTreeNode fatherNodeToAttach, SimpleTreeNode rootNodeToPrint){
+    private Future<ClassReport> launchClassReport(String srcFilePath, SimpleTreeNode fatherNodeToAttach, SimpleTreeNode rootNodeToPrint) {
         SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
         fatherNodeToAttach.addChild(classNodeChild);
         printTree(rootNodeToPrint);
         this.delay(this.DELAY_MILLIS);
-        return this.getClassReport(srcFilePath,classNodeChild);
+        return this.getClassReport(srcFilePath, classNodeChild);
     }
 
     private void printTree(SimpleTreeNode rootProject) {
         this.viewController.clearScreen();
         this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-    }
-
-    public static List<PackageDeclaration> getPackageDeclarationList(String srcProjectFolderName) {
-        SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
-        List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
-
-        return parseResultList.stream()
-                .filter(r -> r.getResult().isPresent() && r.isSuccessful())
-                .map(r -> r.getResult().get())
-                .filter(c -> c.getPackageDeclaration().isPresent())
-                .map(c -> c.getPackageDeclaration().get())
-                .distinct()
-                .collect(Collectors.toList());
     }
 
     public String getPATH() {
@@ -318,7 +317,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
         return this.viewController;
     }
 
-    private void delay(int millis){
+    private void delay(int millis) {
         try {
             Thread.sleep(millis);
         } catch (InterruptedException e) {

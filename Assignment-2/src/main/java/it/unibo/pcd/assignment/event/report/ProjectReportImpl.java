@@ -34,7 +34,7 @@ public class ProjectReportImpl implements ProjectReport, ProjectElem {
         return this.projectName;
     }
 
-    public void setProjectName(String projectName){
+    public void setProjectName(String projectName) {
         this.projectName = projectName;
     }
 
