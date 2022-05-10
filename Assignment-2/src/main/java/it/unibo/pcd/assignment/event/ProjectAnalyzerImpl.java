@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
     private String PATH;
     private final ViewController viewController;
-    private final String SysOpSeparator = System.getProperty("file.separator");
+    private final String separator = System.getProperty("file.separator");
     private final int DELAY_MILLIS = 50;
 
     public ProjectAnalyzerImpl() {
@@ -49,7 +49,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
             InterfaceCollector interfaceCollector = new InterfaceCollector();
             interfaceCollector.visit(compilationUnit, interfaceReport);
-            //this.viewController.increaseInterfaceNumber();
             promise.complete(interfaceReport);
         });
     }
@@ -62,7 +61,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
             classCollector.visit(compilationUnit, classReport);
-            //this.viewController.increaseClassNumber();
             if (classReport.getInnerClass() != null) {
                 this.addInnerChildClassNodeToFather(classReport, fatherTreeNode);
             }
@@ -236,8 +234,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             .collect(Collectors.toList());
 
                     for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                        String srcFilePath = this.PATH + this.SysOpSeparator + declaration.getFullyQualifiedName().get()
-                                .replace(".", this.SysOpSeparator) + ".java";
+                        String srcFilePath = this.PATH + this.separator + declaration.getFullyQualifiedName().get()
+                                .replace(".", this.separator) + ".java";
                         if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(packageDeclaration.getNameAsString(), declaration)) {
                             if (declaration.isInterface()) {
                                 SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
