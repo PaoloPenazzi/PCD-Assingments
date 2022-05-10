@@ -25,24 +25,29 @@ public class ViewController {
         JFileChooser fileChooser = new JFileChooser();
         JButton source = (JButton) actionEvent.getSource();
         switch (source.getText()) {
-            case "Analyze Class" : {
+            case "Class Report" : {
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 this.analysisType = "class";
                 break;
             }
-            case "Analyze Interface" : {
+            case "Interface Report" : {
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 this.analysisType = "interface";
                 break;
             }
-            case "Analyze Package" : {
+            case "Package Report" : {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "package";
                 break;
             }
-            case "Analyze Project" : {
+            case "Project Report" : {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "project";
+                break;
+            }
+            case "Analyze Project" : {
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                this.analysisType = "analysis";
                 break;
             }
             default : throw new IllegalStateException("Unexpected behaviour");
@@ -93,11 +98,25 @@ public class ViewController {
                     break;
                 }
                 case "project" : {
+                    this.projectAnalyzer.getProjectReport(path).onComplete(res -> {
+                        if(res.succeeded()){
+                            this.log(res.result().toString());
+                        }
+                    });
+                    break;
+                }
+                case "analysis" : {
                     this.projectAnalyzer.analyzeProject(path, s -> this.log(s.toString()));
                     break;
                 }
                 default : throw new IllegalStateException("Unexpected behaviour");
             }
+        } else {
+            JDialog dialog = new JDialog();
+            dialog.add(new JLabel("Please select a file or a directory"));
+            dialog.setSize(250, 100);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
         }
     }
 
