@@ -32,7 +32,8 @@ import java.util.stream.Stream;
 public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnalyzer {
     private String PATH;
     private final ViewController viewController;
-    private final String SysOpSeparator = System.getProperty("file.separator"); //
+    private final String SysOpSeparator = System.getProperty("file.separator");
+    private final int DELAY_MILLIS = 50;
 
     public ProjectAnalyzerImpl() {
         this.PATH = "";
@@ -43,11 +44,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<InterfaceReport> getInterfaceReport(String interfacePath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
+            this.delay(this.DELAY_MILLIS);
             CompilationUnit compilationUnit = this.parseSingleFile(interfacePath);
             InterfaceReportImpl interfaceReport = new InterfaceReportImpl();
             InterfaceCollector interfaceCollector = new InterfaceCollector();
             interfaceCollector.visit(compilationUnit, interfaceReport);
-            this.viewController.increaseInterfaceNumber();
+            //this.viewController.increaseInterfaceNumber();
             promise.complete(interfaceReport);
         });
     }
@@ -55,11 +57,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public Future<ClassReport> getClassReport(String classPath, SimpleTreeNode fatherTreeNode) {
         return this.getVertx().executeBlocking(promise -> {
+            this.delay(this.DELAY_MILLIS);
             CompilationUnit compilationUnit = this.parseSingleFile(classPath);
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
             classCollector.visit(compilationUnit, classReport);
-            this.viewController.increaseClassNumber();
+            //this.viewController.increaseClassNumber();
             if (classReport.getInnerClass() != null) {
                 this.addInnerChildClassNodeToFather(classReport, fatherTreeNode);
             }
@@ -114,10 +117,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                         if (declaration.isInterface()) {
                             SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                             fatherTreeNode.addChild(interfaceNodeChild);
+                            this.viewController.increaseInterfaceNumber();
                             futureListInterface.add(this.getInterfaceReport(srcFilePath,interfaceNodeChild));
                         } else {
                             SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                             fatherTreeNode.addChild(classNodeChild);
+                            this.viewController.increaseClassNumber();
                             futureListClass.add(this.getClassReport(srcFilePath, classNodeChild));
                         }
                     }
@@ -212,7 +217,8 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
                 //this.viewController.log("\t Package Name: " + packageDeclaration.getNameAsString());
-                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(packageNodeChild));
+                this.viewController.clearScreen();
+                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
 
                 // ci salviamo le unita di memoria che contengono i dati rilevanti sulle classi e interfacce
                 List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, this.PATH).stream()
@@ -236,7 +242,10 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             if (declaration.isInterface()) {
                                 SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                                 packageNodeChild.addChild(interfaceNodeChild);
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(interfaceNodeChild));
+                                this.viewController.increaseInterfaceNumber();
+                                this.viewController.clearScreen();
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                this.delay(this.DELAY_MILLIS);
                                 this.getInterfaceReport(srcFilePath,interfaceNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
@@ -245,7 +254,10 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                             } else {
                                 SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                                 packageNodeChild.addChild(classNodeChild);
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(classNodeChild));
+                                this.viewController.increaseClassNumber();
+                                this.viewController.clearScreen();
+                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                this.delay(this.DELAY_MILLIS);
                                 this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
@@ -257,6 +269,26 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 }
             }
         });
+    }
+
+    public String getPATH() {
+        return this.PATH;
+    }
+
+    public void setPATH(String PATH) {
+        this.PATH = PATH;
+    }
+
+    public ViewController getViewController() {
+        return this.viewController;
+    }
+
+    private void delay(int millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private boolean isRightPackage(String packageName, ClassOrInterfaceDeclaration declaration) {
@@ -295,17 +327,5 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
     private void log(String msg) {
         System.out.println("[THREAD] " + Thread.currentThread() + msg);
-    }
-
-    public String getPATH() {
-        return this.PATH;
-    }
-
-    public void setPATH(String PATH) {
-        this.PATH = PATH;
-    }
-
-    public ViewController getViewController() {
-        return this.viewController;
     }
 }
