@@ -17,6 +17,10 @@ public class ViewController {
     private boolean isStopped;
     Scheduler scheduler;
     Scheduler.Worker worker;
+    private Disposable classObserver;
+    private Disposable interfaceObserver;
+    private Disposable packageObserver;
+    private Disposable reportObserver;
 
     public ViewController() {
         this.view = new ViewFrame(this);
@@ -98,9 +102,8 @@ public class ViewController {
                     break;
                 }
                 case "analysis": {
-                    this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath());
-                    });
+                    System.out.println(Thread.currentThread());
+                    this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath());
                     break;
                 }
             }
@@ -115,7 +118,11 @@ public class ViewController {
 
     public void stopPressed(ActionEvent actionEvent) {
         this.isStopped = true;
-        this.worker.dispose();
+        this.interfaceObserver.dispose();
+        this.reportObserver.dispose();
+        this.classObserver.dispose();
+        this.packageObserver.dispose();
+        //this.worker.dispose();
     }
 
     private void createObservers() {
@@ -132,17 +139,18 @@ public class ViewController {
     }
 
     private void setupReportObserver() {
-        Disposable reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
-                .subscribeOn(Schedulers.computation())
+        this.reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
+                .observeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
+                        System.out.println(Thread.currentThread());
                         view.getConsoleTextArea().append(res.toString() + "\n\n");
                     }
                 });
     }
 
     private void setupPackageNumberObserver() {
-        Disposable packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
+        this.packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
@@ -152,7 +160,7 @@ public class ViewController {
     }
 
     private void setupClassNumberObserver() {
-        Disposable classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
+        this.classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {
@@ -162,7 +170,7 @@ public class ViewController {
     }
 
     private void setupInterfaceNumberObserver() {
-        Disposable interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
+        this.interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
                 .subscribeOn(Schedulers.computation())
                 .subscribe(res -> {
                     if (!this.isStopped) {

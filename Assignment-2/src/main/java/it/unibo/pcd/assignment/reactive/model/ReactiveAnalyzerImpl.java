@@ -7,7 +7,10 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.PackageDeclaration;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.utils.SourceRoot;
+import io.reactivex.rxjava3.core.Maybe;
+import io.reactivex.rxjava3.core.MaybeEmitter;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
 import it.unibo.pcd.assignment.event.ProjectElem;
@@ -38,7 +41,11 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     public void analyzeProject(String srcProjectFolderName) {
         SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
         List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
-        List<PackageDeclaration> allCus = parseResultList.stream().filter(r -> r.getResult().isPresent() && r.isSuccessful()).map(r -> r.getResult().get()).filter(c -> c.getPackageDeclaration().isPresent()).map(c -> c.getPackageDeclaration().get()).distinct().collect(Collectors.toList());
+        List<PackageDeclaration> allCus = parseResultList.stream()
+                .filter(r -> r.getResult().isPresent() && r.isSuccessful())
+                .map(r -> r.getResult().get())
+                .filter(c -> c.getPackageDeclaration().isPresent())
+                .map(c -> c.getPackageDeclaration().get()).distinct().collect(Collectors.toList());
         for (PackageDeclaration packageDeclaration : allCus) {
             this.analyzePackage(packageDeclaration);
         }
@@ -131,6 +138,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     }
 
     private void createClassReport(String packageName, ClassOrInterfaceDeclaration declaration) {
+
         if (this.isTheRightPackage(packageName, declaration)) {
             ClassReportImpl classReport = new ClassReportImpl();
             ClassCollector classCollector = new ClassCollector();
