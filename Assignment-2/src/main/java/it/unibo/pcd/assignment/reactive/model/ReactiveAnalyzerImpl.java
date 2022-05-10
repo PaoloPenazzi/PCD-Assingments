@@ -40,7 +40,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     @Override
     public Observable<String> analyzeProject(String srcProjectFolderName) {
         return Observable.<PackageDeclaration>create(emitter -> {
-                    ProjectAnalyzerImpl.getPackageDeclarationList(srcProjectFolderName);
+                    List<PackageDeclaration> allCus = ProjectAnalyzerImpl.getPackageDeclarationList(srcProjectFolderName);
                     allCus.forEach(emitter::onNext);
                 }).subscribeOn(Schedulers.computation())
                 .concatMap(packageDeclaration -> Observable.just(packageDeclaration)
