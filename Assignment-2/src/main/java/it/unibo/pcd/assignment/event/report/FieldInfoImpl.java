@@ -37,7 +37,7 @@ public class FieldInfoImpl implements FieldInfo {
         return "FieldInfoImpl{" +
                 "name='" + name + '\'' +
                 ", type='" + type + '\'' +
-                ", parentClass=" + parentClass.toString() +
+                //", parentClass=" + parentClass.toString() +
                 '}';
     }
 }

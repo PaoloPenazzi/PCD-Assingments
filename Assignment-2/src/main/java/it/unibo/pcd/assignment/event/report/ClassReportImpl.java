@@ -63,6 +63,6 @@ public class ClassReportImpl implements ClassReport, ProjectElem {
                 "FileName: " + srcFullFileName + "\n" +
                 "Fields: " + fieldsInfo.toString() + "\n" +
                 "Methods" + methodsInfo.toString() + "\n" +
-                "Inner Class: " + innerClass.toString() + "\n\n";
+                "Inner Class: " + (innerClass == null ? "" : innerClass.toString()) + "\n\n";
     }
 }

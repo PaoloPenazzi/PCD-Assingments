@@ -69,7 +69,7 @@ public class MethodInfoImpl implements MethodInfo {
                 ", beginLine=" + beginLine +
                 ", endBeginLine=" + endBeginLine +
                 ", isMain=" + isMain +
-                ", parentClass=" + parentClass.toString() +
+                ", parentClass=" + parentClass.getFullClassName() +
                 '}';
     }
 }
