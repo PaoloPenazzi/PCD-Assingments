@@ -112,19 +112,16 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 }
             }
 
-            // aspetto che tutte le classi siano pronte
             CompositeFuture.all(futureListClass).onComplete(res -> {
                 futureListClass.forEach(c -> classReports.add((ClassReport) c.result()));
                 packageReport.setClassReports(classReports);
             });
 
-            // aspetto che tutte le interfacce siano pronte
             CompositeFuture.all(futureListInterface).onComplete(res -> {
                 futureListInterface.forEach(c -> interfaceReports.add((InterfaceReport) c.result()));
                 packageReport.setInterfaceReports(interfaceReports);
             });
 
-            // aspetto che tutte le classi e le interfacce siano pronte per caricare il report
             CompositeFuture.all(Stream.concat(futureListClass.stream(),
                     futureListInterface.stream()).collect(Collectors.toList())).onComplete(res -> {
                         this.viewController.increasePackageNumber();
@@ -144,12 +141,10 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             projectReport.setProjectName(srcProjectPath);
 
-            // mi preparo il path da cui deve partire l'analisi
             SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectPath)).setParserConfiguration(new ParserConfiguration());
             List<ParseResult<CompilationUnit>> parseResultList;
             parseResultList = sourceRoot.tryToParseParallelized();
 
-            // mi prendo i vari package che compongono il progetto
             List<PackageDeclaration> allCus = parseResultList.stream()
                     .filter(r -> r.getResult().isPresent() && r.isSuccessful())
                     .map(r -> r.getResult().get())
@@ -160,7 +155,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             SimpleTreeNode rootProject = new SimpleTreeNode("Root Project: " + srcProjectPath);
 
-            // mi preparo una lista di future per i futuri package
             for (PackageDeclaration packageDeclaration : allCus) {
                 List<Future> futureListClass = new ArrayList<>();
                 List<Future> futureListInterface = new ArrayList<>();
@@ -227,7 +221,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 List<Future> futureListTemp = Stream.concat(futureListInterface.stream(), futureListClass.stream()).collect(Collectors.toList());
                 futureList = Stream.concat(futureListTemp.stream(), futureList.stream()).collect(Collectors.toList());
 
-                // aspetto che tutte le classi e le interfacce siano pronte per caricare il report
                 CompositeFuture.all(Stream.concat(futureListClass.stream(),
                         futureListInterface.stream()).collect(Collectors.toList())).onComplete(res -> {
                     packageReports.add(packageReport);
@@ -235,7 +228,6 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
 
             }
 
-            // aspetto che tutte le future siano pronte e restituisco il project report
             CompositeFuture.all(futureList).onComplete(res -> {
                 for (Pair<String, Boolean> booleanPair : pairList) {
                     for (PackageDeclaration packageDeclaration : allCus) {
@@ -258,16 +250,7 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     @Override
     public void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback) {
         this.getVertx().executeBlocking(promise -> {
-            SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
-            List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
-
-            List<PackageDeclaration> allCus = parseResultList.stream()
-                    .filter(r -> r.getResult().isPresent() && r.isSuccessful())
-                    .map(r -> r.getResult().get())
-                    .filter(c -> c.getPackageDeclaration().isPresent())
-                    .map(c -> c.getPackageDeclaration().get())
-                    .distinct()
-                    .collect(Collectors.toList());
+            List<PackageDeclaration> allCus = getPackageDeclarationList(srcProjectFolderName);
 
             SimpleTreeNode rootProject = new SimpleTreeNode("Root Project: " + srcProjectFolderName);
             this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
@@ -325,6 +308,19 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 }
             }
         });
+    }
+
+    public static List<PackageDeclaration> getPackageDeclarationList(String srcProjectFolderName) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
+        List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
+
+        return parseResultList.stream()
+                .filter(r -> r.getResult().isPresent() && r.isSuccessful())
+                .map(r -> r.getResult().get())
+                .filter(c -> c.getPackageDeclaration().isPresent())
+                .map(c -> c.getPackageDeclaration().get())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public String getPATH() {

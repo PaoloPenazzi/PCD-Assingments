@@ -12,6 +12,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.reactivex.rxjava3.subjects.Subject;
+import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
 import it.unibo.pcd.assignment.event.ProjectElem;
 import it.unibo.pcd.assignment.event.collector.ClassCollector;
 import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
@@ -39,13 +40,7 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     @Override
     public Observable<String> analyzeProject(String srcProjectFolderName) {
         return Observable.<PackageDeclaration>create(emitter -> {
-                    SourceRoot sourceRoot = new SourceRoot(Paths.get(srcProjectFolderName)).setParserConfiguration(new ParserConfiguration());
-                    List<ParseResult<CompilationUnit>> parseResultList = sourceRoot.tryToParseParallelized();
-                    List<PackageDeclaration> allCus = parseResultList.stream()
-                            .filter(r -> r.getResult().isPresent() && r.isSuccessful())
-                            .map(r -> r.getResult().get())
-                            .filter(c -> c.getPackageDeclaration().isPresent())
-                            .map(c -> c.getPackageDeclaration().get()).distinct().collect(Collectors.toList());
+                    ProjectAnalyzerImpl.getPackageDeclarationList(srcProjectFolderName);
                     allCus.forEach(emitter::onNext);
                 }).subscribeOn(Schedulers.computation())
                 .concatMap(packageDeclaration -> Observable.just(packageDeclaration)
