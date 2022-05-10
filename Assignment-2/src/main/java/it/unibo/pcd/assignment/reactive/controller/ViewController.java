@@ -3,6 +3,8 @@ package it.unibo.pcd.assignment.reactive.controller;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
+import it.unibo.pcd.assignment.event.ProjectElem;
+import it.unibo.pcd.assignment.event.report.ClassReport;
 import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzerImpl;
 import it.unibo.pcd.assignment.reactive.view.ViewFrame;
 
@@ -21,6 +23,7 @@ public class ViewController {
     private Disposable interfaceObserver;
     private Disposable packageObserver;
     private Disposable reportObserver;
+    private Disposable observer;
 
     public ViewController() {
         this.view = new ViewFrame(this);
@@ -77,33 +80,29 @@ public class ViewController {
             this.clearOutput();
             this.worker = this.scheduler.createWorker();
             switch (this.reactiveAnalyzerImpl.getAnalysisType()) {
-                case "class": {
-                    this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getAnalysisPath());
-                    });
+               /* case "class": {
+                    observer = this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                            .subscribe(this::log);
                     break;
                 }
                 case "interface": {
-                    this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getInterfaceReport(this.reactiveAnalyzerImpl.getAnalysisPath());
-                    });
+                    observer = this.reactiveAnalyzerImpl.getInterfaceReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                            .subscribe(this::log);
                     break;
                 }
                 case "package": {
-                    this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getPackageReport(this.reactiveAnalyzerImpl.getAnalysisPath());
-                    });
+                    observer = this.reactiveAnalyzerImpl.getPackageReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                            .subscribe(this::log);
                     break;
                 }
                 case "project": {
-                    this.worker.schedule(() -> {
-                        this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getAnalysisPath());
-                    });
+                    observer = this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                            .subscribe(this::log);
                     break;
-                }
+                }*/
                 case "analysis": {
-                    System.out.println(Thread.currentThread());
-                    this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath());
+                    observer = this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath())
+                            .subscribe(this::log);
                     break;
                 }
             }
@@ -116,37 +115,25 @@ public class ViewController {
         }
     }
 
+    private void log(String report) {
+        view.getConsoleTextArea().append(report.toString());
+    }
+
     public void stopPressed(ActionEvent actionEvent) {
         this.isStopped = true;
-        this.interfaceObserver.dispose();
-        this.reportObserver.dispose();
-        this.classObserver.dispose();
-        this.packageObserver.dispose();
-        //this.worker.dispose();
+        this.observer.dispose();
     }
 
     private void createObservers() {
         this.setupInterfaceNumberObserver();
         this.setupClassNumberObserver();
         this.setupPackageNumberObserver();
-        this.setupReportObserver();
     }
 
     private void clearOutput() {
         this.reactiveAnalyzerImpl.resetCounters();
         this.view.getConsoleTextArea().selectAll();
         this.view.getConsoleTextArea().replaceSelection("");
-    }
-
-    private void setupReportObserver() {
-        this.reportObserver = this.reactiveAnalyzerImpl.getReportObservable()
-                .observeOn(Schedulers.computation())
-                .subscribe(res -> {
-                    if (!this.isStopped) {
-                        System.out.println(Thread.currentThread());
-                        view.getConsoleTextArea().append(res.toString() + "\n\n");
-                    }
-                });
     }
 
     private void setupPackageNumberObserver() {
