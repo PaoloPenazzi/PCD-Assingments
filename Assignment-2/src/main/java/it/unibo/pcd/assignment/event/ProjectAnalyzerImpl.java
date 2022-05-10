@@ -79,52 +79,31 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             List<Future> futureListInterface = new ArrayList<>();
             PackageReportImpl packageReport = new PackageReportImpl();
 
+            this.printTree(fatherTreeNode);
             packageReport.setFullPackageName(packagePath);
-            List<CompilationUnit> classesOrInterfacesUnit;
 
-            classesOrInterfacesUnit = this.createParsedFileList(this.PATH).stream()
-                    .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                    .map(r -> r.getResult().get())
-                    .collect(Collectors.toList());
-
-            for (CompilationUnit cu : classesOrInterfacesUnit) {
-                List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
-                        .map(TypeDeclaration::asTypeDeclaration)
-                        .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                        .map(ClassOrInterfaceDeclaration.class::cast)
-                        .collect(Collectors.toList());
-
-                for (ClassOrInterfaceDeclaration declaration : declarationList) {
+            for (CompilationUnit cu : this.getClassesOrInterfacesUnit(this.PATH)) {
+                for (ClassOrInterfaceDeclaration declaration : this.getClassOrInterfaceDeclarationList(cu)) {
                     String srcFilePath = this.PATH + "\\" + declaration.getName().toString() + ".java";
                     if (declaration.getFullyQualifiedName().isPresent()) {
                         if (declaration.isInterface()) {
-                            SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
-                            fatherTreeNode.addChild(interfaceNodeChild);
                             this.viewController.increaseInterfaceNumber();
-                            futureListInterface.add(this.getInterfaceReport(srcFilePath,interfaceNodeChild));
+                            futureListInterface.add(this.launchInterfaceReport(srcFilePath, fatherTreeNode, fatherTreeNode));
                         } else {
-                            SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
-                            fatherTreeNode.addChild(classNodeChild);
                             this.viewController.increaseClassNumber();
-                            futureListClass.add(this.getClassReport(srcFilePath, classNodeChild));
+                            futureListClass.add(this.launchClassReport(srcFilePath, fatherTreeNode, fatherTreeNode));
                         }
                     }
                 }
             }
 
-            CompositeFuture.all(futureListClass).onComplete(res -> {
-                futureListClass.forEach(c -> classReports.add((ClassReport) c.result()));
-                packageReport.setClassReports(classReports);
-            });
-
-            CompositeFuture.all(futureListInterface).onComplete(res -> {
-                futureListInterface.forEach(c -> interfaceReports.add((InterfaceReport) c.result()));
-                packageReport.setInterfaceReports(interfaceReports);
-            });
-
             CompositeFuture.all(Stream.concat(futureListClass.stream(),
                     futureListInterface.stream()).collect(Collectors.toList())).onComplete(res -> {
                         this.viewController.increasePackageNumber();
+                        futureListClass.forEach(c -> classReports.add((ClassReport) c.result()));
+                        packageReport.setClassReports(classReports);
+                        futureListInterface.forEach(c -> interfaceReports.add((InterfaceReport) c.result()));
+                        packageReport.setInterfaceReports(interfaceReports);
                         promise.complete(packageReport);
             });
         });
@@ -165,20 +144,12 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 this.viewController.increasePackageNumber();
                 SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
-                this.viewController.clearScreen();
-                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                printTree(rootProject);
 
-                List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(this.PATH).stream()
-                        .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                        .map(r -> r.getResult().get())
-                        .collect(Collectors.toList());
+                List<CompilationUnit> classesOrInterfacesUnit = getClassesOrInterfacesUnit(this.PATH);
 
                 for (CompilationUnit cu : classesOrInterfacesUnit) {
-                    List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
-                            .map(TypeDeclaration::asTypeDeclaration)
-                            .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                            .map(ClassOrInterfaceDeclaration.class::cast)
-                            .collect(Collectors.toList());
+                    List<ClassOrInterfaceDeclaration> declarationList = getClassOrInterfaceDeclarationList(cu);
 
                     for (ClassOrInterfaceDeclaration declaration : declarationList) {
                         String srcFilePath = this.PATH + this.separator + declaration.getFullyQualifiedName().get()
@@ -188,16 +159,14 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                                 SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                                 packageNodeChild.addChild(interfaceNodeChild);
                                 this.viewController.increaseInterfaceNumber();
-                                this.viewController.clearScreen();
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                printTree(rootProject);
                                 this.delay(this.DELAY_MILLIS);
                                 futureListInterface.add(this.getInterfaceReport(srcFilePath,interfaceNodeChild));
                             } else {
                                 SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
                                 packageNodeChild.addChild(classNodeChild);
                                 this.viewController.increaseClassNumber();
-                                this.viewController.clearScreen();
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                                printTree(rootProject);
                                 this.delay(this.DELAY_MILLIS);
                                 futureListClass.add(this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
                                     pairList.add(new Pair<>(res.result().getSrcFullFileName(), res.result().getMethodsInfo().stream().anyMatch(MethodInfo::isMain)));
@@ -259,45 +228,23 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 this.viewController.increasePackageNumber();
                 SimpleTreeNode packageNodeChild = new SimpleTreeNode("Package child: " + packageDeclaration.getNameAsString());
                 rootProject.addChild(packageNodeChild);
-                this.viewController.clearScreen();
-                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
+                this.printTree(rootProject);
 
-                List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(this.PATH).stream()
-                        .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                        .map(r -> r.getResult().get())
-                        .collect(Collectors.toList());
-
-                for (CompilationUnit cu : classesOrInterfacesUnit) {
-                    List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
-                            .map(TypeDeclaration::asTypeDeclaration)
-                            .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                            .map(ClassOrInterfaceDeclaration.class::cast)
-                            .collect(Collectors.toList());
-
-                    for (ClassOrInterfaceDeclaration declaration : declarationList) {
+                for (CompilationUnit cu : this.getClassesOrInterfacesUnit(this.PATH)) {
+                    for (ClassOrInterfaceDeclaration declaration : this.getClassOrInterfaceDeclarationList(cu)) {
                         String srcFilePath = this.PATH + this.separator + declaration.getFullyQualifiedName().get()
                                 .replace(".", this.separator) + ".java";
                         if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(packageDeclaration.getNameAsString(), declaration)) {
                             if (declaration.isInterface()) {
-                                SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
-                                packageNodeChild.addChild(interfaceNodeChild);
                                 this.viewController.increaseInterfaceNumber();
-                                this.viewController.clearScreen();
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                                this.delay(this.DELAY_MILLIS);
-                                this.getInterfaceReport(srcFilePath,interfaceNodeChild).onComplete(res -> {
+                                this.launchInterfaceReport(srcFilePath, packageNodeChild, rootProject).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
                                     }
                                 });
                             } else {
-                                SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
-                                packageNodeChild.addChild(classNodeChild);
                                 this.viewController.increaseClassNumber();
-                                this.viewController.clearScreen();
-                                this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
-                                this.delay(this.DELAY_MILLIS);
-                                this.getClassReport(srcFilePath, classNodeChild).onComplete(res -> {
+                                this.launchClassReport(srcFilePath, packageNodeChild, rootProject).onComplete(res -> {
                                     if (res.result() != null) {
                                         callback.accept(res.result());
                                     }
@@ -308,6 +255,42 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                 }
             }
         });
+    }
+
+    private List<ClassOrInterfaceDeclaration> getClassOrInterfaceDeclarationList(CompilationUnit cu) {
+        return cu.getTypes().stream()
+                .map(TypeDeclaration::asTypeDeclaration)
+                .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
+                .map(ClassOrInterfaceDeclaration.class::cast)
+                .collect(Collectors.toList());
+    }
+
+    private List<CompilationUnit> getClassesOrInterfacesUnit(String pathToParse) {
+        return this.createParsedFileList(pathToParse).stream()
+                .filter(r -> r.isSuccessful() && r.getResult().isPresent())
+                .map(r -> r.getResult().get())
+                .collect(Collectors.toList());
+    }
+
+    private Future<InterfaceReport> launchInterfaceReport(String srcFilePath, SimpleTreeNode fatherNodeToAttach, SimpleTreeNode rootNodeToPrint){
+        SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
+        fatherNodeToAttach.addChild(interfaceNodeChild);
+        printTree(rootNodeToPrint);
+        this.delay(this.DELAY_MILLIS);
+        return this.getInterfaceReport(srcFilePath,interfaceNodeChild);
+    }
+
+    private Future<ClassReport> launchClassReport(String srcFilePath, SimpleTreeNode fatherNodeToAttach, SimpleTreeNode rootNodeToPrint){
+        SimpleTreeNode classNodeChild = new SimpleTreeNode("Class child: " + srcFilePath);
+        fatherNodeToAttach.addChild(classNodeChild);
+        printTree(rootNodeToPrint);
+        this.delay(this.DELAY_MILLIS);
+        return this.getClassReport(srcFilePath,classNodeChild);
+    }
+
+    private void printTree(SimpleTreeNode rootProject) {
+        this.viewController.clearScreen();
+        this.viewController.log(ListingTreePrinter.builder().ascii().build().stringify(rootProject));
     }
 
     public static List<PackageDeclaration> getPackageDeclarationList(String srcProjectFolderName) {
