@@ -22,6 +22,7 @@ import it.unibo.pcd.assignment.event.view.ViewController;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,26 +77,11 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
             List<Future> futureListClass = new ArrayList<>();
             List<Future> futureListInterface = new ArrayList<>();
             PackageReportImpl packageReport = new PackageReportImpl();
-            String srcPackagePath = packagePath.replace("\\", "/");
 
-            String packageName = "";
-            String sourceRootPath = "";
-            String srcMainJavaString = "src/main/java";
+            packageReport.setFullPackageName(packagePath);
+            List<CompilationUnit> classesOrInterfacesUnit;
 
-            if(!srcPackagePath.contains(srcMainJavaString)) {
-                packageName = packagePath;
-                sourceRootPath = this.PATH;
-            } else {
-                packageName = srcPackagePath.replaceAll(".*src/main/java/", "");
-                packageName = packageName.replaceAll("/", ".");
-                sourceRootPath = srcPackagePath.replaceAll(srcMainJavaString+".*", "");
-                sourceRootPath = sourceRootPath + srcMainJavaString; // C:/Users/angel/Desktop/Assignment-2/src/main/java
-            }
-
-            PackageDeclaration packageDeclaration = StaticJavaParser.parsePackageDeclaration("package " + packageName + ";");
-            packageReport.setFullPackageName(srcPackagePath);
-
-            List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath).stream()
+            classesOrInterfacesUnit = this.createParsedFileList(this.PATH).stream()
                     .filter(r -> r.isSuccessful() && r.getResult().isPresent())
                     .map(r -> r.getResult().get())
                     .collect(Collectors.toList());
@@ -108,10 +94,9 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
                         .collect(Collectors.toList());
 
                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                    String srcFilePath = sourceRootPath + "/" + declaration.getFullyQualifiedName().get()
-                            .replace(".", "/") + ".java";
-                    srcFilePath = srcFilePath.replace("/", "\\");
-                    if (declaration.getFullyQualifiedName().isPresent() && this.isRightPackage(packageName, declaration)) {
+                    String srcFilePath = this.PATH + "\\" + declaration.getName().toString() + ".java";
+                    // there was an .isRightPackage control...
+                    if (declaration.getFullyQualifiedName().isPresent()) {
                         if (declaration.isInterface()) {
                             SimpleTreeNode interfaceNodeChild = new SimpleTreeNode("Interface child: " + srcFilePath);
                             fatherTreeNode.addChild(interfaceNodeChild);
@@ -292,15 +277,22 @@ public class ProjectAnalyzerImpl extends AbstractVerticle implements ProjectAnal
     private boolean isRightPackage(String packageName, ClassOrInterfaceDeclaration declaration) {
         String classFullName = declaration.getFullyQualifiedName().isPresent() ? declaration.getFullyQualifiedName().get() : "ERROR!";
         String className = declaration.getNameAsString();
+        classFullName = classFullName.replace("/" + className, "");
         classFullName = classFullName.replace("." + className, "");
+        System.out.println(classFullName);
+        System.out.println(packageName);
         return classFullName.equals(packageName);
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration dec, String sourceRootPath) {
+        System.out.println(sourceRootPath);
         SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
-        List<ParseResult<CompilationUnit>> parseResultList;
-        parseResultList = sourceRoot.tryToParseParallelized(dec.getNameAsString());
-        return parseResultList;
+        return sourceRoot.tryToParseParallelized(dec.getNameAsString());
+    }
+
+    private List<ParseResult<CompilationUnit>> createParsedFileList(String sourceRootPath) {
+        SourceRoot sourceRoot = new SourceRoot(Paths.get(sourceRootPath)).setParserConfiguration(new ParserConfiguration());
+        return sourceRoot.tryToParseParallelized();
     }
 
     private void addInnerChildClassNodeToFather(ClassReport classReport, SimpleTreeNode fatherTreeNode) {
