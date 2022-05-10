@@ -10,4 +10,6 @@ public interface ProjectReport extends ProjectElem {
     List<PackageReport> getPackageReport();
 
     List<Pair<String, String>> getPackageAndMain();
+
+    String getProjectName();
 }
