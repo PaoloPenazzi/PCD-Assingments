@@ -61,8 +61,8 @@ public class ClassReportImpl implements ClassReport, ProjectElem {
     public String toString() {
         return "ClassReportImpl: " + fullClassName + "\n" +
                 "FileName: " + srcFullFileName + "\n" +
-                "Fields: " + fieldsInfo + "\n" +
-                "Methods" + methodsInfo + "\n" +
-                "Inner Class: " + innerClass + "\n\n";
+                "Fields: " + fieldsInfo.toString() + "\n" +
+                "Methods" + methodsInfo.toString() + "\n" +
+                "Inner Class: " + (innerClass == null ? "" : innerClass.toString()) + "\n\n";
     }
 }

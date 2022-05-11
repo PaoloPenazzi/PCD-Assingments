@@ -4,7 +4,6 @@ import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import it.unibo.pcd.assignment.event.ProjectElem;
-import it.unibo.pcd.assignment.event.report.ClassReport;
 import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzerImpl;
 import it.unibo.pcd.assignment.reactive.view.ViewFrame;
 
@@ -16,9 +15,9 @@ import java.awt.event.ActionEvent;
 public class ViewController {
     private final ViewFrame view;
     private final ReactiveAnalyzerImpl reactiveAnalyzerImpl;
-    private boolean isStopped;
     Scheduler scheduler;
     Scheduler.Worker worker;
+    private boolean isStopped;
     private Disposable classObserver;
     private Disposable interfaceObserver;
     private Disposable packageObserver;

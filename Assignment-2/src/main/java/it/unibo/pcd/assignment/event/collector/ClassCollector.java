@@ -13,8 +13,6 @@ import java.util.List;
 public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
     @Override
     public void visit(ClassOrInterfaceDeclaration dec, ClassReportImpl collector) {
-
-        // faccio la visita di evenutali classi innestate e nel caso mi salvo le info sul nuovo class report creato
         super.visit(dec, collector);
 
         if (dec.isInnerClass()) {
@@ -40,7 +38,6 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
     }
 
     private ClassReportImpl createClassReport(ClassReportImpl classReportToFill, ClassOrInterfaceDeclaration classDec) {
-
         classReportToFill.setFullClassName(classDec.getNameAsString());
         classReportToFill.setSrcFullFileName(classDec.getFullyQualifiedName().orElse("NULL!"));
 

@@ -10,10 +10,10 @@ public class ViewController {
     public static int CLASS_NUMBER = 0;
     public static int INTERFACE_NUMBER = 0;
     public static int PACKAGE_NUMBER = 0;
-    private String analysisType;
     private final JTextArea outputConsole;
     private final ViewFrame view;
     private final ProjectAnalyzerImpl projectAnalyzer;
+    private String analysisType;
 
     public ViewController(ProjectAnalyzerImpl projectAnalyzer) {
         this.projectAnalyzer = projectAnalyzer;
@@ -25,27 +25,33 @@ public class ViewController {
         JFileChooser fileChooser = new JFileChooser();
         JButton source = (JButton) actionEvent.getSource();
         switch (source.getText()) {
-            case "Analyze Class" : {
+            case "Class Report": {
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 this.analysisType = "class";
                 break;
             }
-            case "Analyze Interface" : {
+            case "Interface Report": {
                 fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                 this.analysisType = "interface";
                 break;
             }
-            case "Analyze Package" : {
+            case "Package Report": {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "package";
                 break;
             }
-            case "Analyze Project" : {
+            case "Project Report": {
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
                 this.analysisType = "project";
                 break;
             }
-            default : throw new IllegalStateException("Unexpected behaviour");
+            case "Analyze Project": {
+                fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+                this.analysisType = "analysis";
+                break;
+            }
+            default:
+                throw new IllegalStateException("Unexpected behaviour");
 
         }
         fileChooser.showSaveDialog(fileChooser);
@@ -56,7 +62,7 @@ public class ViewController {
         }
     }
 
-    public void startAnalyses(ActionEvent e){
+    public void startAnalyses(ActionEvent e) {
         if (!this.projectAnalyzer.getPATH().equals("")) {
             this.view.getConsoleTextArea().selectAll();
             this.view.getConsoleTextArea().replaceSelection("");
@@ -66,38 +72,53 @@ public class ViewController {
             this.view.getClassCounterTextField().setText("0");
             this.view.getInterfaceCounterTextField().setText("0");
             this.view.getPackageCounterTextField().setText("0");
-            String path =this.projectAnalyzer.getPATH();
-            switch (this.analysisType){
-                case "class" : {
+            String path = this.projectAnalyzer.getPATH();
+            switch (this.analysisType) {
+                case "class": {
                     this.projectAnalyzer.getClassReport(path, new SimpleTreeNode("Class Analyses")).onComplete(res -> {
-                        if(res.succeeded()){
+                        if (res.succeeded()) {
                             this.log(res.result().toString());
                         }
                     });
                     break;
                 }
-                case "interface" : {
+                case "interface": {
                     this.projectAnalyzer.getInterfaceReport(path, new SimpleTreeNode("Interface Analyses")).onComplete(res -> {
-                        if(res.succeeded()){
+                        if (res.succeeded()) {
                             this.log(res.result().toString());
                         }
                     });
                     break;
                 }
-                case "package" : {
+                case "package": {
                     this.projectAnalyzer.getPackageReport(path, new SimpleTreeNode("Package Analyses")).onComplete(res -> {
-                        if(res.succeeded()){
+                        if (res.succeeded()) {
                             this.log(res.result().toString());
                         }
                     });
                     break;
                 }
-                case "project" : {
+                case "project": {
+                    this.projectAnalyzer.getProjectReport(path).onComplete(res -> {
+                        if (res.succeeded()) {
+                            this.log(res.result().toString());
+                        }
+                    });
+                    break;
+                }
+                case "analysis": {
                     this.projectAnalyzer.analyzeProject(path, s -> this.log(s.toString()));
                     break;
                 }
-                default : throw new IllegalStateException("Unexpected behaviour");
+                default:
+                    throw new IllegalStateException("Unexpected behaviour");
             }
+        } else {
+            JDialog dialog = new JDialog();
+            dialog.add(new JLabel("Please select a file or a directory"));
+            dialog.setSize(250, 100);
+            dialog.setLocationRelativeTo(null);
+            dialog.setVisible(true);
         }
     }
 
@@ -125,7 +146,7 @@ public class ViewController {
         this.outputConsole.append(message + "\n");
     }
 
-    public void clearScreen(){
+    public void clearScreen() {
         this.outputConsole.selectAll();
         this.outputConsole.replaceSelection("");
     }

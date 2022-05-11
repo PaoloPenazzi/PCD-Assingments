@@ -6,9 +6,7 @@ import java.util.List;
 
 public class InterfaceReportImpl implements InterfaceReport, ProjectElem {
     private String interfaceName;
-
     private String fullFileName;
-
     private List<String> methodNameList;
 
     @Override
