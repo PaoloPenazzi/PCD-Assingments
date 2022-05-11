@@ -86,10 +86,10 @@ public class ViewFrame extends JFrame {
         this.analyzeProjectButton.addActionListener(controller::analyzePressed);
         this.northPanel.add(this.analyzeProjectButton);
         this.startAnalysisButton = new JButton("Start");
-        this.startAnalysisButton.addActionListener(controller::startPressed);
+        this.startAnalysisButton.addActionListener(actionEvent1 -> controller.startPressed());
         this.northPanel.add(this.startAnalysisButton);
         this.stopAnalysisButton = new JButton("Stop");
-        this.stopAnalysisButton.addActionListener(controller::stopPressed);
+        this.stopAnalysisButton.addActionListener(actionEvent -> controller.stopPressed());
         this.northPanel.add(this.stopAnalysisButton);
     }
 

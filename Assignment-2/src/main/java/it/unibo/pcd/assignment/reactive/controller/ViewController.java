@@ -17,18 +17,12 @@ public class ViewController {
     private final ReactiveAnalyzerImpl reactiveAnalyzerImpl;
     Scheduler scheduler;
     Scheduler.Worker worker;
-    private boolean isStopped;
-    private Disposable classObserver;
-    private Disposable interfaceObserver;
-    private Disposable packageObserver;
     private Disposable observer;
 
     public ViewController() {
         this.view = new ViewFrame(this);
         this.reactiveAnalyzerImpl = new ReactiveAnalyzerImpl();
-        this.isStopped = false;
         this.scheduler = Schedulers.computation();
-        this.createObservers();
     }
 
     public void analyzePressed(ActionEvent actionEvent) {
@@ -36,32 +30,27 @@ public class ViewController {
         fileChooser.setAcceptAllFileFilterUsed(false);
         JButton source = (JButton) actionEvent.getSource();
         switch (source.getText()) {
-            case "Class Report": {
+            case "Class Report" -> {
                 this.reactiveAnalyzerImpl.setAnalysisType("class");
                 FileFilter filter = new FileNameExtensionFilter("", "java");
                 fileChooser.setFileFilter(filter);
-                break;
             }
-            case "Interface Report": {
+            case "Interface Report" -> {
                 this.reactiveAnalyzerImpl.setAnalysisType("interface");
                 FileFilter filter = new FileNameExtensionFilter("", "java");
                 fileChooser.setFileFilter(filter);
-                break;
             }
-            case "Package Report": {
+            case "Package Report" -> {
                 this.reactiveAnalyzerImpl.setAnalysisType("package");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                break;
             }
-            case "Project Report": {
+            case "Project Report" -> {
                 this.reactiveAnalyzerImpl.setAnalysisType("project");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                break;
             }
-            case "Analyze Project": {
+            case "Analyze Project" -> {
                 this.reactiveAnalyzerImpl.setAnalysisType("analysis");
                 fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                break;
             }
         }
         fileChooser.showSaveDialog(fileChooser);
@@ -72,37 +61,26 @@ public class ViewController {
         }
     }
 
-    public void startPressed(ActionEvent actionEvent) {
+    public void startPressed() {
         if (!this.reactiveAnalyzerImpl.getAnalysisPath().equals("")) {
-            this.isStopped = false;
             this.clearOutput();
             this.worker = this.scheduler.createWorker();
             switch (this.reactiveAnalyzerImpl.getAnalysisType()) {
-               case "class": {
-                    observer = this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getAnalysisPath())
-                            .subscribe(this::log);
-                    break;
-                }
-                case "interface": {
-                    observer = this.reactiveAnalyzerImpl.getInterfaceReport(this.reactiveAnalyzerImpl.getAnalysisPath())
-                            .subscribe(this::log);
-                    break;
-                }
-                case "package": {
-                    observer = this.reactiveAnalyzerImpl.getPackageReport(this.reactiveAnalyzerImpl.getAnalysisPath())
-                            .subscribe(this::log);
-                    break;
-                }
-                case "project": {
-                    observer = this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getAnalysisPath())
-                            .subscribe(this::log);
-                    break;
-                }
-                case "analysis": {
-                    observer = this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath())
-                            .subscribe(this::log);
-                    break;
-                }
+                case "class" ->
+                        observer = this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                                .subscribe(this::log);
+                case "interface" ->
+                        observer = this.reactiveAnalyzerImpl.getInterfaceReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                                .subscribe(this::log);
+                case "package" ->
+                        observer = this.reactiveAnalyzerImpl.getPackageReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                                .subscribe(this::log);
+                case "project" ->
+                        observer = this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getAnalysisPath())
+                                .subscribe(this::log);
+                case "analysis" ->
+                        observer = this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath())
+                                .subscribe(this::log);
             }
         } else {
             JDialog dialog = new JDialog();
@@ -114,57 +92,51 @@ public class ViewController {
     }
 
     private void log(String report) {
-        view.getConsoleTextArea().append(report);
+        SwingUtilities.invokeLater(() -> {
+            int indentation = 0;
+            switch (report.substring(0, 3)) {
+                case "Cla" -> {
+                    this.increaseClassNumber();
+                    indentation = 6;
+                }
+                case "Int" -> {
+                    this.increaseInterfaceNumber();
+                    indentation = 6;
+                }
+                case "Pac" -> this.increasePackageNumber();
+            }
+            view.getConsoleTextArea().append(report.indent(indentation) + "\n");
+        });
     }
 
     private void log(ProjectElem report) {
-        view.getConsoleTextArea().append(report.toString());
+        this.log(report.toString());
     }
 
-    public void stopPressed(ActionEvent actionEvent) {
-        this.isStopped = true;
+    public void stopPressed() {
         this.observer.dispose();
     }
 
-    private void createObservers() {
-        this.setupInterfaceNumberObserver();
-        this.setupClassNumberObserver();
-        this.setupPackageNumberObserver();
-    }
-
     private void clearOutput() {
-        this.reactiveAnalyzerImpl.resetCounters();
+        this.view.getPackageCounterTextField().setText("0");
+        this.view.getClassCounterTextField().setText("0");
+        this.view.getInterfaceCounterTextField().setText("0");
         this.view.getConsoleTextArea().selectAll();
         this.view.getConsoleTextArea().replaceSelection("");
     }
 
-    private void setupPackageNumberObserver() {
-        this.packageObserver = this.reactiveAnalyzerImpl.getPackageNumberObservable()
-                .subscribeOn(Schedulers.computation())
-                .subscribe(res -> {
-                    if (!this.isStopped) {
-                        view.getPackageCounterTextField().setText(res + "");
-                    }
-                });
+    private void increasePackageNumber() {
+        int oldValue = Integer.parseInt(view.getPackageCounterTextField().getText());
+        view.getPackageCounterTextField().setText(String.valueOf(++oldValue));
     }
 
-    private void setupClassNumberObserver() {
-        this.classObserver = reactiveAnalyzerImpl.getClassNumberObservable()
-                .subscribeOn(Schedulers.computation())
-                .subscribe(res -> {
-                    if (!this.isStopped) {
-                        view.getClassCounterTextField().setText(res + "");
-                    }
-                });
+    private void increaseClassNumber() {
+        int oldValue = Integer.parseInt(view.getClassCounterTextField().getText());
+        view.getClassCounterTextField().setText(String.valueOf(++oldValue));
     }
 
-    private void setupInterfaceNumberObserver() {
-        this.interfaceObserver = this.reactiveAnalyzerImpl.getInterfaceNumberObservable()
-                .subscribeOn(Schedulers.computation())
-                .subscribe(res -> {
-                    if (!this.isStopped) {
-                        view.getInterfaceCounterTextField().setText(res + "");
-                    }
-                });
+    private void increaseInterfaceNumber() {
+        int oldValue = Integer.parseInt(view.getInterfaceCounterTextField().getText());
+        view.getInterfaceCounterTextField().setText(String.valueOf(++oldValue));
     }
 }
