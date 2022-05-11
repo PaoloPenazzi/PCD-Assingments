@@ -31,7 +31,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
     private final Subject<Integer> packageNumberObservable = PublishSubject.create();
     private final Subject<Integer> classNumberObservable = PublishSubject.create();
     private final Subject<Integer> interfaceNumberObservable = PublishSubject.create();
-    private final Subject<ProjectElem> reportObservable = PublishSubject.create();
     private int packageNumber;
     private int classNumber;
     private int interfaceNumber;
@@ -63,14 +62,14 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath)
                                     .stream()
                                     .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                                    .map(r -> r.getResult().get()).collect(Collectors.toList());
+                                    .map(r -> r.getResult().get()).toList();
 
                             incrementPackageNumber(1);
                             for (CompilationUnit cu : classesOrInterfacesUnit) {
                                 List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream()
                                         .map(TypeDeclaration::asTypeDeclaration)
                                         .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
-                                        .map(x -> (ClassOrInterfaceDeclaration) x).collect(Collectors.toList());
+                                        .map(x -> (ClassOrInterfaceDeclaration) x).toList();
 
                                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
                                     if (isTheRightPackage(packageDeclaration.getNameAsString(), declaration)) {
