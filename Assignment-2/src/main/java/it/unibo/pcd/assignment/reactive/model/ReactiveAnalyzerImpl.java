@@ -45,17 +45,18 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                             .filter(r -> r.getResult().isPresent() && r.isSuccessful())
                             .map(r -> r.getResult().get())
                             .filter(c -> c.getPackageDeclaration().isPresent())
-                            .map(c -> c.getPackageDeclaration().get()).distinct().collect(Collectors.toList());
+                            .map(c -> c.getPackageDeclaration().get()).distinct().toList();
                     allCus.forEach(emitter::onNext);
-                }).subscribeOn(Schedulers.computation())
+                })
+                .subscribeOn(Schedulers.computation())
                 .concatMap(packageDeclaration -> Observable.just(packageDeclaration)
                         .subscribeOn(Schedulers.computation())
                         .flatMap(p -> Observable.create(emitter -> {
                             PackageReportImpl packageNameReport = new PackageReportImpl();
                             packageNameReport.setFullPackageName(p.getNameAsString());
                             emitter.onNext(packageNameReport.toString());
-                            //String packagePath = packageDeclaration.getNameAsString();
                             String sourceRootPath = this.analysisPath;
+                            //String packagePath = packageDeclaration.getNameAsString();
                             List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath)
                                     .stream()
                                     .filter(r -> r.isSuccessful() && r.getResult().isPresent())
@@ -67,39 +68,19 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
                                         .filter(BodyDeclaration::isClassOrInterfaceDeclaration)
                                         .map(x -> (ClassOrInterfaceDeclaration) x).toList();
                                 for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                                    if (declaration.isInterface()) {
-                                        // TODO check if path is correct
-                                        this.getInterfaceReport("src/main/java/" + declaration.getFullyQualifiedName().get().replace(".", "/") + ".java")
-                                                .blockingSubscribe(report -> emitter.onNext(report.toString()));
-                                    } else {
-                                        this.getClassReport("src/main/java/" + declaration.getFullyQualifiedName().get().replace(".", "/") + ".java")
-                                                .blockingSubscribe(report -> emitter.onNext(report.toString()));
+                                    if (isTheRightPackage(packageDeclaration.getNameAsString(), declaration)) {
+                                        if (declaration.isInterface()) {
+                                            this.getInterfaceReport(this.analysisPath + "/" + declaration.getFullyQualifiedName().get().replace(".", "/") + ".java")
+                                                    .blockingSubscribe(report -> emitter.onNext(report.toString()));
+                                        } else {
+                                            this.getClassReport(this.analysisPath + "/" + declaration.getFullyQualifiedName().get().replace(".", "/") + ".java")
+                                                    .blockingSubscribe(report -> emitter.onNext(report.toString()));
+                                        }
                                     }
                                 }
                             }
                             emitter.onComplete();
                         })));
-    }
-
-    private void analyzePackage(PackageDeclaration packageDeclaration) {
-        String packagePath = packageDeclaration.getNameAsString();
-        String sourceRootPath = this.analysisPath;
-        List<CompilationUnit> classesOrInterfacesUnit = this.createParsedFileList(packageDeclaration, sourceRootPath)
-                .stream()
-                .filter(r -> r.isSuccessful() && r.getResult().isPresent())
-                .map(r -> r.getResult().get())
-                .collect(Collectors.toList());
-        incrementPackageNumber(1);
-        for (CompilationUnit cu : classesOrInterfacesUnit) {
-            List<ClassOrInterfaceDeclaration> declarationList = cu.getTypes().stream().map(TypeDeclaration::asTypeDeclaration).filter(BodyDeclaration::isClassOrInterfaceDeclaration).map(ClassOrInterfaceDeclaration.class::cast).collect(Collectors.toList());
-            for (ClassOrInterfaceDeclaration declaration : declarationList) {
-                if (declaration.isInterface()) {
-                    this.createInterfaceReport(packagePath, declaration);
-                } else {
-                    this.createClassReport(packagePath, declaration);
-                }
-            }
-        }
     }
 
     private List<ParseResult<CompilationUnit>> createParsedFileList(PackageDeclaration packageDeclaration, String sourceRootPath) {
@@ -262,10 +243,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
         this.interfaceNumberObservable.onNext(this.interfaceNumber += variation);
     }
 
-    public void addReport(ProjectElem report) {
-        reportObservable.onNext(report);
-    }
-
     public Observable<Integer> getPackageNumberObservable() {
         return packageNumberObservable;
     }
@@ -276,10 +253,6 @@ public class ReactiveAnalyzerImpl implements ReactiveAnalyzer {
 
     public Observable<Integer> getInterfaceNumberObservable() {
         return interfaceNumberObservable;
-    }
-
-    public Observable<ProjectElem> getReportObservable() {
-        return reportObservable;
     }
 
     public String getAnalysisPath() {

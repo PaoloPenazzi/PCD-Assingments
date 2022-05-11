@@ -37,8 +37,12 @@ public class PackageReportImpl implements PackageReport, ProjectElem {
 
     @Override
     public String toString() {
-        return "PackageReportImpl: " + fullPackageName + '\n' +
-                "Classes: " + classReports.toString() + '\n' +
-                "Interfaces: " + interfaceReports.toString() + '\n' + '\n';
+        if(this.classReports == null){
+            return "Package Name: " + fullPackageName + "\n\n";
+        } else {
+            return "PackageReportImpl: " + fullPackageName + "\n\n" +
+                    "Classes: " + classReports + '\n' +
+                    "Interfaces: " + interfaceReports + '\n' + '\n';
+        }
     }
 }

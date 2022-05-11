@@ -22,7 +22,6 @@ public class ViewController {
     private Disposable classObserver;
     private Disposable interfaceObserver;
     private Disposable packageObserver;
-    private Disposable reportObserver;
     private Disposable observer;
 
     public ViewController() {
@@ -80,7 +79,7 @@ public class ViewController {
             this.clearOutput();
             this.worker = this.scheduler.createWorker();
             switch (this.reactiveAnalyzerImpl.getAnalysisType()) {
-               /* case "class": {
+               case "class": {
                     observer = this.reactiveAnalyzerImpl.getClassReport(this.reactiveAnalyzerImpl.getAnalysisPath())
                             .subscribe(this::log);
                     break;
@@ -99,7 +98,7 @@ public class ViewController {
                     observer = this.reactiveAnalyzerImpl.getProjectReport(this.reactiveAnalyzerImpl.getAnalysisPath())
                             .subscribe(this::log);
                     break;
-                }*/
+                }
                 case "analysis": {
                     observer = this.reactiveAnalyzerImpl.analyzeProject(this.reactiveAnalyzerImpl.getAnalysisPath())
                             .subscribe(this::log);
@@ -116,6 +115,10 @@ public class ViewController {
     }
 
     private void log(String report) {
+        view.getConsoleTextArea().append(report);
+    }
+
+    private void log(ProjectElem report) {
         view.getConsoleTextArea().append(report.toString());
     }
 
