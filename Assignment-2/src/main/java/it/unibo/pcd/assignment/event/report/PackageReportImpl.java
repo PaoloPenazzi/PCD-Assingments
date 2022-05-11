@@ -35,14 +35,26 @@ public class PackageReportImpl implements PackageReport, ProjectElem {
         return this.interfaceReports;
     }
 
+    private String createReport(){
+        StringBuilder report = new StringBuilder();
+            for (ClassReport classReport : classReports) {
+                report.append(classReport.toString());
+                report.append("\n");
+            }
+            for (InterfaceReport interfaceReport : interfaceReports) {
+                report.append(interfaceReport.toString());
+                report.append("\n\n");
+            }
+            report.append("\n");
+        return report.toString();
+    }
+
     @Override
     public String toString() {
         if(this.classReports == null){
-            return "Package Name: " + fullPackageName + "\n\n";
+            return "Package: " + fullPackageName + "\n";
         } else {
-            return "PackageReportImpl: " + fullPackageName + "\n\n" +
-                    "Classes: " + classReports + '\n' +
-                    "Interfaces: " + interfaceReports + '\n' + '\n';
+            return "Package: " + fullPackageName + "\n\n" + createReport() + "\n\n";
         }
     }
 }

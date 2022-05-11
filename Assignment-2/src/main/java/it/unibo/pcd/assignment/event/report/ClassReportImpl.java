@@ -59,10 +59,10 @@ public class ClassReportImpl implements ClassReport, ProjectElem {
 
     @Override
     public String toString() {
-        return "ClassReportImpl: " + fullClassName + "\n" +
-                "FileName: " + srcFullFileName + "\n" +
+        return "Class: " + fullClassName + "\n" +
+                "Full Name: " + srcFullFileName + "\n" +
                 "Fields: " + fieldsInfo.toString() + "\n" +
-                "Methods" + methodsInfo.toString() + "\n" +
-                "Inner Class: " + (innerClass == null ? "" : innerClass.toString()) + "\n\n";
+                "Methods: " + methodsInfo.toString() + "\n" +
+                (innerClass == null ? "" : innerClass.toString());
     }
 }

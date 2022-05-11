@@ -38,8 +38,8 @@ public class InterfaceReportImpl implements InterfaceReport, ProjectElem {
 
     @Override
     public String toString() {
-        return "InterfaceReportImpl: " + interfaceName + '\n' +
-                "File Name: " + fullFileName + '\n' +
-                "Methods: " + methodNameList + '\n' + '\n';
+        return "Interface: " + interfaceName + '\n' +
+                "Full Name: " + fullFileName + '\n' +
+                "Methods: " + methodNameList.toString();
     }
 }

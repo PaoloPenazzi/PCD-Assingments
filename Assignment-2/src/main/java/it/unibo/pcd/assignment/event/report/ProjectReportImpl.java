@@ -38,12 +38,26 @@ public class ProjectReportImpl implements ProjectReport, ProjectElem {
         this.projectName = projectName;
     }
 
+    private String createReport(){
+        StringBuilder report = new StringBuilder();
+        for (PackageReport packageReport : getPackageReport()) {
+            report.append("Package: ").append(packageReport.getFullPackageName());
+            report.append("\n\n");
+            for (ClassReport classReport : packageReport.getClassesReport()) {
+                report.append(classReport.toString());
+                report.append("\n");
+            }
+            for (InterfaceReport interfaceReport : packageReport.getInterfacesReport()) {
+                report.append(interfaceReport.toString());
+                report.append("\n\n");
+            }
+            report.append("\n");
+        }
+        return report.toString();
+    }
+
     @Override
     public String toString() {
-        return "ProjectReportImpl{" +
-                "packageReports=" + packageReports.toString() +
-                ", pairList=" + pairList.toString() +
-                ", projectName='" + projectName + '\'' +
-                '}';
+        return "Project Report\n\n" + createReport() + "";
     }
 }
