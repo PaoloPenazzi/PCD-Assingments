@@ -1,4 +1,4 @@
-Three projects made for the course "Distributed and Concurrent Programming" (MSc, Computer Science @Unibo)
+Three projects made for the course "Distributed and Concurrent Programming" (MSc, Computer Science @Unibo).
 The focus of these projects is about concurrency, so other aspects of software development (Testing, code quality, OOP principles, etc..) were left out.
 
 ## 1st Assignment ##
