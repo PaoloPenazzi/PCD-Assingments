@@ -1,8 +1,8 @@
-package it.unibo.pcd.assignment.event.collector;
+package it.unibo.pcd.assignment.parser.collector;
 
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-import it.unibo.pcd.assignment.event.report.InterfaceReportImpl;
+import it.unibo.pcd.assignment.parser.report.InterfaceReportImpl;
 
 import java.util.ArrayList;
 import java.util.List;

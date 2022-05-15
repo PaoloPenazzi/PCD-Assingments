@@ -16,10 +16,11 @@ import io.vertx.core.AbstractVerticle;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
-import it.unibo.pcd.assignment.event.collector.ClassCollector;
-import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
-import it.unibo.pcd.assignment.event.report.*;
-import it.unibo.pcd.assignment.event.view.ViewController;
+import it.unibo.pcd.assignment.parser.ProjectElem;
+import it.unibo.pcd.assignment.parser.collector.ClassCollector;
+import it.unibo.pcd.assignment.parser.collector.InterfaceCollector;
+import it.unibo.pcd.assignment.event.controller.ViewController;
+import it.unibo.pcd.assignment.parser.report.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;

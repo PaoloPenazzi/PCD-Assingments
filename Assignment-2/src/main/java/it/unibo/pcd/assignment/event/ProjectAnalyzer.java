@@ -2,10 +2,11 @@ package it.unibo.pcd.assignment.event;
 
 import hu.webarticum.treeprinter.SimpleTreeNode;
 import io.vertx.core.Future;
-import it.unibo.pcd.assignment.event.report.ClassReport;
-import it.unibo.pcd.assignment.event.report.InterfaceReport;
-import it.unibo.pcd.assignment.event.report.PackageReport;
-import it.unibo.pcd.assignment.event.report.ProjectReport;
+import it.unibo.pcd.assignment.parser.ProjectElem;
+import it.unibo.pcd.assignment.parser.report.ClassReport;
+import it.unibo.pcd.assignment.parser.report.InterfaceReport;
+import it.unibo.pcd.assignment.parser.report.PackageReport;
+import it.unibo.pcd.assignment.parser.report.ProjectReport;
 
 import java.util.function.Consumer;
 

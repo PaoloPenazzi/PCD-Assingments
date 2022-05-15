@@ -1,4 +1,4 @@
-package it.unibo.pcd.assignment.event.collector;
+package it.unibo.pcd.assignment.parser.collector;
 
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
@@ -9,7 +9,7 @@ import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.utils.SourceRoot;
-import it.unibo.pcd.assignment.event.report.*;
+import it.unibo.pcd.assignment.parser.report.*;
 
 import java.io.IOException;
 import java.nio.file.Paths;

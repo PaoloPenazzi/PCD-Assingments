@@ -1,7 +1,8 @@
-package it.unibo.pcd.assignment.event.view;
+package it.unibo.pcd.assignment.event.controller;
 
 import hu.webarticum.treeprinter.SimpleTreeNode;
 import it.unibo.pcd.assignment.event.ProjectAnalyzerImpl;
+import it.unibo.pcd.assignment.event.view.ViewFrame;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
