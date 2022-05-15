@@ -20,9 +20,9 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
             if (collector.getInnerClass() == null) {
                 collector.setInnerClass(myInnerReport);
             } else {
-                ClassReportImpl innerClassino = collector.getInnerClass();
-                this.addInnerClassReportToTail(myInnerReport, innerClassino);
-                collector.setInnerClass(innerClassino);
+                ClassReportImpl innerClass = collector.getInnerClass();
+                this.addInnerClassReportToTail(myInnerReport, innerClass);
+                collector.setInnerClass(innerClass);
             }
         } else {
             this.createClassReport(collector, dec);
