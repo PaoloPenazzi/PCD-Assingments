@@ -3,8 +3,8 @@ package it.unibo.pcd.assignment.reactive.controller;
 import io.reactivex.rxjava3.core.Scheduler;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import it.unibo.pcd.assignment.event.ProjectElem;
-import it.unibo.pcd.assignment.reactive.model.ReactiveAnalyzerImpl;
+import it.unibo.pcd.assignment.parser.ProjectElem;
+import it.unibo.pcd.assignment.reactive.ReactiveAnalyzerImpl;
 import it.unibo.pcd.assignment.reactive.view.ViewFrame;
 
 import javax.swing.*;

@@ -1,5 +1,7 @@
 package it.unibo.pcd.assignment.event.view;
 
+import it.unibo.pcd.assignment.event.controller.ViewController;
+
 import javax.swing.*;
 import java.awt.*;
 

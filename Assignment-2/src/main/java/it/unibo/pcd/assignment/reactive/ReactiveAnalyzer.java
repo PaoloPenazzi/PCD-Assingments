@@ -1,11 +1,11 @@
-package it.unibo.pcd.assignment.reactive.model;
+package it.unibo.pcd.assignment.reactive;
 
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
-import it.unibo.pcd.assignment.event.report.ClassReport;
-import it.unibo.pcd.assignment.event.report.InterfaceReport;
-import it.unibo.pcd.assignment.event.report.PackageReport;
-import it.unibo.pcd.assignment.event.report.ProjectReport;
+import it.unibo.pcd.assignment.parser.report.ClassReport;
+import it.unibo.pcd.assignment.parser.report.InterfaceReport;
+import it.unibo.pcd.assignment.parser.report.PackageReport;
+import it.unibo.pcd.assignment.parser.report.ProjectReport;
 
 /**
  * A Reactive Java files analyzer.

@@ -1,4 +1,4 @@
-package it.unibo.pcd.assignment.reactive.model;
+package it.unibo.pcd.assignment.reactive;
 
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ParserConfiguration;
@@ -12,11 +12,12 @@ import com.github.javaparser.utils.SourceRoot;
 import io.reactivex.rxjava3.core.Maybe;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
-import it.unibo.pcd.assignment.event.collector.ClassCollector;
-import it.unibo.pcd.assignment.event.collector.InterfaceCollector;
-import it.unibo.pcd.assignment.event.collector.PackageCollector;
-import it.unibo.pcd.assignment.event.collector.ProjectCollector;
-import it.unibo.pcd.assignment.event.report.*;
+import it.unibo.pcd.assignment.parser.collector.ClassCollector;
+import it.unibo.pcd.assignment.parser.collector.InterfaceCollector;
+import it.unibo.pcd.assignment.parser.collector.PackageCollector;
+import it.unibo.pcd.assignment.parser.collector.ProjectCollector;
+import it.unibo.pcd.assignment.parser.report.*;
+import it.unibo.pcd.assignment.reactive.ReactiveAnalyzer;
 
 import java.io.File;
 import java.io.FileNotFoundException;
