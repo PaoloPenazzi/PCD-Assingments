@@ -3,6 +3,9 @@
 
 # Ignore Gradle build output directory
 build
+target
+.bsp
+project
 
 .DS_STORE
 .idea
