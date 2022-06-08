@@ -3,7 +3,7 @@ trait Velocity2d:
   def y: Double
   def fromPositions(from: Position2d, to: Position2d): Velocity2d
   def scalarMul(k: Double): Velocity2d
-  def normalize(): Velocity2d
+  def normalize: Velocity2d
   def sum(v: Velocity2d): Velocity2d
 
 object Velocity2d:
@@ -13,7 +13,7 @@ object Velocity2d:
   private class Velocity2dImpl(override val x: Double, override val y: Double) extends Velocity2d:
     def fromPositions(from: Position2d, to: Position2d): Velocity2d = Velocity2d(to.x - from.x, to.y - from.y)
     def scalarMul(k: Double): Velocity2d = Velocity2d(x * k, y * k)
-    def normalize(): Velocity2d =
+    def normalize: Velocity2d =
       val mod: Double = Math.sqrt(x * x + y * y)
       if(mod > 0) Velocity2d(x / mod, y / mod) else throw IllegalStateException()
     def sum(v: Velocity2d): Velocity2d = Velocity2d(x + v.x, y + v.y)
@@ -42,7 +42,7 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
 
   def computeRepulsiveForceBy(body: Body): Velocity2d =
     val distance: Double = getDistanceFrom(body)
-    Velocity2d(body.position, position).normalize().scalarMul(body.mass * repulsiveConst / (distance * distance))
+    Velocity2d(body.position, position).normalize.scalarMul(body.mass * repulsiveConst / (distance * distance))
 
 @main
 def test(): Unit = {
