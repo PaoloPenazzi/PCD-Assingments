@@ -45,7 +45,7 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
     Velocity2d(body.position, position).normalize().scalarMul(body.mass * repulsiveConst / (distance * distance))
 
 @main
-def main(): Unit = {
+def test(): Unit = {
   println(Position2d(3, 2))
 }
 
