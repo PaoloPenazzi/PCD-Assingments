@@ -61,7 +61,8 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
       case x if x < bounds.x0 =>
         position = Position2d(bounds.x0, position.y)
         velocity = Velocity2d(-velocity.x, velocity.y)
-        
+      case _ =>
+
     y match
       case y if y > bounds.y1 =>
         position = Position2d(position.x, bounds.y1)
@@ -69,3 +70,4 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
       case y if y < bounds.y0 =>
         position = Position2d(position.x, bounds.y0)
         velocity = Velocity2d(velocity.x, -velocity.y)
+      case _ =>
