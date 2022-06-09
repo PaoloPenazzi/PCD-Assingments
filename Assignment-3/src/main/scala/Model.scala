@@ -76,6 +76,7 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
 
   def computeBodyVelocity(bodies: mutable.Seq[Body]): Unit =
     var totalForce: Velocity2d = Velocity2d(0,0)
+    // TODO concurrent error while accessing to bodies
     bodies.filter(b => !b.equals(this)).foreach(b => totalForce = totalForce.sum(this.computeRepulsiveForceBy(b)))
     totalForce = totalForce.sum(this.getCurrentFrictionForce)
     val acceleration: Velocity2d = Velocity2d(totalForce).scalarMul(1.0 / this.mass)

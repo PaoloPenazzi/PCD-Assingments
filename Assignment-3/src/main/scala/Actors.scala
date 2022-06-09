@@ -6,6 +6,7 @@ import scala.util.Random
 
 enum Command:
   case StartSimulation
+  case StopSimulation
   case VelocityDoneResponse(result: Body)
   case PositionDoneResponse(result: Body)
   case ComputeVelocityRequest(bodies: mutable.Seq[Body], replyTo: ActorRef[Command.VelocityDoneResponse])
@@ -33,6 +34,7 @@ object SimulationActor:
   def apply(simulation: Simulation): Behavior[Command] =
     Behaviors.receive { (context, msg) =>
       msg match
+        case Command.StopSimulation => ???
         case Command.StartSimulation =>
           println("Simulation Started!")
           // creo gli attori
