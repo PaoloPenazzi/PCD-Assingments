@@ -8,7 +8,9 @@ import scala.collection.mutable
 case class Simulation(numBodies: Int,
                       var iteration: Int,
                       sideLength: Int,
-                      var bodies: mutable.Seq[Body])
+                      var bodies: mutable.Seq[Body]):
+  val boundary: Boundary =
+    Boundary(-sideLength, -sideLength, sideLength, sideLength)
 
 object SimulationActor:
   var responseCounter = 0
@@ -18,7 +20,7 @@ object SimulationActor:
     case VelocityDoneResponse(result: Body)
     case PositionDoneResponse(result: Body)
     case ComputeVelocityRequest(body: Body, bodies: mutable.Seq[Body], replyTo: ActorRef[VelocityDoneResponse])
-    case ComputePositionRequest(body: Body, bodies: mutable.Seq[Body], replyTo: ActorRef[VelocityDoneResponse])
+    case ComputePositionRequest(body: Body, boundary: Boundary, replyTo: ActorRef[PositionDoneResponse])
     case UpdateGUI(bodies: mutable.Seq[Body])
     export Command.*
 
@@ -45,7 +47,7 @@ object SimulationActor:
               for
                 x <- simulation.bodies
                 y <- actorsList
-              yield y ! Command.ComputePositionRequest(x, simulation.bodies, context.self)
+              yield y ! Command.ComputePositionRequest(x, simulation.boundary, context.self)
               Behaviors.same
             else Behaviors.stopped
           else Behaviors.same
@@ -61,16 +63,23 @@ object BodyActor:
     Behaviors.receive { (context, msg) =>
       msg match
         case ComputeVelocityRequest(body, bodies, ref) =>
-          computeBodyVelocity(body, bodies)
+          ref ! Command.VelocityDoneResponse(computeBodyVelocity(body, bodies))
           Behaviors.same
-        case ComputePositionRequest(body, bodies, ref) =>
+        case ComputePositionRequest(body, boundary, ref) =>
+          ref ! Command.PositionDoneResponse(computeBodyPosition(body, boundary))
           Behaviors.same
         case _ => throw new IllegalStateException()
     }
 
-  def computeBodyVelocity(body: Body, bodies: mutable.Seq[Body]): Unit =
+  def computeBodyVelocity(body: Body, bodies: mutable.Seq[Body]): Body =
     var totalForce: Velocity2d = Velocity2d(0,0)
     bodies.filter((b) => !b.equals(body)).foreach((b) =>totalForce = totalForce.sum(body.computeRepulsiveForceBy(b)))
     totalForce = totalForce.sum(body.getCurrentFrictionForce)
     val acceleration: Velocity2d = Velocity2d(totalForce).scalarMul(1.0 / body.mass)
     body.updateVelocity(acceleration, 0.001) // TODO deltaTime hard coded
+    body
+
+  def computeBodyPosition(body: Body, boundary: Boundary): Body =
+    body.updatePosition(0.001)
+    body.checkAndSolveBoundaryCollision(boundary)
+    body

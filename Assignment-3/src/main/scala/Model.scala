@@ -24,6 +24,8 @@ case class Position2d(x: Double, y: Double):
   def sum(v: Velocity2d): Position2d = Position2d(x + v.x, y + v.y)
 
 
+case class Boundary(x0: Double, y0: Double, x1: Double, y1: Double)
+
 case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mass: Double):
   val repulsiveConst: Double = 0.01
   val frictionConst: Double = 1
@@ -47,9 +49,22 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
     
   def getCurrentFrictionForce: Velocity2d =
     Velocity2d(velocity).scalarMul(-frictionConst)
-
-@main
-def test(): Unit = {
-  println(Position2d(3, 2))
-}
+    
+  def checkAndSolveBoundaryCollision(bounds: Boundary): Unit =
+    val x = position.x
+    val y = position.y
+    x match
+      case x if x > bounds.x1 => 
+        position = Position2d(bounds.x1, position.y)
+        velocity = Velocity2d(-velocity.x, velocity.y)
+      case _ =>
+        position = Position2d(bounds.x0, position.y)
+        velocity = Velocity2d(-velocity.x, velocity.y)
+    y match
+      case y if y > bounds.y1 =>
+        position = Position2d(position.x, bounds.y1)
+        velocity = Velocity2d(velocity.x, -velocity.y)
+      case _ =>
+        position = Position2d(position.x, bounds.y0)
+        velocity = Velocity2d(velocity.x, -velocity.y)
 
