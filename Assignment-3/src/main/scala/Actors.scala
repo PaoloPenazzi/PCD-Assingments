@@ -15,10 +15,8 @@ enum Command:
 case class Simulation(numBodies: Int,
                       var iteration: Int,
                       sideLength: Int):
-
   val boundary: Boundary =
     Boundary(-sideLength, -sideLength, sideLength, sideLength)
-
   var bodies: mutable.Seq[Body] =
     var myBodies: mutable.Seq[Body] = mutable.Seq.empty
     for (id <- 0 until numBodies)
@@ -31,11 +29,10 @@ case class Simulation(numBodies: Int,
 object SimulationActor:
   var responseCounter = 0
   var actorsList: mutable.Seq[ActorRef[Command]] = mutable.Seq.empty
-
+  
   def apply(simulation: Simulation): Behavior[Command] =
     Behaviors.receive { (context, msg) =>
       msg match
-
         case Command.StartSimulation =>
           println("Simulation Started!")
           // creo gli attori
@@ -46,7 +43,6 @@ object SimulationActor:
             // mando i messaggi di partire a fare i calcoli
             newActor ! Command.ComputeVelocityRequest(simulation.bodies, context.self)
           Behaviors.same
-
         case Command.VelocityDoneResponse(result) =>
           println(s"VelocityDone for ${result.id}")
           simulation.bodies.update(result.id, result)
@@ -55,7 +51,6 @@ object SimulationActor:
             responseCounter = 0
             actorsList.foreach(y => y ! Command.ComputePositionRequest(simulation.boundary, context.self))
           Behaviors.same
-
         case Command.PositionDoneResponse(result) =>
           println(s"PositionDone for ${result.id}")
           simulation.bodies.update(result.id, result)
@@ -68,46 +63,26 @@ object SimulationActor:
               Behaviors.same
             else Behaviors.stopped
           else Behaviors.same
-
         case _ => throw IllegalStateException()
     }
 
 object BodyActor:
-
   def apply(body: Body): Behavior[Command] =
     Behaviors.receive { (_, msg) =>
       msg match
-
         case Command.ComputeVelocityRequest(bodies, ref) =>
           println(s"VelocityRequest for ${body.id}")
-          // il body cambia il suo valore? Non penso...
-          val newBody: Body = computeBodyVelocity(body, bodies)
-          body.velocity = newBody.velocity
+          body.computeBodyVelocity(bodies)
           println(s"VelocityDone: Body ${body.id} Position ${body.position} Velocity ${body.velocity}")
           ref ! Command.VelocityDoneResponse(body)
           Behaviors.same
-
         case Command.ComputePositionRequest(boundary, ref) =>
           println(s"PositionRequest for ${body.id}")
-          // il body cambia il suo valore? Non penso...
-          val newBody: Body = computeBodyPosition(body, boundary)
-          body.position = newBody.position
+          body.computeBodyPosition(boundary)
           println(s"PositionDone: Body ${body.id} Position ${body.position} Velocity ${body.velocity}")
           ref ! Command.PositionDoneResponse(body)
           Behaviors.same
-
         case _ => throw new IllegalStateException()
     }
-
-  def computeBodyVelocity(body: Body, bodies: mutable.Seq[Body]): Body =
-    var totalForce: Velocity2d = Velocity2d(0,0)
-    bodies.filter((b) => !b.equals(body)).foreach((b) =>totalForce = totalForce.sum(body.computeRepulsiveForceBy(b)))
-    totalForce = totalForce.sum(body.getCurrentFrictionForce)
-    val acceleration: Velocity2d = Velocity2d(totalForce).scalarMul(1.0 / body.mass)
-    body.updateVelocity(acceleration, 0.001) // TODO deltaTime hard coded
-    body
-
-  def computeBodyPosition(body: Body, boundary: Boundary): Body =
-    body.updatePosition(0.001)
-    body.checkAndSolveBoundaryCollision(boundary)
-    body
+    
+  

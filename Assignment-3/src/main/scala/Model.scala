@@ -1,3 +1,5 @@
+import scala.collection.mutable
+
 trait Velocity2d:
   def x: Double
   def y: Double
@@ -71,3 +73,14 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
         position = Position2d(position.x, bounds.y0)
         velocity = Velocity2d(velocity.x, -velocity.y)
       case _ =>
+
+  def computeBodyVelocity(bodies: mutable.Seq[Body]): Unit =
+    var totalForce: Velocity2d = Velocity2d(0,0)
+    bodies.filter(b => !b.equals(this)).foreach(b => totalForce = totalForce.sum(this.computeRepulsiveForceBy(b)))
+    totalForce = totalForce.sum(this.getCurrentFrictionForce)
+    val acceleration: Velocity2d = Velocity2d(totalForce).scalarMul(1.0 / this.mass)
+    this.updateVelocity(acceleration, 0.001)
+
+  def computeBodyPosition(boundary: Boundary): Unit =
+    this.updatePosition(0.001)
+    this.checkAndSolveBoundaryCollision(boundary)
