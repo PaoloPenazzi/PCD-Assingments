@@ -6,6 +6,7 @@ import scala.util.Random
 
 enum Command:
   case StartSimulation
+  case ResumeSimulation
   case StopSimulation
   case VelocityDoneResponse(result: Body)
   case PositionDoneResponse(result: Body)
@@ -30,11 +31,17 @@ case class Simulation(numBodies: Int,
 object SimulationActor:
   var responseCounter = 0
   var actorsList: mutable.Seq[ActorRef[Command]] = mutable.Seq.empty
-  
+
   def apply(simulation: Simulation): Behavior[Command] =
     Behaviors.receive { (context, msg) =>
       msg match
-        case Command.StopSimulation => ???
+        case Command.StopSimulation =>
+          // come faccio in modo di gestire tutti i messaggi che ancora mi devono arrivare? Li lascio li e li faccio ripartire
+          // oppure faccio finire gli ultimi calcoli e poi blocco tutto?
+          ???
+        case Command.ResumeSimulation =>
+          // come faccio ripartire tutto? Da dove riprendo? Perché?
+          ???
         case Command.StartSimulation =>
           println("Simulation Started!")
           // creo gli attori
@@ -86,5 +93,4 @@ object BodyActor:
           Behaviors.same
         case _ => throw new IllegalStateException()
     }
-    
-  
+
