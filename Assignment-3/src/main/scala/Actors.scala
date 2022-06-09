@@ -4,13 +4,23 @@ import akka.actor.typed.scaladsl.Behaviors
 import SimulationActor.Command
 
 import scala.collection.mutable
+import scala.util.Random
 
 case class Simulation(numBodies: Int,
                       var iteration: Int,
-                      sideLength: Int,
-                      var bodies: mutable.Seq[Body]):
+                      sideLength: Int):
+
   val boundary: Boundary =
     Boundary(-sideLength, -sideLength, sideLength, sideLength)
+
+  var bodies: mutable.Seq[Body] =
+    var myBodies: mutable.Seq[Body] = mutable.Seq.empty
+    for (id <- 0 until numBodies)
+      val x = boundary.x0 * 0.25 + Random.nextDouble() * (boundary.x1 - boundary.x0) * 0.25
+      val y = boundary.y0 * 0.25 + Random.nextDouble() * (boundary.y1 - boundary.y0) * 0.25
+      val body = Body(id, Position2d(x, y), Velocity2d(0, 0), 10)
+      myBodies = myBodies :+ body
+    myBodies
 
 object SimulationActor:
   var responseCounter = 0
@@ -54,13 +64,12 @@ object SimulationActor:
         case _ => throw IllegalStateException()
     }
 
-
 object BodyActor:
 
   import SimulationActor.Command.*
 
   def apply(): Behavior[Command] =
-    Behaviors.receive { (context, msg) =>
+    Behaviors.receive { (_, msg) =>
       msg match
         case ComputeVelocityRequest(body, bodies, ref) =>
           ref ! Command.VelocityDoneResponse(computeBodyVelocity(body, bodies))
