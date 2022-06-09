@@ -1,7 +1,6 @@
 import SimulationActor.Command.{PositionDoneResponse, VelocityDoneResponse}
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, SupervisorStrategy, Terminated}
 import akka.actor.typed.scaladsl.Behaviors
-import Body.*
 import SimulationActor.Command
 
 import scala.collection.mutable
@@ -69,9 +68,9 @@ object BodyActor:
         case _ => throw new IllegalStateException()
     }
 
-    def computeBodyVelocity(body: Body, bodies: mutable.Seq[Body]): Unit =
-      var totalForce: Velocity2d = Velocity2d(0,0)
-      bodies.filter((b) => !b.equals(body)).foreach((b) =>totalForce = totalForce.sum(body.computeRepulsiveForceBy(b)))
-      totalForce = totalForce.sum(body.getCurrentFrictionForce)
-      val acceleration: Velocity2d = Velocity2d(totalForce).scalarMul(1.0 / body.mass)
-      body.updateVelocity(acceleration, 0.001) // TODO deltaTime hard coded
+  def computeBodyVelocity(body: Body, bodies: mutable.Seq[Body]): Unit =
+    var totalForce: Velocity2d = Velocity2d(0,0)
+    bodies.filter((b) => !b.equals(body)).foreach((b) =>totalForce = totalForce.sum(body.computeRepulsiveForceBy(b)))
+    totalForce = totalForce.sum(body.getCurrentFrictionForce)
+    val acceleration: Velocity2d = Velocity2d(totalForce).scalarMul(1.0 / body.mass)
+    body.updateVelocity(acceleration, 0.001) // TODO deltaTime hard coded
