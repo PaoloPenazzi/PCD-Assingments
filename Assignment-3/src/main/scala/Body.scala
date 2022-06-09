@@ -9,6 +9,7 @@ trait Velocity2d:
 object Velocity2d:
   def apply(x: Double, y: Double): Velocity2d = Velocity2dImpl(x, y)
   def apply(from: Position2d, to: Position2d): Velocity2d = Velocity2dImpl(to.x - from.x, to.y - from.y)
+  def apply(velocity: Velocity2d): Velocity2d = Velocity2dImpl(velocity.x, velocity.y)
 
   private class Velocity2dImpl(override val x: Double, override val y: Double) extends Velocity2d:
     def fromPositions(from: Position2d, to: Position2d): Velocity2d = Velocity2d(to.x - from.x, to.y - from.y)
@@ -43,6 +44,9 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
   def computeRepulsiveForceBy(body: Body): Velocity2d =
     val distance: Double = getDistanceFrom(body)
     Velocity2d(body.position, position).normalize.scalarMul(body.mass * repulsiveConst / (distance * distance))
+    
+  def getCurrentFrictionForce: Velocity2d =
+    Velocity2d(velocity).scalarMul(-frictionConst)
 
 @main
 def test(): Unit = {
