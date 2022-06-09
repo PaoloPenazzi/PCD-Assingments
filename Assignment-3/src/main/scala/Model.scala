@@ -11,7 +11,7 @@ object Velocity2d:
   def apply(from: Position2d, to: Position2d): Velocity2d = Velocity2dImpl(to.x - from.x, to.y - from.y)
   def apply(velocity: Velocity2d): Velocity2d = Velocity2dImpl(velocity.x, velocity.y)
 
-  private class Velocity2dImpl(override val x: Double, override val y: Double) extends Velocity2d:
+  private case class Velocity2dImpl(override val x: Double, override val y: Double) extends Velocity2d:
     def fromPositions(from: Position2d, to: Position2d): Velocity2d = Velocity2d(to.x - from.x, to.y - from.y)
     def scalarMul(k: Double): Velocity2d = Velocity2d(x * k, y * k)
     def normalize: Velocity2d =
@@ -51,20 +51,21 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
     Velocity2d(velocity).scalarMul(-frictionConst)
     
   def checkAndSolveBoundaryCollision(bounds: Boundary): Unit =
-    val x = position.x
-    val y = position.y
+    val x: Double = position.x
+    val y: Double = position.y
+
     x match
       case x if x > bounds.x1 => 
         position = Position2d(bounds.x1, position.y)
         velocity = Velocity2d(-velocity.x, velocity.y)
-      case _ =>
+      case x if x < bounds.x0 =>
         position = Position2d(bounds.x0, position.y)
         velocity = Velocity2d(-velocity.x, velocity.y)
+        
     y match
       case y if y > bounds.y1 =>
         position = Position2d(position.x, bounds.y1)
         velocity = Velocity2d(velocity.x, -velocity.y)
-      case _ =>
+      case y if y < bounds.y0 =>
         position = Position2d(position.x, bounds.y0)
         velocity = Velocity2d(velocity.x, -velocity.y)
-

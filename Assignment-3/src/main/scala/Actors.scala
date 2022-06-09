@@ -1,10 +1,16 @@
-import SimulationActor.Command.{PositionDoneResponse, VelocityDoneResponse}
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, SupervisorStrategy, Terminated}
 import akka.actor.typed.scaladsl.Behaviors
-import SimulationActor.Command
 
 import scala.collection.mutable
 import scala.util.Random
+
+enum Command:
+  case StartSimulation
+  case VelocityDoneResponse(result: Body)
+  case PositionDoneResponse(result: Body)
+  case ComputeVelocityRequest(bodies: mutable.Seq[Body], replyTo: ActorRef[Command.VelocityDoneResponse])
+  case ComputePositionRequest(boundary: Boundary, replyTo: ActorRef[Command.PositionDoneResponse])
+  case UpdateGUI(bodies: mutable.Seq[Body])
 
 case class Simulation(numBodies: Int,
                       var iteration: Int,
@@ -24,59 +30,72 @@ case class Simulation(numBodies: Int,
 
 object SimulationActor:
   var responseCounter = 0
-  val actorsList: List[ActorRef[Command]] = List.empty
-
-  enum Command:
-    case VelocityDoneResponse(result: Body)
-    case PositionDoneResponse(result: Body)
-    case ComputeVelocityRequest(body: Body, bodies: mutable.Seq[Body], replyTo: ActorRef[VelocityDoneResponse])
-    case ComputePositionRequest(body: Body, boundary: Boundary, replyTo: ActorRef[PositionDoneResponse])
-    case UpdateGUI(bodies: mutable.Seq[Body])
-    export Command.*
+  var actorsList: mutable.Seq[ActorRef[Command]] = mutable.Seq.empty
 
   def apply(simulation: Simulation): Behavior[Command] =
     Behaviors.receive { (context, msg) =>
       msg match
-        case VelocityDoneResponse(result) =>
+
+        case Command.StartSimulation =>
+          println("Simulation Started!")
+          // creo gli attori
+          for (n <- 0 until simulation.numBodies)
+            val newActor = context.spawn(BodyActor(simulation.bodies(n)), "actor-number-"+ n.toString)
+            actorsList = actorsList :+ newActor
+            println(s"Actor: $newActor Number: $n")
+            // mando i messaggi di partire a fare i calcoli
+            newActor ! Command.ComputeVelocityRequest(simulation.bodies, context.self)
+          Behaviors.same
+
+        case Command.VelocityDoneResponse(result) =>
+          println(s"VelocityDone for ${result.id}")
           simulation.bodies.update(result.id, result)
           responseCounter = responseCounter + 1
           if (responseCounter == simulation.bodies.size)
             responseCounter = 0
-            for
-              x <- simulation.bodies
-              y <- actorsList
-            yield y ! Command.ComputeVelocityRequest(x, simulation.bodies, context.self)
+            actorsList.foreach(y => y ! Command.ComputePositionRequest(simulation.boundary, context.self))
           Behaviors.same
-        case PositionDoneResponse(result) =>
+
+        case Command.PositionDoneResponse(result) =>
+          println(s"PositionDone for ${result.id}")
           simulation.bodies.update(result.id, result)
           responseCounter = responseCounter + 1
           if (responseCounter == simulation.bodies.size)
             responseCounter = 0
             if (simulation.iteration != 0)
               simulation.iteration = simulation.iteration - 1
-              for
-                x <- simulation.bodies
-                y <- actorsList
-              yield y ! Command.ComputePositionRequest(x, simulation.boundary, context.self)
+              actorsList.foreach(y => y ! Command.ComputeVelocityRequest(simulation.bodies, context.self))
               Behaviors.same
             else Behaviors.stopped
           else Behaviors.same
+
         case _ => throw IllegalStateException()
     }
 
 object BodyActor:
 
-  import SimulationActor.Command.*
-
-  def apply(): Behavior[Command] =
+  def apply(body: Body): Behavior[Command] =
     Behaviors.receive { (_, msg) =>
       msg match
-        case ComputeVelocityRequest(body, bodies, ref) =>
-          ref ! Command.VelocityDoneResponse(computeBodyVelocity(body, bodies))
+
+        case Command.ComputeVelocityRequest(bodies, ref) =>
+          println(s"VelocityRequest for ${body.id}")
+          // il body cambia il suo valore? Non penso...
+          val newBody: Body = computeBodyVelocity(body, bodies)
+          body.velocity = newBody.velocity
+          println(s"VelocityDone: Body ${body.id} Position ${body.position} Velocity ${body.velocity}")
+          ref ! Command.VelocityDoneResponse(body)
           Behaviors.same
-        case ComputePositionRequest(body, boundary, ref) =>
-          ref ! Command.PositionDoneResponse(computeBodyPosition(body, boundary))
+
+        case Command.ComputePositionRequest(boundary, ref) =>
+          println(s"PositionRequest for ${body.id}")
+          // il body cambia il suo valore? Non penso...
+          val newBody: Body = computeBodyPosition(body, boundary)
+          body.position = newBody.position
+          println(s"PositionDone: Body ${body.id} Position ${body.position} Velocity ${body.velocity}")
+          ref ! Command.PositionDoneResponse(body)
           Behaviors.same
+
         case _ => throw new IllegalStateException()
     }
 
