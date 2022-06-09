@@ -8,7 +8,7 @@ case class Simulation(numBodies: Int, var iteration: Int, sideLength: Int, var b
 
 object SimulationActor:
   var responseCounter = 0
-  val actorsList: List[ActorRef] = List.empty // TODO
+  val actorsList: List[ActorRef[Command]] = List.empty
 
   enum Command:
     case VelocityDoneResponse(result: Body)
@@ -23,35 +23,36 @@ object SimulationActor:
       msg match
         case VelocityDoneResponse(result) =>
           simulation.bodies.update(result.id, result)
-          if (incrementResponseCounter())
+          responseCounter = responseCounter + 1
+          if(responseCounter == simulation.bodies.size)
+            responseCounter = 0
             for
               x <- simulation.bodies
               y <- actorsList
             yield y ! Command.ComputeVelocityRequest(x, simulation.bodies, context.self)
-          else Behaviors.same
+          Behaviors.same
         case PositionDoneResponse(result) =>
           simulation.bodies.update(result.id, result)
-          if (incrementResponseCounter())
+          responseCounter = responseCounter + 1
+          if (responseCounter == simulation.bodies.size)
+            responseCounter = 0
             if (simulation.iteration != 0)
+              simulation.iteration = simulation.iteration - 1
               for
                 x <- simulation.bodies
                 y <- actorsList
               yield y ! Command.ComputePositionRequest(x, simulation.bodies, context.self)
+              Behaviors.same
+            else Behaviors.stopped
           else Behaviors.same
     }
 
-    private def incrementResponseCounter(): Boolean =
-      responseCounter = responseCounter + 1
-      if(responseCounter == simulation.numBodies)
-        responseCounter = 0
-        true
-
-  // TODO
-  // seconda apply con la gui...
-  // def apply(simulation: Simulation, )
+// TODO
+// seconda apply con la gui...
+// def apply(simulation: Simulation, )
 
 
 @main
 def main(): Unit = {
-  println(Simulation(100,100,100, mutable.Seq.empty))
+  println(Simulation(100, 100, 100, mutable.Seq.empty))
 }
