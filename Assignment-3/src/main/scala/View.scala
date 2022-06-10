@@ -4,6 +4,8 @@ import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
 import javax.swing.{JButton, JFrame, JPanel}
 import scala.collection.mutable
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior, SupervisorStrategy, Terminated}
+import akka.actor.typed.scaladsl.Behaviors
 
 trait View:
   def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit
@@ -104,8 +106,19 @@ class ViewController(actor: ActorRef[Command]):
       case "-" => view.updateScale(0.9)
       case _ => throw new IllegalStateException()
 
-  def startView(): Unit =
-    view.start()
+  def startView(): Unit = view.start()
 
   def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit =
     view.display(bodies, virtualTime, iteration, bounds)
+
+object ViewActor:
+  import Command.*
+  val view: ViewController = new ViewController(this)
+
+  def apply(): Behaviour[Command] =
+    view.startView()
+    Behaviors.receive { (context, message) =>
+      message match
+        case Command.UpdateGUI(bodies, virtualTime, iteration, bounds) =>
+          view.display(bodies, virtualTime, iteration, bounds)
+    }
