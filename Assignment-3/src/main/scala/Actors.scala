@@ -54,7 +54,8 @@ object SimulationActor:
           Behaviors.same
         case Command.VelocityDoneResponse(result) =>
           println(s"VelocityDone for ${result.id}")
-          simulation.bodies.update(result.id, result)
+          simulation.bodies(result.id).velocity = result.velocity
+          // simulation.bodies.update(result.id, result)
           responseCounter = responseCounter + 1
           if (responseCounter == simulation.bodies.size)
             responseCounter = 0
@@ -62,7 +63,8 @@ object SimulationActor:
           Behaviors.same
         case Command.PositionDoneResponse(result) =>
           println(s"PositionDone for ${result.id}")
-          simulation.bodies.update(result.id, result)
+          simulation.bodies(result.id).position = result.position
+          // simulation.bodies.update(result.id, result)
           responseCounter = responseCounter + 1
           if (responseCounter == simulation.bodies.size)
             responseCounter = 0
