@@ -55,8 +55,8 @@ class SimulationPanel(width: Int, height: Int) extends JPanel:
       val ht = y0 - getYCoordinate(boundary.y1)
       g2.drawRect(x0, y0 - ht, wd, ht)
       var radius = (10 * scale).toInt
-      if (radius < 1) then radius = 1
-      bodies.foreach((b) => g2.drawOval(getXCoordinate(b.position.x), getYCoordinate(b.position.y), radius, radius))
+      if radius < 1 then radius = 1
+      bodies.foreach(b => g2.drawOval(getXCoordinate(b.position.x), getYCoordinate(b.position.y), radius, radius))
       val time: String = String.format("%.2f", virtualTime)
       g2.drawString("Bodies: " + bodies.size + " - virtualTime: " + time
         + " - iteration: " + iteration + " (+ for zoom in, - for zoom out)", 2, 45)
@@ -77,7 +77,7 @@ class ControlPanel(width: Int, height: Int) extends JPanel:
     buttonsList :+ new JButton("PAUSE")
     buttonsList :+ new JButton("+")
     buttonsList :+ new JButton("-")
-    buttonsList.foreach((b) => {
+    buttonsList.foreach(b => {
       add(b)
       b.addActionListener(controller.actionPerformed(_))
     })
