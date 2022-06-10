@@ -1,4 +1,4 @@
-import java.awt.event.ActionEvent
+import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
 import javax.swing.{JButton, JFrame, JPanel}
 import scala.collection.mutable
@@ -19,8 +19,14 @@ object View:
       setLayout(new BorderLayout())
       setTitle("Bodies Simulation")
       setResizable(true)
+      simulationPanel.setup()
       getContentPane.add(simulationPanel)
+      controlPanel.setup()
       getContentPane.add(controlPanel)
+      addWindowListener(new WindowAdapter() {
+        override def windowClosing(ev: WindowEvent): Unit = System.exit(-1)
+        override def windowClosed(ev: WindowEvent): Unit = System.exit(-1)
+      })
       setVisible(true)
     override def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit =
       simulationPanel.bodies = bodies
@@ -39,6 +45,9 @@ class SimulationPanel(width: Int, height: Int) extends JPanel:
   var scale: Double = 1
   val dx: Int = width / 2 - 20
   val dy: Int = height / 2 - 20
+
+  def setup(): Unit =
+    setSize(width, height)
 
   def updateScale(k: Double): Unit =
     scale = scale * k
@@ -83,6 +92,8 @@ class ControlPanel(width: Int, height: Int) extends JPanel:
     })
 
 class ViewController():
+  val view: View = View()
+  
   def actionPerformed(event: ActionEvent): Unit =
     event.getSource.asInstanceOf[JButton].getText match
       case "PLAY" => ???
@@ -90,8 +101,14 @@ class ViewController():
       case "+" => ???
       case "-" => ???
       case _ => throw new IllegalStateException()
+      
+  def startView(): Unit =
+    view.start()  
+      
+  def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit =
+    view.display(bodies, virtualTime, iteration, bounds)
 
 @main
 def testView(): Unit =
-  val view: View = View()
-  view.start()
+  val view: ViewController = new ViewController
+  view.startView()
