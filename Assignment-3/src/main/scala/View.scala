@@ -1,3 +1,5 @@
+import akka.actor.typed.ActorRef
+
 import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
 import javax.swing.{JButton, JFrame, JPanel}
@@ -91,24 +93,19 @@ class ControlPanel(width: Int, height: Int) extends JPanel:
       b.addActionListener(controller.actionPerformed(_))
     })
 
-class ViewController():
+class ViewController(actor: ActorRef[Command]):
   val view: View = View()
-  
+
   def actionPerformed(event: ActionEvent): Unit =
     event.getSource.asInstanceOf[JButton].getText match
-      case "PLAY" => ???
-      case "PAUSE" => ???
-      case "+" => ???
-      case "-" => ???
+      case "PLAY" => actor ! Command.ResumeSimulation
+      case "PAUSE" => actor ! Command.StopSimulation
+      case "+" => view.updateScale(1.1)
+      case "-" => view.updateScale(0.9)
       case _ => throw new IllegalStateException()
-      
+
   def startView(): Unit =
-    view.start()  
-      
+    view.start()
+
   def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit =
     view.display(bodies, virtualTime, iteration, bounds)
-
-@main
-def testView(): Unit =
-  val view: ViewController = new ViewController
-  view.startView()
