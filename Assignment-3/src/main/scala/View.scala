@@ -89,10 +89,10 @@ class ControlPanel(width: Int, height: Int, controller: ViewController) extends 
     setFocusable(true)
     setFocusTraversalKeysEnabled(false)
     requestFocusInWindow
-    buttonsList :+ new JButton("PLAY")
-    buttonsList :+ new JButton("PAUSE")
-    buttonsList :+ new JButton("+")
-    buttonsList :+ new JButton("-")
+    buttonsList = buttonsList :+ new JButton("PLAY")
+    buttonsList = buttonsList :+ new JButton("PAUSE")
+    buttonsList = buttonsList :+ new JButton("+")
+    buttonsList = buttonsList :+ new JButton("-")
     buttonsList.foreach(b => {
       add(b)
       b.addActionListener(controller.actionPerformed(_))
