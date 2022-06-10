@@ -1,5 +1,3 @@
-import akka.actor.typed.ActorRef
-
 import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
 import javax.swing.{JButton, JFrame, JPanel}
@@ -13,11 +11,11 @@ trait View:
   def start(): Unit
 
 object View:
-  def apply(): View = new ViewFrame()
+  def apply(controller: ViewController): View = new ViewFrame(controller)
 
-  private class ViewFrame() extends JFrame, View:
+  private class ViewFrame(controller: ViewController) extends JFrame, View:
     val simulationPanel: SimulationPanel = SimulationPanel(620, (620 * 0.9).toInt)
-    val controlPanel: ControlPanel = ControlPanel(620, (620 * 0.1).toInt)
+    val controlPanel: ControlPanel = ControlPanel(620, (620 * 0.1).toInt, controller)
     override def start(): Unit =
       setSize(620, 620)
       setLayout(new BorderLayout())
@@ -77,9 +75,8 @@ class SimulationPanel(width: Int, height: Int) extends JPanel:
   private def getYCoordinate(y: Double): Int = (dy - y * dy * scale).toInt
   private def getXCoordinate(x: Double): Int = (dx + x * dx * scale).toInt
 
-class ControlPanel(width: Int, height: Int) extends JPanel:
+class ControlPanel(width: Int, height: Int, controller: ViewController) extends JPanel:
   var buttonsList: List[JButton] = List.empty
-  val controller: ViewController = new ViewController()
 
   def setup(): Unit =
     setSize(width, height)
@@ -94,9 +91,11 @@ class ControlPanel(width: Int, height: Int) extends JPanel:
       add(b)
       b.addActionListener(controller.actionPerformed(_))
     })
+import Command.*
 
 class ViewController(actor: ActorRef[Command]):
-  val view: View = View()
+
+  val view: View = View(this)
 
   def actionPerformed(event: ActionEvent): Unit =
     event.getSource.asInstanceOf[JButton].getText match
@@ -112,13 +111,20 @@ class ViewController(actor: ActorRef[Command]):
     view.display(bodies, virtualTime, iteration, bounds)
 
 object ViewActor:
-  import Command.*
-  val view: ViewController = new ViewController(this)
 
-  def apply(): Behaviour[Command] =
-    view.startView()
+  var view: ViewController = null
+
+  def apply(): Behavior[Command] =
     Behaviors.receive { (context, message) =>
       message match
         case Command.UpdateGUI(bodies, virtualTime, iteration, bounds) =>
+          println("UPDATE GUI SON OF A BITCH")
           view.display(bodies, virtualTime, iteration, bounds)
+          Behaviors.same
+        case Command.StartGUI =>
+          println("START GUI SON OF A BITCH")
+          view = new ViewController(context.self)
+          view.startView()
+          Behaviors.same
+        case _ => throw IllegalStateException()
     }
