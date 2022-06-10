@@ -1,34 +1,7 @@
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, SupervisorStrategy, Terminated}
 import akka.actor.typed.scaladsl.Behaviors
-
 import scala.collection.mutable
 import scala.util.Random
-
-enum Command:
-  case StartSimulation
-  case StartGUI
-  case ResumeSimulation
-  case StopSimulation
-  case VelocityDoneResponse(result: Body)
-  case PositionDoneResponse(result: Body)
-  case ComputeVelocityRequest(bodies: mutable.Seq[Body], replyTo: ActorRef[Command.VelocityDoneResponse])
-  case ComputePositionRequest(boundary: Boundary, replyTo: ActorRef[Command.PositionDoneResponse])
-  case UpdateGUI(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary)
-
-// TODO spostare nel model
-case class Simulation(numBodies: Int,
-                      var iteration: Int,
-                      sideLength: Int):
-  val boundary: Boundary =
-    Boundary(-sideLength, -sideLength, sideLength, sideLength)
-  var bodies: mutable.Seq[Body] =
-    var myBodies: mutable.Seq[Body] = mutable.Seq.empty
-    for (id <- 0 until numBodies)
-      val x = boundary.x0 * 0.25 + Random.nextDouble() * (boundary.x1 - boundary.x0) * 0.25
-      val y = boundary.y0 * 0.25 + Random.nextDouble() * (boundary.y1 - boundary.y0) * 0.25
-      val body = Body(id, Position2d(x, y), Velocity2d(0, 0), 10)
-      myBodies = myBodies :+ body
-    myBodies
 
 object SimulationActor:
   var responseCounter = 0
