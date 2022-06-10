@@ -1,9 +1,10 @@
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.*
+
 import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
-import javax.swing.{JButton, JFrame, JPanel}
+import javax.swing.{JButton, JFrame, JPanel, SwingUtilities}
 import scala.collection.mutable
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior, SupervisorStrategy, Terminated}
-import akka.actor.typed.scaladsl.Behaviors
 
 trait View:
   def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit
@@ -13,9 +14,10 @@ trait View:
 object View:
   def apply(controller: ViewController): View = new ViewFrame(controller)
 
-  private class ViewFrame(controller: ViewController) extends JFrame, View:
+  private class ViewFrame(controller: ViewController) extends JFrame, View :
     val simulationPanel: SimulationPanel = SimulationPanel(620, (620 * 0.9).toInt)
     val controlPanel: ControlPanel = ControlPanel(620, (620 * 0.1).toInt, controller)
+
     override def start(): Unit =
       setSize(620, 620)
       setLayout(new BorderLayout())
@@ -30,20 +32,23 @@ object View:
         override def windowClosed(ev: WindowEvent): Unit = System.exit(-1)
       })
       setVisible(true)
+
     override def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit =
-      simulationPanel.bodies = bodies
-      simulationPanel.virtualTime = virtualTime
-      simulationPanel.iteration = iteration
-      simulationPanel.boundary = bounds
-      repaint()
+        simulationPanel.bodies = bodies
+        simulationPanel.virtualTime = virtualTime
+        simulationPanel.iteration = iteration
+        simulationPanel.boundary = bounds
+        repaint()
+
+
     override def updateScale(k: Double): Unit =
       simulationPanel.updateScale(k)
 
-class SimulationPanel(width: Int, height: Int) extends JPanel:
+class SimulationPanel(width: Int, height: Int) extends JPanel :
   var bodies: mutable.Seq[Body] = mutable.Seq.empty
   var virtualTime: Double = 0
   var iteration: Int = 0
-  var boundary: Boundary = Boundary(0,0,0,0)
+  var boundary: Boundary = Boundary(0, 0, 0, 0)
   var scale: Double = 1
   val dx: Int = width / 2 - 20
   val dy: Int = height / 2 - 20
@@ -73,9 +78,10 @@ class SimulationPanel(width: Int, height: Int) extends JPanel:
         + " - iteration: " + iteration + " (+ for zoom in, - for zoom out)", 2, 45)
 
   private def getYCoordinate(y: Double): Int = (dy - y * dy * scale).toInt
+
   private def getXCoordinate(x: Double): Int = (dx + x * dx * scale).toInt
 
-class ControlPanel(width: Int, height: Int, controller: ViewController) extends JPanel:
+class ControlPanel(width: Int, height: Int, controller: ViewController) extends JPanel :
   var buttonsList: List[JButton] = List.empty
 
   def setup(): Unit =
@@ -91,6 +97,7 @@ class ControlPanel(width: Int, height: Int, controller: ViewController) extends 
       add(b)
       b.addActionListener(controller.actionPerformed(_))
     })
+
 import Command.*
 
 class ViewController(actor: ActorRef[Command]):
@@ -108,7 +115,11 @@ class ViewController(actor: ActorRef[Command]):
   def startView(): Unit = view.start()
 
   def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit =
-    view.display(bodies, virtualTime, iteration, bounds)
+    SwingUtilities.invokeLater(() => {
+      view.display(bodies, virtualTime, iteration, bounds)
+    })
+
+
 
 object ViewActor:
 
@@ -118,11 +129,11 @@ object ViewActor:
     Behaviors.receive { (context, message) =>
       message match
         case Command.UpdateGUI(bodies, virtualTime, iteration, bounds) =>
-          println("UPDATE GUI SON OF A BITCH")
+          println("Update GUI")
           view.display(bodies, virtualTime, iteration, bounds)
           Behaviors.same
         case Command.StartGUI =>
-          println("START GUI SON OF A BITCH")
+          println("Start GUI")
           view = new ViewController(context.self)
           view.startView()
           Behaviors.same
