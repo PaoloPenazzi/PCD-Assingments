@@ -128,11 +128,9 @@ object ViewActor:
     Behaviors.receive { (context, message) =>
       message match
         case UpdateGUI(bodies, virtualTime, iteration, bounds) =>
-          // println("Update GUI")
           view.display(bodies, virtualTime, iteration, bounds)
           Behaviors.same
         case StartGUI() =>
-          //println("Start GUI")
           view = new ViewController(father)
           view.startView()
           Behaviors.same
