@@ -1,18 +1,35 @@
+import akka.actor.Kill
 import akka.actor.typed.ActorRef
 
 import scala.collection.mutable
 import scala.util.Random
 
-enum Command:
-  case StartSimulation
-  case StartGUI
-  case ResumeSimulation
-  case StopSimulation
-  case VelocityDoneResponse(result: Body)
-  case PositionDoneResponse(result: Body)
-  case ComputeVelocityRequest(bodies: mutable.Seq[Body], replyTo: ActorRef[Command.VelocityDoneResponse])
-  case ComputePositionRequest(boundary: Boundary, replyTo: ActorRef[Command.PositionDoneResponse])
-  case UpdateGUI(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary)
+
+trait Message
+
+case class StartSimulation() extends Message
+case class StopSimulation() extends Message
+case class StartGUI() extends Message
+case class ResumeSimulation() extends Message
+case class VelocityDoneResponse(result: Body) extends Message
+case class PositionDoneResponse(result: Body) extends Message 
+case class ComputeVelocityRequest(bodies: mutable.Seq[Body], replyTo: ActorRef[VelocityDoneResponse]) extends Message
+case class ComputePositionRequest(boundary: Boundary, replyTo: ActorRef[PositionDoneResponse]) extends Message
+case class UpdateGUI(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary) extends Message
+
+
+
+//enum Command:
+//  case StartSimulation
+//  case StartGUI
+//  case ResumeSimulation
+//  case StopSimulation
+//  case VelocityDoneResponse(result: Body)
+//  case PositionDoneResponse(result: Body)
+//  case ComputeVelocityRequest(bodies: mutable.Seq[Body], replyTo: ActorRef[Command.VelocityDoneResponse])
+//  case ComputePositionRequest(boundary: Boundary, replyTo: ActorRef[Command.PositionDoneResponse])
+//  case UpdateGUI(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary)
+
 
 case class Simulation(numBodies: Int,
                       var iteration: Int,

@@ -98,16 +98,15 @@ class ControlPanel(width: Int, height: Int, controller: ViewController) extends 
       b.addActionListener(controller.actionPerformed(_))
     })
 
-import Command.*
 
-class ViewController(actor: ActorRef[Command]):
+class ViewController(actor: ActorRef[Message]):
 
   val view: View = View(this)
 
   def actionPerformed(event: ActionEvent): Unit =
     event.getSource.asInstanceOf[JButton].getText match
-      case "PLAY" => actor ! Command.ResumeSimulation
-      case "PAUSE" => actor ! Command.StopSimulation
+      case "PLAY" => actor ! ResumeSimulation()
+      case "PAUSE" => actor ! StopSimulation()
       case "+" => view.updateScale(1.1)
       case "-" => view.updateScale(0.9)
       case _ => throw new IllegalStateException()
@@ -125,17 +124,18 @@ object ViewActor:
 
   var view: ViewController = null
 
-  def apply(): Behavior[Command] =
+  def apply(father: ActorRef[Message]): Behavior[Message] =
     Behaviors.receive { (context, message) =>
       message match
-        case Command.UpdateGUI(bodies, virtualTime, iteration, bounds) =>
-          println("Update GUI")
+        case UpdateGUI(bodies, virtualTime, iteration, bounds) =>
+          // println("Update GUI")
           view.display(bodies, virtualTime, iteration, bounds)
           Behaviors.same
-        case Command.StartGUI =>
-          println("Start GUI")
-          view = new ViewController(context.self)
+        case StartGUI() =>
+          //println("Start GUI")
+          view = new ViewController(father)
           view.startView()
           Behaviors.same
-        case _ => throw IllegalStateException()
+        case _ =>
+          throw IllegalStateException()
     }

@@ -10,7 +10,7 @@ import scala.util.Success
 
 @main
 def main(): Unit = {
-  val system: ActorSystem[Command] = ActorSystem(SimulationActor(Simulation(100, 5000,
+  val system: ActorSystem[Message] = ActorSystem(SimulationActor(Simulation(1000, 50000,
     8), true), name = "simulation")
-  system ! Command.StartSimulation
+  system ! StartSimulation()
 }
