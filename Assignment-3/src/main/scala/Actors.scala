@@ -7,6 +7,7 @@ import scala.util.Random
 
 object SimulationActor:
   var responseCounter = 0
+  var virtualTime = 0.0
   var actorsList: mutable.Seq[ActorRef[Message]] = mutable.Seq.empty
   var view: Option[ActorRef[Message]] = None
 
@@ -34,7 +35,8 @@ object SimulationActor:
           responseCounter = responseCounter + 1
           if (responseCounter == simulation.bodies.size)
             responseCounter = 0
-            view.get ! UpdateGUI(simulation.bodies, 0.001, simulation.iteration, simulation.boundary)
+            virtualTime = virtualTime + 0.001
+            view.get ! UpdateGUI(simulation.bodies, virtualTime, simulation.iteration, simulation.boundary)
             if (simulation.iteration != 0)
               simulation.iteration = simulation.iteration - 1
               actorsList.foreach(y => y ! ComputeVelocityRequest(simulation.bodies, context.self))

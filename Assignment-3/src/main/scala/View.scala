@@ -122,17 +122,17 @@ class ViewController(actor: ActorRef[Message]):
 
 object ViewActor:
 
-  var view: ViewController = null
+  var view: Option[ViewController] = None
 
   def apply(father: ActorRef[Message]): Behavior[Message] =
-    Behaviors.receive { (context, message) =>
+    Behaviors.receive { (_, message) =>
       message match
         case UpdateGUI(bodies, virtualTime, iteration, bounds) =>
-          view.display(bodies, virtualTime, iteration, bounds)
+          view.get.display(bodies, virtualTime, iteration, bounds)
           Behaviors.same
         case StartGUI() =>
-          view = new ViewController(father)
-          view.startView()
+          view = Some(new ViewController(father))
+          view.get.startView()
           Behaviors.same
         case _ =>
           throw IllegalStateException()
