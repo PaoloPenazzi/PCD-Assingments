@@ -1,3 +1,5 @@
+package it.unibo.pcd.assignment
+
 import akka.actor.Kill
 import akka.actor.typed.ActorRef
 import scala.collection.mutable

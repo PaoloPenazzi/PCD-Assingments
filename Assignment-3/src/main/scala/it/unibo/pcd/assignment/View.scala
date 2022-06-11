@@ -1,6 +1,7 @@
+package it.unibo.pcd.assignment
+
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.*
-
 import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
 import javax.swing.{JButton, JFrame, JPanel, SwingUtilities}
