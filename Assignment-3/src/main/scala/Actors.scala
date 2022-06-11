@@ -67,6 +67,9 @@ object SimulationActor:
               // println(stash.size)
               stash.unstashAll(SimulationActor(simulation, gui))
 
+            case StopSimulation() =>
+              Behaviors.same
+
             case other =>
               // println("YET IN PAUSE")
               stash.stash(other)
