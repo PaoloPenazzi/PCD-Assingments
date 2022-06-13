@@ -4,7 +4,7 @@ import it.unibo.pcd.assignment.Boundary
 
 import scala.util.Random
 
-class Sensor(id: Int):
+class Sensor(id: Int, var x: Int, var y:Int):
   var level: Option[Double] = None
 
   def generateValueOrFailure(): Unit =
@@ -32,8 +32,9 @@ object Zone:
 class CityGrid(width: Int, height: Int):
   var zones: List[Zone] = List.empty
   var bounds: Boundary = Boundary(0, 0, width, height)
+  var sensors: List[Sensor] = List.empty
 
-  def createZones(rows: Int, cols: Int): Unit =
+  def createCity(rows: Int, cols: Int): Unit =
     val sizeX: Double = width/cols
     val sizeY: Double = height/rows
     for
@@ -42,11 +43,16 @@ class CityGrid(width: Int, height: Int):
     do
       val newZone = Zone((y + x.toString), (sizeX * y).toInt, (sizeX * (y + 1)).toInt, (sizeY * x).toInt, (sizeY * (x + 1)).toInt)
       zones = zones :+ newZone
+    for
+      z <- zones
+    do
+      val sensor = new Sensor(0, Random.between(z.bounds.x0.toInt, z.bounds.x1.toInt), Random.between(z.bounds.y0.toInt, z.bounds.y1.toInt))
+      sensors = sensors :+ sensor
 
 @main
 def testGrid(): Unit =
   val city = new CityGrid(400, 400)
-  city.createZones(4, 4)
+  city.createCity(4, 4)
   city.zones.foreach(z => println(z.id + "  " + z.bounds))
   val view: View = View(500, 550)
   view.start()

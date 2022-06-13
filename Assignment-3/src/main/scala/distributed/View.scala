@@ -53,6 +53,9 @@ class CityPanel(width: Int, height: Int) extends JPanel:
           x.bounds.y0.toInt + 50,
           x.bounds.x1.toInt - x.bounds.x0.toInt,
           x.bounds.y1.toInt - x.bounds.y0.toInt)
+      for x <- city.get.sensors
+        do g2.drawOval(x.x + 50, x.y + 50, 5, 5)
+
 
   def setup(): Unit =
     setSize(width + 100, height + 100)
