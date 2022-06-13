@@ -15,7 +15,7 @@ object View:
     val cityPanel = new CityPanel(width, height)
 
     override def start(): Unit =
-      setSize(width + 150, height + 150)
+      setSize(width, height)
       setLayout(new BorderLayout())
       setTitle("Smart City Simulation")
       setLocationRelativeTo(null)
@@ -47,12 +47,12 @@ class CityPanel(width: Int, height: Int) extends JPanel:
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
       g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
       g2.clearRect(0, 0, 2 * width, 2 * height)
-      //val x0 = getXCoordinate(city.get.bounds.x0)
-      //val y0 = getYCoordinate(city.get.bounds.y0)
-      //val wd = getXCoordinate(city.get.bounds.x1) - x0
-      //val ht = y0 - getYCoordinate(city.get.bounds.y1)
-      // g2.drawRect(x0, y0 - ht, wd, ht)
       g2.drawRect(50, 50, city.get.bounds.x1.toInt, city.get.bounds.y1.toInt)
+      for x <- city.get.zones
+        do g2.drawRect(x.bounds.x0.toInt + 50,
+          x.bounds.y0.toInt + 50,
+          x.bounds.x1.toInt - x.bounds.x0.toInt,
+          x.bounds.y1.toInt - x.bounds.y0.toInt)
 
   def setup(): Unit =
     setSize(width + 100, height + 100)

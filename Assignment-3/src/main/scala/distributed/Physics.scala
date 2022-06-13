@@ -45,9 +45,9 @@ class CityGrid(width: Int, height: Int):
 
 @main
 def testGrid(): Unit =
-  val city = new CityGrid(600, 600)
+  val city = new CityGrid(400, 400)
   city.createZones(4, 4)
-  // city.zones.foreach(z => println(z.id + "  " + z.bounds))
-  val view: View = View(600, 600)
+  city.zones.foreach(z => println(z.id + "  " + z.bounds))
+  val view: View = View(500, 550)
   view.start()
   view.display(city)
