@@ -41,9 +41,7 @@ object View:
         simulationPanel.boundary = bounds
         repaint()
 
-
-    override def updateScale(k: Double): Unit =
-      simulationPanel.updateScale(k)
+    override def updateScale(k: Double): Unit = simulationPanel.updateScale(k)
 
 class SimulationPanel(width: Int, height: Int) extends JPanel :
   var bodies: mutable.Seq[Body] = mutable.Seq.empty
@@ -54,11 +52,10 @@ class SimulationPanel(width: Int, height: Int) extends JPanel :
   val dx: Int = width / 2 - 20
   val dy: Int = height / 2 - 20
 
-  def setup(): Unit =
-    setSize(width, height)
-
-  def updateScale(k: Double): Unit =
-    scale = scale * k
+  def setup(): Unit = setSize(width, height)
+  def updateScale(k: Double): Unit = scale = scale * k
+  private def getYCoordinate(y: Double): Int = (dy - y * dy * scale).toInt
+  private def getXCoordinate(x: Double): Int = (dx + x * dx * scale).toInt
 
   override def paint(g: Graphics): Unit =
     if (bodies.nonEmpty)
@@ -78,10 +75,6 @@ class SimulationPanel(width: Int, height: Int) extends JPanel :
       g2.drawString("Bodies: " + bodies.size + " - virtualTime: " + time
         + " - iteration: " + iteration + " (+ for zoom in, - for zoom out)", 2, 45)
 
-  private def getYCoordinate(y: Double): Int = (dy - y * dy * scale).toInt
-
-  private def getXCoordinate(x: Double): Int = (dx + x * dx * scale).toInt
-
 class ControlPanel(width: Int, height: Int, controller: ViewController) extends JPanel :
   var buttonsList: List[JButton] = List.empty
 
@@ -99,9 +92,7 @@ class ControlPanel(width: Int, height: Int, controller: ViewController) extends 
       b.addActionListener(controller.actionPerformed(_))
     })
 
-
 class ViewController(actor: ActorRef[Message]):
-
   val view: View = View(this)
 
   def actionPerformed(event: ActionEvent): Unit =
@@ -119,10 +110,7 @@ class ViewController(actor: ActorRef[Message]):
       view.display(bodies, virtualTime, iteration, bounds)
     })
 
-
-
 object ViewActor:
-
   var view: Option[ViewController] = None
 
   def apply(father: ActorRef[Message]): Behavior[Message] =
