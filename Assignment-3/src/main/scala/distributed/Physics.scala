@@ -31,7 +31,7 @@ object Zone:
 
 class CityGrid(width: Int, height: Int):
   var zones: List[Zone] = List.empty
-  var bounds: Boundary = Boundary(0, width, 0, height)
+  var bounds: Boundary = Boundary(-width, -width, -height, -height)
 
   def createZones(rows: Int, cols: Int): Unit =
     val sizeX: Double = width/cols
@@ -47,4 +47,7 @@ class CityGrid(width: Int, height: Int):
 def testGrid(): Unit =
   val city = new CityGrid(200, 200)
   city.createZones(4, 4)
-  city.zones.foreach(z => println(z.id + "  " + z.bounds))
+  // city.zones.foreach(z => println(z.id + "  " + z.bounds))
+  val view: View = View(200, 200)
+  view.start()
+  view.display(city)

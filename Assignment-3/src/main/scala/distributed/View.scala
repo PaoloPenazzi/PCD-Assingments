@@ -18,6 +18,9 @@ object View:
       setLayout(new BorderLayout())
       setTitle("Smart City Simulation")
       setResizable(true)
+      cityPanel.setup()
+      add(cityPanel)
+      setVisible(true)
 
     override def display(city: CityGrid): Unit =
       cityPanel.city = Option(city)
@@ -47,4 +50,5 @@ class CityPanel(width: Int, height: Int) extends JPanel:
 
   def setup(): Unit =
     setSize(width, height)
+    setVisible(true)
 
