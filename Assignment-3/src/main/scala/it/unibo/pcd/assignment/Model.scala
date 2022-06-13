@@ -15,7 +15,7 @@ case class ResumeSimulation() extends Message
 case class VelocityDoneResponse(result: Body) extends Message
 case class PositionDoneResponse(result: Body) extends Message
 case class ComputeVelocityRequest(bodies: mutable.Seq[Body], replyTo: ActorRef[VelocityDoneResponse]) extends Message
-case class ComputePositionRequest(boundary: Boundary, replyTo: ActorRef[PositionDoneResponse]) extends Message
+case class ComputePositionRequest(bounds: Boundary, replyTo: ActorRef[PositionDoneResponse]) extends Message
 case class UpdateGUI(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary) extends Message
 
 case class Simulation(numBodies: Int,
@@ -65,11 +65,9 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
   val frictionConst: Double = 1
 
   def equals(obj: Body): Boolean = id == obj.id
-
-  def updatePosition(deltaTime: Double): Unit =
-    position = position.sum(velocity.scalarMul(deltaTime))
-
-  def updateVelocity(acceleration: Velocity2d, deltaTime: Double): Unit =
+  def updatePosition(deltaTime: Double): Unit = position = position.sum(velocity.scalarMul(deltaTime))
+  
+  def updateVelocity(acceleration: Velocity2d, deltaTime: Double): Unit = 
     velocity = velocity.sum(acceleration.scalarMul(deltaTime))
 
   def getDistanceFrom(body: Body): Double =
@@ -87,7 +85,6 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
   def checkAndSolveBoundaryCollision(bounds: Boundary): Unit =
     val x: Double = position.x
     val y: Double = position.y
-
     x match
       case x if x > bounds.x1 => 
         position = Position2d(bounds.x1, position.y)
@@ -96,7 +93,6 @@ case class Body(id: Int, var position: Position2d, var velocity: Velocity2d, mas
         position = Position2d(bounds.x0, position.y)
         velocity = Velocity2d(-velocity.x, velocity.y)
       case _ =>
-
     y match
       case y if y > bounds.y1 =>
         position = Position2d(position.x, bounds.y1)

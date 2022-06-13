@@ -77,8 +77,8 @@ object BodyActor:
           body.computeBodyVelocity(bodies)
           ref ! VelocityDoneResponse(body)
           Behaviors.same
-        case ComputePositionRequest(boundary, ref) =>
-          body.computeBodyPosition(boundary)
+        case ComputePositionRequest(bounds, ref) =>
+          body.computeBodyPosition(bounds)
           ref ! PositionDoneResponse(body)
           Behaviors.same
         case _ => throw new IllegalStateException()
