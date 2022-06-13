@@ -38,7 +38,7 @@ object SimulationActor:
           if (responseCounter == simulation.bodies.size)
             responseCounter = 0
             virtualTime = virtualTime + 0.001
-            view.get ! UpdateGUI(simulation.bodies, virtualTime, simulation.iteration, simulation.boundary)
+            if view.isDefined then view.get ! UpdateGUI(simulation.bodies, virtualTime, simulation.iteration, simulation.boundary)
             if (simulation.iteration != 0)
               simulation.iteration = simulation.iteration - 1
               actorsList.foreach(y => y ! ComputeVelocityRequest(simulation.bodies, context.self))
