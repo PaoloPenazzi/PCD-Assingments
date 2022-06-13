@@ -12,6 +12,7 @@ object SimulationActor:
   var virtualTime = 0.0
   var actorsList: mutable.Seq[ActorRef[Message]] = mutable.Seq.empty
   var view: Option[ActorRef[Message]] = None
+  // var initialTime: Long = 0
 
   def apply(simulation: Simulation, gui: Boolean): Behavior[Message] =
     Behaviors.receive { (context, msg) =>
@@ -19,6 +20,7 @@ object SimulationActor:
         case StopSimulation() =>
           onPause(simulation, gui)
         case StartSimulation() =>
+          // initialTime = System.currentTimeMillis()
           if gui then {view = Some(context.spawn(ViewActor(context.self), "view-actor")); view.get ! StartGUI()}
           for (n <- 0 until simulation.numBodies)
             val newActor = context.spawn(BodyActor(simulation.bodies(n)), "actor-number-"+ n.toString)
@@ -43,7 +45,10 @@ object SimulationActor:
               simulation.iteration = simulation.iteration - 1
               actorsList.foreach(y => y ! ComputeVelocityRequest(simulation.bodies, context.self))
               Behaviors.same
-            else Behaviors.stopped
+            else
+              // val finalTime: Long = System.currentTimeMillis()
+              // println("Tempo: " + (finalTime - initialTime) + " ms")
+              Behaviors.stopped
           else Behaviors.same
         case _ => Behaviors.same
     }
