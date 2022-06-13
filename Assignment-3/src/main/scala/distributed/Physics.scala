@@ -31,6 +31,7 @@ object Zone:
 
 class CityGrid(width: Int, height: Int):
   var zones: List[Zone] = List.empty
+  var bounds: Boundary = Boundary(0, width, 0, height)
 
   def createZones(rows: Int, cols: Int): Unit =
     val sizeX: Double = width/cols
