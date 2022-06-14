@@ -1,7 +1,7 @@
 package distributed
 
 import java.awt.event.{WindowAdapter, WindowEvent}
-import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
+import java.awt.{BorderLayout, Color, Graphics, Graphics2D, RenderingHints}
 import javax.swing.{JFrame, JPanel}
 
 trait View:
@@ -34,12 +34,7 @@ object View:
 class CityPanel(width: Int, height: Int) extends JPanel:
   var iteration: Int = 0
   var city: Option[CityGrid] = None
-  val dx: Int = width / 2 - 20
-  val dy: Int = height / 2 - 20
-  var scale: Double = 1
 
-  //private def getYCoordinate(y: Double): Int = (dy - y * dy * scale).toInt
-  //private def getXCoordinate(x: Double): Int = (dx + x * dx * scale).toInt
   override def paint(g: Graphics): Unit =
     if city.isDefined
     then
@@ -54,7 +49,9 @@ class CityPanel(width: Int, height: Int) extends JPanel:
           x.bounds.x1.toInt - x.bounds.x0.toInt,
           x.bounds.y1.toInt - x.bounds.y0.toInt)
       for x <- city.get.sensors
-        do g2.drawOval(x.x + 50, x.y + 50, 5, 5)
+        do
+          g2.setColor(Color.red)
+          g2.drawOval(x.x + 50, x.y + 50, 8, 8)
 
 
   def setup(): Unit =
