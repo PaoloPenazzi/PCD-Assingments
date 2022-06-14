@@ -1,6 +1,5 @@
 package it.unibo.pcd.assignment
 
-import akka.actor.Kill
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, SupervisorStrategy, Terminated}
 import akka.actor.typed.scaladsl.Behaviors
 

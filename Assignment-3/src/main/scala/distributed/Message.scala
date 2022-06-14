@@ -1,0 +1,3 @@
+package distributed
+
+trait Message 
