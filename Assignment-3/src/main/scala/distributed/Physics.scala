@@ -7,7 +7,6 @@ import scala.util.Random
 trait Zone:
   def bounds: Boundary
   def id: String
-  def station: Station
   def sensors: List[Sensor]
 
 object Zone:
@@ -16,7 +15,6 @@ object Zone:
   private class ZoneImpl(override val id: String, fromX: Int, toX: Int, fromY: Int, toY: Int) extends Zone:
     override def bounds: Boundary = Boundary(fromX, fromY, toX, toY)
     override def sensors: List[Sensor] = List.empty
-    override def station: Station = new Station(id)
 
 class CityGrid(width: Int, height: Int):
   var zones: List[Zone] = List.empty
@@ -32,11 +30,6 @@ class CityGrid(width: Int, height: Int):
     do
       val newZone = Zone((y + x.toString), (sizeX * y).toInt, (sizeX * (y + 1)).toInt, (sizeY * x).toInt, (sizeY * (x + 1)).toInt)
       zones = zones :+ newZone
-    for
-      z <- zones
-    do
-      val sensor = new Sensor(0, Random.between(z.bounds.x0.toInt, z.bounds.x1.toInt), Random.between(z.bounds.y0.toInt, z.bounds.y1.toInt))
-      sensors = sensors :+ sensor
 
 @main
 def testGrid(): Unit =
