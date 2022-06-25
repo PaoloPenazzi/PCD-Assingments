@@ -30,11 +30,11 @@ object FireStation :
     case Normal
 
   // (1) a ServiceKey is a unique identifier for this actor
-  val fireStationServiceKey = ServiceKey[Message]("fireStationTODO")
+  val fireStationServiceKey = ServiceKey[FireStationCommand]("fireStationTODO")
 
   val status: Status = Status.Normal
 
-  def apply(): Behavior[Message] = Behaviors.setup( ctx => {
+  def apply(): Behavior[FireStationCommand] = Behaviors.setup( ctx => {
     // operazioni preliminari per quando viene istanziato l'attore caserma
     // vanno fatte qui sotto
     // la firestation si deve registrare per una certa zona al receptionist
@@ -56,7 +56,7 @@ object FireStation :
 
   // MACRO BEHA: BUSY
   // La stazione qui è occupata e sta gestendo una assistenza
-  def busyBehavior: Behavior[Message] = Behaviors.receive((ctx, msg) => {
+  def busyBehavior: Behavior[FireStationCommand] = Behaviors.receive((ctx, msg) => {
     msg match
       case EndAssistance() => ???
       case other => ???
