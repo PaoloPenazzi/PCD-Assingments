@@ -41,6 +41,8 @@ object FireStation :
     // (2) every actor that wants to be discoverable must register itself
     // with the Receptionist by sending the Receptionist as Receptionist
     // message, including your ServiceKey
+    // nel setup, quindi prima di istanziare l'attore con le sue behavior ai messaggi, dico al recepionist che ora
+    // gli altri nodi mi possono trovare per quel servizio Service (di Firestation) a questo riferimento (mio contesto)
     ctx.system.receptionist ! Receptionist.Register(fireStationServiceKey, ctx.self)
 
     Behaviors.receiveMessage( msg => {
