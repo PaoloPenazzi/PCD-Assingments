@@ -1,25 +1,21 @@
 package distributed
 
-import it.unibo.pcd.assignment.Boundary
-
 import scala.util.Random
+import it.unibo.pcd.assignment.Boundary
 
 trait Zone:
   def bounds: Boundary
   def id: String
-  def sensors: List[Sensor]
 
 object Zone:
   def apply(id: String, fromX: Int, toX: Int, fromY: Int, toY: Int): Zone = new ZoneImpl(id, fromX, toX, fromY, toY)
 
   private class ZoneImpl(override val id: String, fromX: Int, toX: Int, fromY: Int, toY: Int) extends Zone:
     override def bounds: Boundary = Boundary(fromX, fromY, toX, toY)
-    override def sensors: List[Sensor] = List.empty
 
 class CityGrid(width: Int, height: Int):
   var zones: List[Zone] = List.empty
   var bounds: Boundary = Boundary(0, 0, width, height)
-  var sensors: List[Sensor] = List.empty
 
   def createCityGrid(rows: Int, cols: Int): Unit =
     val sizeX: Double = width/cols

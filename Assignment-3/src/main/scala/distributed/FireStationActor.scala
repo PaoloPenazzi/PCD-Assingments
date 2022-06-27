@@ -23,7 +23,7 @@ case class GetInfo() extends FireStationCommand
 // messaggio che gli arriva dai sensori nel caso di allarme
 case class sensorInAlarm() extends FireStationCommand
 
-object FireStation :
+object FireStationActort :
 
   enum Status:
     case Busy
