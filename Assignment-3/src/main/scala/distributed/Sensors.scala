@@ -20,34 +20,37 @@ object SensorActor:
   def sensorRead: Double = Random.between(0.0, 10.0)
 
   def apply(position: (Int, Int),
-            id: String): Behavior[SensorCommand|Receptionist.Listing] =
+            id: String,
+            zone: String): Behavior[SensorCommand|Receptionist.Listing] =
     Behaviors.setup[SensorCommand | Receptionist.Listing]( ctx => {
-      ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("fireStationTODO"), ctx.self)
+      ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("Station" + zone), ctx.self)
       var fireStation: Option[ActorRef[FireStationCommand]] = None
       Behaviors.withTimers( timers => {
         Behaviors.receiveMessage(msg => {
           msg match
             case msg:Receptionist.Listing =>
               println(s"New Firestation! $msg")
-              fireStation = Some(msg.serviceInstances(FireStationActor.fireStationServiceKey).head)
+              fireStation = Some(msg.serviceInstances(ServiceKey[FireStationCommand]("Station" + zone)).head)
               Behaviors.same
-
             case Update() =>
-              println("Update sensor")
               sensorRead match
-                // se update > 7 --> errore
-                case _ > 7 => ???
-                // recepionist allarme a chi gestisce il messaggio allarme
-                // se update < 7 --> tutto regolare
-                case _ =>
-                  println("Tutto regolare Update")
+                case _ > 7 =>
+                  println(id + ": ALARM")
+                  // TODO avvisare gli altri sensori
+                  fireStation ! Alarm()
+                  Behaviors.same
+                case _ <= 7  =>
+                  println(id + ": OK")
                   timers.startSingleTimer(Update(), 5000.millis)
                   Behaviors.same
-            // caso di errore futuro da gestire...
-            case other => Behaviors.stopped
+                case _ =>
+                  Thread.sleep(15000)
+                  Behaviors.same
+            case _ => 
+              throw new IllegalStateException()
+              Behaviors.same
         })
       })
-
     })
 
 

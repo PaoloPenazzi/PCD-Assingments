@@ -13,32 +13,42 @@ case class EndAssistance() extends FireStationCommand
 case class GetInfo() extends FireStationCommand
 case class sensorInAlarm() extends FireStationCommand
 
-object FireStationActor :
-
+object FireStationActor:
   enum Status:
     case Busy
     case Normal
 
-  val fireStationServiceKey = ServiceKey[FireStationCommand]("fireStationTODO")
-
   val status: Status = Status.Normal
 
-  def apply(): Behavior[FireStationCommand] = Behaviors.setup( ctx => {
-    ctx.system.receptionist ! Receptionist.Register(fireStationServiceKey, ctx.self)
-
-    Behaviors.receiveMessage( msg => {
-      msg match
-        case GetInfo() => ???
-        case Alarm() => ???
-        case StartAssistance() => ???
-        case other => ???
+  def apply(position: (Int, Int),
+            id: String,
+            zone: String): Behavior[FireStationCommand] = Behaviors.setup(ctx => {
+    ctx.system.receptionist ! Receptionist.Register(ServiceKey[FireStationCommand](id), ctx.self)
+    Behaviors.withTimers(timers => {
+      Behaviors.receiveMessage(msg => {
+        msg match
+          case GetInfo() => ???
+          case Alarm() =>
+            println(id + ": Alarm Received")
+            timers.startSingleTimer(StartAssistance(), 3000.millis)
+            Behaviors.same
+          case StartAssistance() =>
+            println(id + ": Assistance Started")
+            status = Status.Busy
+            // TODO notify GUI
+            busyBehavior
+          case _ => ???
+      })
     })
   })
 
   def busyBehavior: Behavior[FireStationCommand] = Behaviors.receive((ctx, msg) => {
     msg match
-      case EndAssistance() => ???
-      case other => ???
+      case EndAssistance() =>
+        //println(id + ": Assistance Started")
+        status = Status.Busy
+        // TODO finish behavior
+      case _ => ???
   })
 
 

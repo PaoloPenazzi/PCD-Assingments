@@ -16,6 +16,8 @@ object Zone:
 class CityGrid(width: Int, height: Int):
   var zones: List[Zone] = List.empty
   var bounds: Boundary = Boundary(0, 0, width, height)
+  var sensors: List[(Int,Int)] = List.empty
+  var fireStations: List[(Int,Int)] = List.empty
 
   def createCityGrid(rows: Int, cols: Int): Unit =
     val sizeX: Double = width/cols
