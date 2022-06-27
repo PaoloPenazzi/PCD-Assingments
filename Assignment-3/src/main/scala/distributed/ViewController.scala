@@ -17,15 +17,15 @@ object ViewActor:
   var city: Option[CityGrid] = None
 
   def apply(): Behavior[Message] =
-    Behaviors.setup[ViewCommand | Receptionist.Listing](ctx => {
+    Behaviors.setup[ViewCommand | Receptionist.Listing] (ctx => {
       Behaviors.receiveMessage { message =>
         message match
-          case message: Receptionist.Listing =>
-            message.allServiceInstances(_).foreach(z => z ! GetInfo(ctx))
+          case message: Receptionist.Listing => ???
+            // message.allServiceInstances().foreach(z => z ! GetInfo(ctx))
           case StartGUI(cityGrid) =>
             view = Some(View(cityGrid.width + 100, cityGrid.height + 100))
             city = Some(cityGrid)
-            view.display(city.get)
+            view.get.display(city.get)
             for z <- city.get.zones
               do
                 ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("Station" + z.id), ctx.self)
@@ -36,21 +36,20 @@ object ViewActor:
             then
               Behaviors.same
             else
-              city.get.sensors = city.get.sensors :: (position)
-              view.display(city.get)
+              city.get.sensors = city.get.sensors.::(position)
+              view.get.display(city.get)
               Behaviors.same
           case StationInfo(position) =>
             if city.get.fireStations.contains(position)
             then
               Behaviors.same
             else
-              city.get.fireStations = city.get.fireStations :: (position)
-              view.display(city.get)
+              city.get.fireStations = city.get.fireStations.::(position)
+              view.get.display(city.get)
               Behaviors.same
           case StartAssistance() =>
             Behaviors.same
           case Alarm() =>
-
             Behaviors.same
           case _ =>
             throw IllegalStateException()
