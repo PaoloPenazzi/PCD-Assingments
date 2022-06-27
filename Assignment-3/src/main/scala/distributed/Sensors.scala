@@ -18,7 +18,8 @@ case class getInfo(ctx: ActorRef[Message]) extends SensorCommand
 
 
 object SensorActor:
-  def sensorRead: Double = Random.between(0.0, 10.0)
+  def sensorRead: Double = Random.between(0.0, 10.5)
+  var viewActor: Option[ActorRef[Message]] = None
 
   def apply(position: (Int, Int),
             id: String,
@@ -30,27 +31,29 @@ object SensorActor:
         Behaviors.receiveMessage(msg => {
           msg match
             case msg:Receptionist.Listing =>
-              println(s"New Firestation! $msg")
               fireStation = Some(msg.serviceInstances(ServiceKey[FireStationCommand]("Station" + zone)).head)
               Behaviors.same
             case Update() =>
-              sensorRead match
-                case _ > 7 =>
-                  println(id + ": ALARM")
-                  // TODO avvisare gli altri sensori
-                  fireStation ! Alarm()
-                  Behaviors.same
-                case _ <= 7  =>
+              val level: Double = sensorRead
+              level match
+                case level if level <= 7 =>
                   println(id + ": OK")
                   timers.startSingleTimer(Update(), 5000.millis)
+                  Behaviors.same
+                case level if level <= 10 =>
+                  println(id + ": ALARM")
+                  // TODO avvisare gli altri sensori
+                  fireStation.get ! Alarm()
+                  viewActor.get ! Alarm()
                   Behaviors.same
                 case _ =>
                   Thread.sleep(15000)
                   Behaviors.same
-            case getInfo(ctx) => 
+            case getInfo(ctx) =>
+              viewActor = Some(ctx)
               ctx ! SensorInfo(position)
               Behaviors.same
-            case _ => 
+            case _ =>
               throw new IllegalStateException()
               Behaviors.same
         })

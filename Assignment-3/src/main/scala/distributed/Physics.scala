@@ -13,12 +13,12 @@ object Zone:
   private class ZoneImpl(override val id: String, fromX: Int, toX: Int, fromY: Int, toY: Int) extends Zone:
     override def bounds: Boundary = Boundary(fromX, fromY, toX, toY)
 
-class CityGrid(width: Int, height: Int):
+class CityGrid(var width: Int, var height: Int):
   var zones: List[Zone] = List.empty
   var bounds: Boundary = Boundary(0, 0, width, height)
   var sensors: List[(Int,Int)] = List.empty
   var fireStations: List[(Int,Int)] = List.empty
-  
+
   def createCityGrid(rows: Int, cols: Int): Unit =
     val sizeX: Double = width/cols
     val sizeY: Double = height/rows
