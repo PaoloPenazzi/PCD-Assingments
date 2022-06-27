@@ -27,7 +27,10 @@ object FireStationActor:
     Behaviors.withTimers(timers => {
       Behaviors.receiveMessage(msg => {
         msg match
-          case GetInfo() => ???
+          case GetInfo() =>
+          case getInfo(ctx) =>
+            ctx ! StationInfo(position)
+            Behaviors.same
           case Alarm() =>
             println(id + ": Alarm Received")
             timers.startSingleTimer(StartAssistance(), 3000.millis)

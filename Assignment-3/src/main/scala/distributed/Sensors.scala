@@ -14,6 +14,7 @@ import concurrent.duration.DurationInt
 
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
+case class getInfo(ctx: ActorRef[Message]) extends SensorCommand
 
 
 object SensorActor:
@@ -46,6 +47,9 @@ object SensorActor:
                 case _ =>
                   Thread.sleep(15000)
                   Behaviors.same
+            case getInfo(ctx) => 
+              ctx ! SensorInfo(position)
+              Behaviors.same
             case _ => 
               throw new IllegalStateException()
               Behaviors.same

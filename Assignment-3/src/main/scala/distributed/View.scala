@@ -51,7 +51,11 @@ class CityPanel(width: Int, height: Int) extends JPanel:
       for x <- city.get.sensors
         do
           g2.setColor(Color.red)
-          g2.drawOval(x.x + 50, x.y + 50, 8, 8)
+          g2.drawOval(x._1 + 50, x._2 + 50, 8, 8)
+      for x <- city.get.fireStations
+        do
+          g2.setColor(Color.BLUE)
+          g2.drawRect(x._1 + 50, x._2 + 50, 8, 8)
 
 
   def setup(): Unit =
