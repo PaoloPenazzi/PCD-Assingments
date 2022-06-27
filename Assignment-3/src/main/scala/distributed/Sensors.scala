@@ -12,8 +12,6 @@ import akka.actor.typed.receptionist.ServiceKey
 import scala.util.Random
 import concurrent.duration.DurationInt
 
-// al momento con un sensore per zona questo invia solo messaggi all'esterno sul suo livello
-// in futuro (con 3 sensori) questo dovrà inviare messaggi di sincronizzazione anche al resto dei sensori
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
 
@@ -22,6 +20,7 @@ object SensorActor:
   def sensorRead: Double = Random.between(0.0, 10.0)
 
   def apply(position: (Int, Int),
+            id: String,
             fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand|Receptionist.Listing] =
     Behaviors.setup[SensorCommand | Receptionist.Listing]( ctx => {
       ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("fireStationTODO"), ctx.self)
@@ -30,7 +29,7 @@ object SensorActor:
           msg match
             case msg:Receptionist.Listing =>
               println(s"New Firestation! $msg")
-              fireStation = Some(msg.serviceInstances(FireStation.fireStationServiceKey).head)
+              fireStation = Some(msg.serviceInstances(FireStationActor.fireStationServiceKey).head)
 
             case Update() =>
               println("Update sensor")
@@ -49,12 +48,5 @@ object SensorActor:
       })
 
     })
-
-@main
-def createSensors(): Unit =
-  val cityGrid = CityGrid(300, 300)
-  cityGrid.createCityGrid(3, 3)
-  cityGrid.zones.foreach(z => SensorActor(new Sensor(Random.between(z.bounds.x0.toInt, z.bounds.x1.toInt),
-    Random.between(z.bounds.y0.toInt, z.bounds.y1.toInt))))
 
 
