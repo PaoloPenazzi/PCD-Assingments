@@ -20,16 +20,17 @@ object SensorActor:
   def sensorRead: Double = Random.between(0.0, 10.0)
 
   def apply(position: (Int, Int),
-            id: String,
-            fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand|Receptionist.Listing] =
+            id: String): Behavior[SensorCommand|Receptionist.Listing] =
     Behaviors.setup[SensorCommand | Receptionist.Listing]( ctx => {
       ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("fireStationTODO"), ctx.self)
+      var fireStation: Option[ActorRef[FireStationCommand]] = None
       Behaviors.withTimers( timers => {
         Behaviors.receiveMessage(msg => {
           msg match
             case msg:Receptionist.Listing =>
               println(s"New Firestation! $msg")
               fireStation = Some(msg.serviceInstances(FireStationActor.fireStationServiceKey).head)
+              Behaviors.same
 
             case Update() =>
               println("Update sensor")
