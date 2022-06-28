@@ -17,22 +17,21 @@ sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
 case class GetInfoSensor(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
-
 object SensorActor:
   def sensorRead: Double = Random.between(0.0, 10.5)
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
 
   def apply(position: (Int, Int),
             id: String,
-            zone: String): Behavior[SensorCommand|Receptionist.Listing] =
-    Behaviors.setup[SensorCommand | Receptionist.Listing]( ctx => {
+            zone: String): Behavior[SensorCommand | Receptionist.Listing] =
+    Behaviors.setup[SensorCommand | Receptionist.Listing](ctx => {
       ctx.system.receptionist ! Receptionist.Register(ServiceKey[SensorCommand](id), ctx.self)
       ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[Message]("Station" + zone), ctx.self)
       var fireStation: Option[ActorRef[Message]] = None
-      Behaviors.withTimers( timers => {
+      Behaviors.withTimers(timers => {
         Behaviors.receiveMessage(msg => {
           msg match
-            case msg:Receptionist.Listing =>
+            case msg: Receptionist.Listing =>
               if msg.serviceInstances(ServiceKey[Message]("Station" + zone)).nonEmpty then
                 fireStation = Some(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).head)
                 Behaviors.same
@@ -54,14 +53,10 @@ object SensorActor:
                   Thread.sleep(15000)
                   Behaviors.same
             case GetInfoSensor(ctx) =>
+              println("ECCOLOOOO")
               viewActor = Some(ctx)
               ctx ! SensorInfo(position)
-              Behaviors.same
-            case _ =>
-              throw new IllegalStateException()
               Behaviors.same
         })
       })
     })
-
-

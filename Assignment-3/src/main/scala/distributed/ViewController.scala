@@ -26,9 +26,11 @@ object ViewActor:
             val id = message.getKey.id
             id match
               case id if id.contains("Sensor") =>
+                println(message)
                 message.serviceInstances(ServiceKey[SensorCommand](id)).toList.foreach(z => z ! GetInfoSensor(ctx.self))
                 Behaviors.same
               case id if id.contains("Station") =>
+                println(message)
                 message.serviceInstances(ServiceKey[FireStationCommand](id)).toList.foreach(z => z ! GetInfoStation(ctx.self))
                 Behaviors.same
           case StartGUI(cityGrid) =>
@@ -38,8 +40,8 @@ object ViewActor:
             view.get.display(city.get)
             for z <- city.get.zones
               do
-                ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("Station" + z.id), ctx.self)
                 ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[SensorCommand]("Sensor" + z.id), ctx.self)
+                ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("Station" + z.id), ctx.self)
             Behaviors.same
           case SensorInfo(position) =>
             if city.get.sensors.contains(position)

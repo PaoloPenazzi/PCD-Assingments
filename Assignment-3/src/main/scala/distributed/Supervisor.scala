@@ -18,10 +18,10 @@ object Supervisor :
     if cluster.selfMember.hasRole("SENSOR")
     then
       println(id + " spawned")
-      ctx.spawn(SensorActor(position, id, zone), "Sensor" + id)
+      ctx.spawn(SensorActor(position, id, zone), id)
     else
       println(id + " spawned")
-      ctx.spawn(FireStationActor(position, id), "Station" + id)
+      ctx.spawn(FireStationActor(position, id), id)
     Behaviors.empty
   }
 
