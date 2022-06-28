@@ -24,6 +24,7 @@ object FireStationActor:
 
   def apply(position: (Int, Int),
             id: String): Behavior[FireStationCommand] = Behaviors.setup(ctx => {
+    println(id)
     ctx.system.receptionist ! Receptionist.Register(ServiceKey[FireStationCommand](id), ctx.self)
     standardBehavior(position, id)
   })

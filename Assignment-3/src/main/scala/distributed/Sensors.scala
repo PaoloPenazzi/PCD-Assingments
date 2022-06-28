@@ -32,8 +32,13 @@ object SensorActor:
         Behaviors.receiveMessage(msg => {
           msg match
             case msg:Receptionist.Listing =>
-              fireStation = Some(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).head)
-              Behaviors.same
+              println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + msg)
+              println("ZOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONEEEE" + zone)
+              println(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).size)
+              if msg.serviceInstances(ServiceKey[Message]("Station" + zone)).nonEmpty then
+                fireStation = Some(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).head)
+                Behaviors.same
+              else Behaviors.same
             case Update() =>
               val level: Double = sensorRead
               level match
