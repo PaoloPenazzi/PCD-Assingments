@@ -8,13 +8,17 @@ import distributed.ViewCommand
 import concurrent.duration.DurationInt
 
 sealed trait FireStationCommand extends Message
-case class Alarm(id: String) extends FireStationCommand
+case class Alarm(zone: String) extends FireStationCommand
 case class StartAssistance() extends FireStationCommand
 case class EndAssistance() extends FireStationCommand
+case class MyZoneRequest(replyTo: ActorRef[SensorCommand], zone: String) extends FireStationCommand
 case class GetInfoStation(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends FireStationCommand
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
+
+  val fireStationKey: ServiceKey[FireStationCommand] = ServiceKey[FireStationCommand]("fireStation")
+
   enum Status:
     case Busy
     case Normal
@@ -22,41 +26,51 @@ object FireStationActor:
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
   var status: Status = Status.Normal
 
-  def apply(position: (Int, Int), id: String): Behavior[FireStationCommand] = 
+  def apply(position: (Int, Int), zone: String): Behavior[FireStationCommand] =
     Behaviors.setup(ctx => {
-      ctx.system.receptionist ! Receptionist.Register(ServiceKey[FireStationCommand](id), ctx.self)
-      standardBehavior(position, id)
+      ctx.system.receptionist ! Receptionist.Register(fireStationKey, ctx.self)
+      standardBehavior(position, zone, ctx)
   })
 
-  def standardBehavior(position: (Int, Int), id: String): Behavior[FireStationCommand] =
+  def standardBehavior(position: (Int, Int), zone: String, ctx: ActorContext[FireStationCommand]): Behavior[FireStationCommand] =
     Behaviors.withTimers(timers => {
       Behaviors.receiveMessage(msg => {
         msg match
+
+          case MyZoneRequest(reply, zn) =>
+            if zone == zn then
+              reply ! MyZoneResponse(ctx.self)
+            Behaviors.same
+
           case GetInfoStation(ctx) =>
             viewActor = Some(ctx)
             ctx ! StationInfo(position)
             Behaviors.same
+
           case Alarm(zoneId) =>
-            if zoneId.equals(id)
+            if zoneId.equals(zone)
             then
-              println(id + ": Alarm Received")
+              println(zone + ": Alarm Received")
               timers.startSingleTimer(StartAssistance(), 3000.millis)
             Behaviors.same
+
           case StartAssistance() =>
-            println(id + ": Assistance Started")
+            println(zone + ": Assistance Started")
             status = Status.Busy
             viewActor.get ! StationOccupied(position)
-            busyBehavior(position, id)
+            busyBehavior(position, zone, ctx)
+
           case _ => throw IllegalStateException()
       })
   })
 
   def busyBehavior(position: (Int, Int),
-                   id: String): Behavior[FireStationCommand] = Behaviors.receive((ctx, msg) => {
+                   zone: String,
+                   ctx: ActorContext[FireStationCommand]): Behavior[FireStationCommand] = Behaviors.receive((ctx, msg) => {
     msg match
       case EndAssistance() =>
         status = Status.Normal
-        standardBehavior(position, id)
+        standardBehavior(position, zone, ctx)
       case _ => throw IllegalStateException()
   })
 

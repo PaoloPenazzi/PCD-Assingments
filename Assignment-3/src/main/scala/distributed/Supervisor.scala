@@ -11,15 +11,14 @@ import scala.util.Random
 
 object Supervisor :
 
-  def apply(id: String,
-            zone: String,
+  def apply(zone: String,
             position: (Int, Int)): Behavior[Nothing] = Behaviors.setup { ctx =>
     val cluster = Cluster(ctx.system)
     if cluster.selfMember.hasRole("SENSOR")
     then
-      ctx.spawn(SensorActor(position, id, zone), id)
+      ctx.spawnAnonymous(SensorActor(position, zone))
     else
-      ctx.spawn(FireStationActor(position, id), id)
+      ctx.spawnAnonymous(FireStationActor(position, zone))
     Behaviors.empty
   }
 
@@ -39,14 +38,15 @@ object Supervisor :
   val cityGrid = CityGrid(200, 200)
   cityGrid.createCityGrid(2, 2)
   var port = 2551
+  startupWithRole("GUI", 7593)(Supervisor(cityGrid))
   for
     z <- cityGrid.zones
   do
-    startupWithRole("STATION", port)(Supervisor("Station"+ z.id, z.id, Supervisor.randomPosition(z)))
+    startupWithRole("STATION", port)(Supervisor(z.id, Supervisor.randomPosition(z)))
     port = port + 1
   for
     z <- cityGrid.zones
   do
-    startupWithRole("SENSOR", port)(Supervisor("Sensor"+ z.id, z.id, Supervisor.randomPosition(z)))
+    startupWithRole("SENSOR", port)(Supervisor(z.id, Supervisor.randomPosition(z)))
     port = port + 1
-  startupWithRole("GUI", port)(Supervisor(cityGrid))
+  
