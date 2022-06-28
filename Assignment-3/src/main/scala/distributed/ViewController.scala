@@ -23,12 +23,14 @@ object ViewActor:
       Behaviors.receiveMessage { message =>
         message match
           case message: Receptionist.Listing =>
-            val key = message.getKey.id
-            key match
-              case key if key.contains("Sensor") =>
-                message.serviceInstances(message.getKey).toList.foreach(z => z ! GetInfoSensor(ctx.self))
-              case key if key.contains("Station") =>
-                message.serviceInstances(message.getKey).toList.foreach(z => z ! GetInfoStation(ctx.self))
+            val id = message.getKey.id
+            id match
+              case id if id.contains("Sensor") =>
+                message.serviceInstances(ServiceKey[SensorCommand](id)).toList.foreach(z => z ! GetInfoSensor(ctx.self))
+                Behaviors.same
+              case id if id.contains("Station") =>
+                message.serviceInstances(ServiceKey[FireStationCommand](id)).toList.foreach(z => z ! GetInfoStation(ctx.self))
+                Behaviors.same
           case StartGUI(cityGrid) =>
             view = Some(View(cityGrid.width + 100, cityGrid.height + 100))
             city = Some(cityGrid)
