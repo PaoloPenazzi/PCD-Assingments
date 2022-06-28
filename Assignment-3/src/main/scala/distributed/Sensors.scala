@@ -26,15 +26,13 @@ object SensorActor:
             id: String,
             zone: String): Behavior[SensorCommand|Receptionist.Listing] =
     Behaviors.setup[SensorCommand | Receptionist.Listing]( ctx => {
+      ctx.system.receptionist ! Receptionist.Register(ServiceKey[SensorCommand](id), ctx.self)
       ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[Message]("Station" + zone), ctx.self)
       var fireStation: Option[ActorRef[Message]] = None
       Behaviors.withTimers( timers => {
         Behaviors.receiveMessage(msg => {
           msg match
             case msg:Receptionist.Listing =>
-              println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" + msg)
-              println("ZOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOONEEEE" + zone)
-              println(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).size)
               if msg.serviceInstances(ServiceKey[Message]("Station" + zone)).nonEmpty then
                 fireStation = Some(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).head)
                 Behaviors.same

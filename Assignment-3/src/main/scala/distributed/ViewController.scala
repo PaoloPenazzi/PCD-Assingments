@@ -34,6 +34,7 @@ object ViewActor:
           case StartGUI(cityGrid) =>
             view = Some(View(cityGrid.width + 100, cityGrid.height + 100))
             city = Some(cityGrid)
+            view.get.start()
             view.get.display(city.get)
             for z <- city.get.zones
               do
