@@ -23,13 +23,12 @@ object SensorActor:
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
   var fireStation: Option[ActorRef[FireStationCommand]] = None
 
-  def sensorRead: Double = Random.between(0.0, 10.5)
+  def sensorRead: Double = Random.between(0.0, 10)
 
   def apply(position: (Int, Int), zone: String): Behavior[SensorCommand | Receptionist.Listing] =
-    Behaviors.setup (ctx => {
+    Behaviors.setup(ctx => {
       ctx.system.receptionist ! Receptionist.Register(sensorKey, ctx.self)
-      ctx.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, ctx.self)
-      Behaviors.withTimers( timer => {
+      Behaviors.withTimers(timer => {
         sensorLogic(position, zone, ctx, timer)
       })
     })
@@ -44,32 +43,33 @@ object SensorActor:
           fireStation = Some(ref)
           Behaviors.same
         case msg: Receptionist.Listing =>
-          if msg.serviceInstances(FireStationActor.fireStationKey).nonEmpty
-          then
-            println(msg)
-            msg.serviceInstances(FireStationActor.fireStationKey).foreach(act => act ! MyZoneRequest(ctx.self, zone) )
-            Behaviors.same
-          else
-            println("EMPTY")
-            Behaviors.same
+          println(msg.serviceInstances(FireStationActor.fireStationKey).toList.size)
+          msg.serviceInstances(FireStationActor.fireStationKey).toList.foreach(act => act ! MyZoneRequest(ctx.self, zone))
+          Behaviors.same
         case Update() =>
           val level: Double = sensorRead
           level match
-            case level if level <= 7 =>
-              println(zone + ": OK")
-              timer.startSingleTimer(Update(), 5000.millis)
+            case level if level <= 8 =>
+              println("Sensor" + zone + " - OK(" + level + ")")
+              viewActor.get ! SensorUpdate(position, false)
+              timer.startSingleTimer(Update(), 10000.millis)
               Behaviors.same
             case level if level <= 10 =>
-              println(zone + ": ALARM")
+              println("Sensor" + zone + " - WARNING(" + level + ")")
+              viewActor.get ! SensorUpdate(position, true)
               // TODO avvisare gli altri sensori
-              fireStation.get ! Alarm(zone)
+              //fireStation.get ! Alarm(zone)
               viewActor.get ! AlarmView(zone)
+              timer.startSingleTimer(Update(), 10000.millis)
               Behaviors.same
             case _ =>
-              Thread.sleep(15000)
+              println("Sensor" + zone + " - FAILED")
+              timer.startSingleTimer(Update(), 30000.millis)
               Behaviors.same
         case GetInfoSensor(context) =>
           viewActor = Some(context)
           context ! SensorInfo(position)
+          ctx.self ! Update()
+          // ctx.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, ctx.self)
           Behaviors.same
     })

@@ -16,7 +16,6 @@ case class GetInfoStation(ctx: ActorRef[ViewCommand | Receptionist.Listing]) ext
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
-
   val fireStationKey: ServiceKey[FireStationCommand] = ServiceKey[FireStationCommand]("fireStation")
 
   enum Status:
@@ -38,6 +37,7 @@ object FireStationActor:
         msg match
 
           case MyZoneRequest(reply, zn) =>
+            println("my zone req received")
             if zone == zn then
               reply ! MyZoneResponse(ctx.self)
             Behaviors.same

@@ -12,24 +12,24 @@ case class SensorInfo(position: (Int, Int)) extends ViewCommand
 case class StationInfo(position: (Int, Int)) extends ViewCommand
 case class StationOccupied(position: (Int, Int)) extends ViewCommand
 case class AlarmView(id: String) extends ViewCommand
-case class SensorUpdate(position: (Int, Int)) extends ViewCommand
+case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCommand
 
 object ViewActor:
   var view: Option[View] = None
   var city: Option[CityGrid] = None
 
   def apply(): Behavior[ViewCommand | Receptionist.Listing] =
-    Behaviors.setup { ctx =>
+    Behaviors.setup(ctx => {
       Behaviors.receiveMessage { message =>
         message match
           case message: Receptionist.Listing =>
             val id = message.getKey.id
             id match
-              case id if id.contains("Sensor") =>
+              case id if id.contains("sensor") =>
                 println(message)
                 message.serviceInstances(SensorActor.sensorKey).toList.foreach(z => z ! GetInfoSensor(ctx.self))
                 Behaviors.same
-              case id if id.contains("Station") =>
+              case id if id.contains("fire") =>
                 println(message)
                 message.serviceInstances(FireStationActor.fireStationKey).toList.foreach(z => z ! GetInfoStation(ctx.self))
                 Behaviors.same
@@ -66,17 +66,21 @@ object ViewActor:
             Behaviors.same
 
           case AlarmView(id) =>
+            println("Alarm Received")
             val zoneAlarmed = city.get.zones.find(z => z.id == id)
             city.get.zonesAlarmed = city.get.zonesAlarmed.::(zoneAlarmed.get)
             view.get.display(city.get)
             Behaviors.same
-            
-          case SensorUpdate(position: (Int, Int)) =>
-            city.get.sensors = city.get.sensors + (position -> true)
+
+          case SensorUpdate(position, overLevel) =>
+            if overLevel 
+            then city.get.sensors = city.get.sensors + (position -> true)
+            else 
+              city.get.sensors = city.get.sensors + (position -> false)
             // TODO check if updates the map correctly
             view.get.display(city.get)
             Behaviors.same
-            
+
           case _ => throw IllegalStateException()
       }
-    }
+    })

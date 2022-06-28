@@ -45,7 +45,7 @@ class CityPanel(width: Int, height: Int) extends JPanel:
       g2.drawRect(50, 50, city.get.bounds.x1.toInt, city.get.bounds.y1.toInt)
       for x <- city.get.zones
         do
-          if city.get.zonesAlarmed.contains(x) then g2.setBackground(Color.YELLOW) else g2.setBackground(Color.WHITE)
+          if city.get.zonesAlarmed.contains(x) then g2.setColor(Color.ORANGE) else g2.setColor(Color.BLACK)
           g2.drawRect(x.bounds.x0.toInt + 50,
           x.bounds.y0.toInt + 50,
           x.bounds.x1.toInt - x.bounds.x0.toInt,
