@@ -17,38 +17,36 @@ object Supervisor :
     val cluster = Cluster(ctx.system)
     if cluster.selfMember.hasRole("SENSOR")
     then
-      println(id + " spawned")
       ctx.spawn(SensorActor(position, id, zone), id)
     else
-      println(id + " spawned")
       ctx.spawn(FireStationActor(position, id), id)
     Behaviors.empty
   }
 
   def apply(city: CityGrid): Behavior[Nothing] = Behaviors.setup { ctx =>
-    println("GUI spawned")
     val viewActor = ctx.spawn(ViewActor(), "View")
     viewActor ! StartGUI(city)
     Behaviors.empty
   }
 
+  def randomPosition(zone: Zone): (Int, Int) = {
+    (Random.between(zone.bounds.x0.toInt + 10, zone.bounds.x1.toInt - 10),
+      Random.between(zone.bounds.y0.toInt + 10, zone.bounds.y1.toInt - 10))
+  }
+
 
 @main def demo(): Unit =
   val cityGrid = CityGrid(300, 300)
-  cityGrid.createCityGrid(3, 3)
+  cityGrid.createCityGrid(2, 2)
   var port = 2551
   for
     z <- cityGrid.zones
   do
-    startupWithRole("STATION", port)(Supervisor("Station"+ z.id, z.id,
-      (Random.between(z.bounds.x0.toInt + 10, z.bounds.x1.toInt - 10),
-        Random.between(z.bounds.y0.toInt + 10, z.bounds.y1.toInt - 10))))
+    startupWithRole("STATION", port)(Supervisor("Station"+ z.id, z.id, Supervisor.randomPosition(z)))
     port = port + 1
   for
     z <- cityGrid.zones
   do
-    startupWithRole("SENSOR", port)(Supervisor("Sensor"+ z.id, z.id,
-      (Random.between(z.bounds.x0.toInt + 10, z.bounds.x1.toInt - 10),
-        Random.between(z.bounds.y0.toInt + 10, z.bounds.y1.toInt - 10))))
+    startupWithRole("SENSOR", port)(Supervisor("Sensor"+ z.id, z.id, Supervisor.randomPosition(z)))
     port = port + 1
   startupWithRole("GUI", port)(Supervisor(cityGrid))

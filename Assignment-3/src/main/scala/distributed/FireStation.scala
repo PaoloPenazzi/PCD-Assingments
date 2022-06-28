@@ -29,26 +29,27 @@ object FireStationActor:
   })
 
   def standardBehavior(position: (Int, Int),
-                       id: String): Behavior[FireStationCommand] = Behaviors.withTimers(timers => {
-    Behaviors.receiveMessage(msg => {
-      msg match
-        case GetInfoStation(ctx) =>
-          viewActor = Some(ctx)
-          ctx ! StationInfo(position)
-          Behaviors.same
-        case Alarm(zoneId) =>
-          if zoneId.equals(id)
-          then
-            println(id + ": Alarm Received")
-            timers.startSingleTimer(StartAssistance(), 3000.millis)
-          Behaviors.same
-        case StartAssistance() =>
-          println(id + ": Assistance Started")
-          status = Status.Busy
-          viewActor.get ! StationOccupied(position)
-          busyBehavior(position, id)
-        case _ => throw IllegalStateException()
-    })
+                       id: String): Behavior[FireStationCommand] = 
+    Behaviors.withTimers(timers => {
+      Behaviors.receiveMessage(msg => {
+        msg match
+          case GetInfoStation(ctx) =>
+            viewActor = Some(ctx)
+            ctx ! StationInfo(position)
+            Behaviors.same
+          case Alarm(zoneId) =>
+            if zoneId.equals(id)
+            then
+              println(id + ": Alarm Received")
+              timers.startSingleTimer(StartAssistance(), 3000.millis)
+            Behaviors.same
+          case StartAssistance() =>
+            println(id + ": Assistance Started")
+            status = Status.Busy
+            viewActor.get ! StationOccupied(position)
+            busyBehavior(position, id)
+          case _ => throw IllegalStateException()
+      })
   })
 
   def busyBehavior(position: (Int, Int),
