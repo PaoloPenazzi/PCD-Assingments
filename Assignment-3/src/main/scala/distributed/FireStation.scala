@@ -29,7 +29,7 @@ object FireStationActor:
   })
 
   def standardBehavior(position: (Int, Int),
-                       id: String): Behavior[FireStationCommand] = 
+                       id: String): Behavior[FireStationCommand] =
     Behaviors.withTimers(timers => {
       Behaviors.receiveMessage(msg => {
         msg match
