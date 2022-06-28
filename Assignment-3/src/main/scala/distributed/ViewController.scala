@@ -6,7 +6,7 @@ import akka.actor.typed.scaladsl.Behaviors
 import distributed.Message
 import distributed.Zone
 
-sealed trait ViewCommand extends Message
+trait ViewCommand extends Message
 case class StartGUI(cityGrid: CityGrid) extends ViewCommand
 case class SensorInfo(position: (Int, Int)) extends ViewCommand
 case class StationInfo(position: (Int, Int)) extends ViewCommand
@@ -18,12 +18,17 @@ object ViewActor:
   var view: Option[View] = None
   var city: Option[CityGrid] = None
 
-  def apply(): Behavior[Message] =
-    Behaviors.setup[ViewCommand | Receptionist.Listing] (ctx => {
+  def apply(): Behavior[ViewCommand | Receptionist.Listing] =
+    Behaviors.setup[ViewCommand | Receptionist.Listing] { ctx =>
       Behaviors.receiveMessage { message =>
         message match
-          case message: Receptionist.Listing => ???
-            // message.allServiceInstances().foreach(z => z ! GetInfo(ctx))
+          case message: Receptionist.Listing =>
+            val key = message.getKey.id
+            key match
+              case key if key.contains("Sensor") =>
+                message.serviceInstances(message.getKey).toList.foreach(z => z ! GetInfoSensor(ctx.self))
+              case key if key.contains("Station") =>
+                message.serviceInstances(message.getKey).toList.foreach(z => z ! GetInfoStation(ctx.self))
           case StartGUI(cityGrid) =>
             view = Some(View(cityGrid.width + 100, cityGrid.height + 100))
             city = Some(cityGrid)
@@ -62,7 +67,6 @@ object ViewActor:
             // TODO check if updates the map correctly
             view.get.display(city.get)
             Behaviors.same
-          case _ =>
-            throw IllegalStateException()
+          case _ => throw IllegalStateException()
       }
-    })
+    }

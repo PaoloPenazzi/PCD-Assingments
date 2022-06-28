@@ -4,14 +4,14 @@ import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import distributed.Message
 import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, SupervisorStrategy, Terminated}
 import akka.actor.typed.scaladsl.{Behaviors, ActorContext}
-import distributed.Message
+import distributed.ViewCommand
 import concurrent.duration.DurationInt
 
 sealed trait FireStationCommand extends Message
 case class Alarm(id: String) extends FireStationCommand
 case class StartAssistance() extends FireStationCommand
 case class EndAssistance() extends FireStationCommand
-case class GetInfo(ctx: ActorRef[Message]) extends FireStationCommand
+case class GetInfoStation(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends FireStationCommand
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
@@ -19,7 +19,7 @@ object FireStationActor:
     case Busy
     case Normal
 
-  var viewActor: Option[ActorRef[Message]] = None
+  var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
   var status: Status = Status.Normal
 
   def apply(position: (Int, Int),
@@ -32,7 +32,7 @@ object FireStationActor:
                        id: String): Behavior[FireStationCommand] = Behaviors.withTimers(timers => {
     Behaviors.receiveMessage(msg => {
       msg match
-        case GetInfo(ctx) =>
+        case GetInfoStation(ctx) =>
           viewActor = Some(ctx)
           ctx ! StationInfo(position)
           Behaviors.same

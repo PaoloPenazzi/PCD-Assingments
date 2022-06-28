@@ -2,6 +2,7 @@ package distributed
 
 import distributed.CityGrid
 import distributed.Message
+import distributed.ViewCommand
 import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.scaladsl.*
 import akka.actor.typed.scaladsl.adapter.*
@@ -14,12 +15,12 @@ import concurrent.duration.DurationInt
 
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
-case class getInfo(ctx: ActorRef[Message]) extends SensorCommand
+case class GetInfoSensor(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
 
 object SensorActor:
   def sensorRead: Double = Random.between(0.0, 10.5)
-  var viewActor: Option[ActorRef[Message]] = None
+  var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
 
   def apply(position: (Int, Int),
             id: String,
@@ -49,7 +50,7 @@ object SensorActor:
                 case _ =>
                   Thread.sleep(15000)
                   Behaviors.same
-            case getInfo(ctx) =>
+            case GetInfoSensor(ctx) =>
               viewActor = Some(ctx)
               ctx ! SensorInfo(position)
               Behaviors.same
