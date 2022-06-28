@@ -25,13 +25,13 @@ object SensorActor:
             id: String,
             zone: String): Behavior[SensorCommand|Receptionist.Listing] =
     Behaviors.setup[SensorCommand | Receptionist.Listing]( ctx => {
-      ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("Station" + zone), ctx.self)
-      var fireStation: Option[ActorRef[FireStationCommand]] = None
+      ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[Message]("Station" + zone), ctx.self)
+      var fireStation: Option[ActorRef[Message]] = None
       Behaviors.withTimers( timers => {
         Behaviors.receiveMessage(msg => {
           msg match
             case msg:Receptionist.Listing =>
-              fireStation = Some(msg.serviceInstances(ServiceKey[FireStationCommand]("Station" + zone)).head)
+              fireStation = Some(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).head)
               Behaviors.same
             case Update() =>
               val level: Double = sensorRead
@@ -43,8 +43,8 @@ object SensorActor:
                 case level if level <= 10 =>
                   println(id + ": ALARM")
                   // TODO avvisare gli altri sensori
-                  fireStation.get ! Alarm()
-                  viewActor.get ! Alarm()
+                  fireStation.get ! Alarm(id)
+                  viewActor.get ! AlarmView(id)
                   Behaviors.same
                 case _ =>
                   Thread.sleep(15000)
