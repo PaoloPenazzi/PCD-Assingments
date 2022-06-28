@@ -19,44 +19,45 @@ case class GetInfoSensor(ctx: ActorRef[ViewCommand | Receptionist.Listing]) exte
 
 object SensorActor:
   def sensorRead: Double = Random.between(0.0, 10.5)
+
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
+  var fireStation: Option[ActorRef[FireStationCommand]] = None
 
   def apply(position: (Int, Int),
             id: String,
             zone: String): Behavior[SensorCommand | Receptionist.Listing] =
-    Behaviors.setup[SensorCommand | Receptionist.Listing](ctx => {
+    Behaviors.setup(ctx => {
       ctx.system.receptionist ! Receptionist.Register(ServiceKey[SensorCommand](id), ctx.self)
-      ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[Message]("Station" + zone), ctx.self)
-      var fireStation: Option[ActorRef[Message]] = None
-      Behaviors.withTimers(timers => {
-        Behaviors.receiveMessage(msg => {
-          msg match
-            case msg: Receptionist.Listing =>
-              if msg.serviceInstances(ServiceKey[Message]("Station" + zone)).nonEmpty then
-                fireStation = Some(msg.serviceInstances(ServiceKey[Message]("Station" + zone)).head)
-                Behaviors.same
-              else Behaviors.same
-            case Update() =>
-              val level: Double = sensorRead
-              level match
-                case level if level <= 7 =>
-                  println(id + ": OK")
-                  timers.startSingleTimer(Update(), 5000.millis)
-                  Behaviors.same
-                case level if level <= 10 =>
-                  println(id + ": ALARM")
-                  // TODO avvisare gli altri sensori
-                  fireStation.get ! Alarm(id)
-                  viewActor.get ! AlarmView(id)
-                  Behaviors.same
-                case _ =>
-                  Thread.sleep(15000)
-                  Behaviors.same
-            case GetInfoSensor(ctx) =>
-              println("ECCOLOOOO")
-              viewActor = Some(ctx)
-              ctx ! SensorInfo(position)
+      ctx.system.receptionist ! Receptionist.Subscribe(ServiceKey[FireStationCommand]("Station" + zone), ctx.self)
+      //Behaviors.withTimers(timers => {
+      Behaviors.receiveMessage(msg => {
+        msg match
+          case msg: Receptionist.Listing =>
+            if msg.serviceInstances(ServiceKey[FireStationCommand]("Station" + zone)).nonEmpty then
+              fireStation = Some(msg.serviceInstances(ServiceKey[FireStationCommand]("Station" + zone)).head)
               Behaviors.same
-        })
+            else Behaviors.same
+          case Update() =>
+            val level: Double = sensorRead
+            level match
+              case level if level <= 7 =>
+                println(id + ": OK")
+                //timers.startSingleTimer(Update(), 5000.millis)
+                Behaviors.same
+              case level if level <= 10 =>
+                println(id + ": ALARM")
+                // TODO avvisare gli altri sensori
+                fireStation.get ! Alarm(id)
+                viewActor.get ! AlarmView(id)
+                Behaviors.same
+              case _ =>
+                Thread.sleep(15000)
+                Behaviors.same
+          case GetInfoSensor(ctx) =>
+            println("ECCOLOOOO")
+            viewActor = Some(ctx)
+            ctx ! SensorInfo(position)
+            Behaviors.same
       })
+      //})
     })

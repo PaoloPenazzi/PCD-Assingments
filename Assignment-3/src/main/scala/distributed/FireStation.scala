@@ -22,8 +22,8 @@ object FireStationActor:
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
   var status: Status = Status.Normal
 
-  def apply(position: (Int, Int),
-            id: String): Behavior[FireStationCommand] = Behaviors.setup(ctx => {
+  def apply(position: (Int, Int), id: String): Behavior[FireStationCommand] = 
+    Behaviors.setup(ctx => {
     ctx.system.receptionist ! Receptionist.Register(ServiceKey[FireStationCommand](id), ctx.self)
     standardBehavior(position, id)
   })
@@ -47,7 +47,6 @@ object FireStationActor:
           status = Status.Busy
           viewActor.get ! StationOccupied(position)
           busyBehavior(position, id)
-        case _ => throw IllegalStateException()
     })
   })
 
@@ -57,7 +56,6 @@ object FireStationActor:
       case EndAssistance() =>
         status = Status.Normal
         standardBehavior(position, id)
-      case _ => throw IllegalStateException()
   })
 
 

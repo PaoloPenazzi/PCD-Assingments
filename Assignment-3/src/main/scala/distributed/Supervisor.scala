@@ -34,20 +34,20 @@ object Supervisor :
 
 
 @main def demo(): Unit =
-  val cityGrid = CityGrid(300, 300)
-  cityGrid.createCityGrid(3, 3)
+  val cityGrid = CityGrid(200, 200)
+  cityGrid.createCityGrid(2, 2)
   var port = 2551
   for
     z <- cityGrid.zones
   do
-    startupWithRole("STATION", port)(Supervisor("Station"+ z.id, z.id,
+    startupWithRole("STATION", port)(Supervisor("Station" + z.id, z.id,
       (Random.between(z.bounds.x0.toInt + 10, z.bounds.x1.toInt - 10),
         Random.between(z.bounds.y0.toInt + 10, z.bounds.y1.toInt - 10))))
     port = port + 1
   for
     z <- cityGrid.zones
   do
-    startupWithRole("SENSOR", port)(Supervisor("Sensor"+ z.id, z.id,
+    startupWithRole("SENSOR", port)(Supervisor("Sensor" + z.id, z.id,
       (Random.between(z.bounds.x0.toInt + 10, z.bounds.x1.toInt - 10),
         Random.between(z.bounds.y0.toInt + 10, z.bounds.y1.toInt - 10))))
     port = port + 1

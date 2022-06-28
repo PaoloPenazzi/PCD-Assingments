@@ -19,7 +19,7 @@ object ViewActor:
   var city: Option[CityGrid] = None
 
   def apply(): Behavior[ViewCommand | Receptionist.Listing] =
-    Behaviors.setup[ViewCommand | Receptionist.Listing] { ctx =>
+    Behaviors.setup { ctx =>
       Behaviors.receiveMessage { message =>
         message match
           case message: Receptionist.Listing =>
@@ -59,9 +59,6 @@ object ViewActor:
               city.get.fireStations = city.get.fireStations.+(position -> false)
               view.get.display(city.get)
               Behaviors.same
-          case StationOccupied(position) =>
-            ???
-            Behaviors.same
           case AlarmView(id) =>
             val zoneAlarmed = city.get.zones.find(z => z.id == id)
             city.get.zonesAlarmed = city.get.zonesAlarmed.::(zoneAlarmed.get)
