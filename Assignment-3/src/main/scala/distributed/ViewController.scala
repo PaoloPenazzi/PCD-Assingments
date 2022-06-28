@@ -19,10 +19,9 @@ object ViewActor:
   var city: Option[CityGrid] = None
 
   def apply(): Behavior[ViewCommand | Receptionist.Listing] =
-    Behaviors.setup[ViewCommand | Receptionist.Listing] { ctx =>
+    Behaviors.setup { ctx =>
       Behaviors.receiveMessage { message =>
         message match
-
           case message: Receptionist.Listing =>
             val id = message.getKey.id
             id match

@@ -24,7 +24,7 @@ object SensorActor:
   var fireStation: Option[ActorRef[FireStationCommand]] = None
 
   def apply(position: (Int, Int), id: String, zone: String): Behavior[SensorCommand | Receptionist.Listing] =
-    Behaviors.setup[SensorCommand | Receptionist.Listing] (ctx => {
+    Behaviors.setup (ctx => {
       fireStationServiceKey = Some(ServiceKey[FireStationCommand]("Station" + zone))
       ctx.system.receptionist ! Receptionist.Subscribe(fireStationServiceKey.get, ctx.self)
       ctx.system.receptionist ! Receptionist.Register(ServiceKey[SensorCommand](id), ctx.self)
@@ -43,9 +43,11 @@ object SensorActor:
         case msg: Receptionist.Listing =>
           if msg.serviceInstances(fireStationServiceKey.get).nonEmpty
           then
+            println(msg)
             fireStation = Some(msg.serviceInstances(fireStationServiceKey.get).head)
             Behaviors.same
           else
+            println("EMPTY")
             Behaviors.same
         case Update() =>
           val level: Double = sensorRead
@@ -64,7 +66,6 @@ object SensorActor:
               Thread.sleep(15000)
               Behaviors.same
         case GetInfoSensor(context) =>
-          println(id + ": INFO SENSOR")
           viewActor = Some(context)
           context ! SensorInfo(position)
           Behaviors.same

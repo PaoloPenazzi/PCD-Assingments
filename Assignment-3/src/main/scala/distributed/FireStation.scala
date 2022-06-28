@@ -22,14 +22,13 @@ object FireStationActor:
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
   var status: Status = Status.Normal
 
-  def apply(position: (Int, Int),
-            id: String): Behavior[FireStationCommand] = Behaviors.setup(ctx => {
-    ctx.system.receptionist ! Receptionist.Register(ServiceKey[FireStationCommand](id), ctx.self)
-    standardBehavior(position, id)
+  def apply(position: (Int, Int), id: String): Behavior[FireStationCommand] = 
+    Behaviors.setup(ctx => {
+      ctx.system.receptionist ! Receptionist.Register(ServiceKey[FireStationCommand](id), ctx.self)
+      standardBehavior(position, id)
   })
 
-  def standardBehavior(position: (Int, Int),
-                       id: String): Behavior[FireStationCommand] =
+  def standardBehavior(position: (Int, Int), id: String): Behavior[FireStationCommand] =
     Behaviors.withTimers(timers => {
       Behaviors.receiveMessage(msg => {
         msg match
