@@ -16,37 +16,50 @@ import concurrent.duration.DurationInt
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
 case class ReconnectToGUI() extends SensorCommand
+case class FirestationRegistered(firestation: List[ActorRef[FireStationCommand]]) extends SensorCommand
 case class MyStationResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
 case class GetSensorInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
 object SensorActor:
+  // qua ci vanno le variabile che sono UNICHE per tutti i sensori
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
-  var fireStation: Option[ActorRef[FireStationCommand]] = None
 
   def sensorRead: Double = Random.between(0.0, 10.5)
 
-  def apply(position: (Int, Int), zone: String): Behavior[SensorCommand | Receptionist.Listing] =
-    Behaviors.setup(context => {
+  def apply(position: (Int, Int), zone: String, fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand] =
+    Behaviors.setup (context => {
+      println("SensorActor created with zone: " + zone)
+      context.spawnAnonymous(manageFirestation(context.self))
       context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
-      // context.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, context.self)
       Behaviors.withTimers(timer => {
-        sensorLogic(position, zone, context, timer)
+        sensorLogic(position, zone, context, timer, fireStation)
       })
+    })
+
+  def manageFirestation(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
+    Behaviors.setup (context => {
+      context.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, context.self)
+      Behaviors.receiveMessage {
+        case msg: Receptionist.Listing =>
+          sendReplyTo ! FirestationRegistered(msg.serviceInstances(FireStationActor.fireStationKey).toList)
+          Behaviors.same
+      }
     })
 
   def sensorLogic(position: (Int, Int),
                   zone: String,
-                  ctx: ActorContext[SensorCommand | Receptionist.Listing],
-                  timer: TimerScheduler[SensorCommand | Receptionist.Listing]): Behavior[SensorCommand | Receptionist.Listing] =
+                  ctx: ActorContext[SensorCommand],
+                  timer: TimerScheduler[SensorCommand],
+                  fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand] =
     Behaviors.receiveMessage(msg => {
       msg match
-        case message: Receptionist.Listing =>
-          message.serviceInstances(FireStationActor.fireStationKey).toList.foreach(act => act ! MyZoneRequest(ctx.self, zone))
+        case FirestationRegistered(listings) =>
+          if fireStation.isEmpty then listings.foreach(act => act ! MyZoneRequest(ctx.self, zone))
           Behaviors.same
         case MyStationResponse(fireStationRef) =>
-          fireStation = Some(fireStationRef)
-          Behaviors.same  
+          println("I'm Sensor: "+ zone+ " My Firestation has actorRef: "+fireStationRef)
+          sensorLogic(position, zone, ctx, timer, Some(fireStationRef))
         case Update() =>
           val level: Double = sensorRead
           level match
@@ -59,7 +72,8 @@ object SensorActor:
               println("Sensor" + zone + " - WARNING(" + level + ")")
               viewActor.get ! SensorUpdate(position, true)
               // TODO avvisare gli altri sensori
-              // fireStation.get ! Alarm(zone)
+              println("Sensor" + zone + " - Send Alarm to Firestation: " + fireStation.get)
+              fireStation.get ! Alarm(zone)
               viewActor.get ! AlarmView(zone)
               timer.startSingleTimer(Update(), 10000.millis)
               Behaviors.same

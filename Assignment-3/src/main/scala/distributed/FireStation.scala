@@ -16,14 +16,9 @@ case class GetStationInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) ext
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
+  // qua ci vanno le variabile che sono UNICHE per tutti le firestation
   val fireStationKey: ServiceKey[FireStationCommand] = ServiceKey[FireStationCommand]("fireStation")
-
-  enum Status:
-    case Busy
-    case Normal
-
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
-  var status: Status = Status.Normal
 
   def apply(position: (Int, Int), zone: String): Behavior[FireStationCommand] =
     Behaviors.setup(ctx => {
@@ -37,8 +32,9 @@ object FireStationActor:
         msg match
 
           case MyZoneRequest(reply, zn) =>
-            println("my zone req received")
+            println("My zone req received")
             if zone == zn then
+              println("Sensor with zone: "+ zn + " in FireStation: "+zone)
               reply ! MyStationResponse(ctx.self)
             Behaviors.same
 
@@ -48,6 +44,7 @@ object FireStationActor:
             Behaviors.same
 
           case Alarm(zoneId) =>
+            println("Alarm form Sensor: "+ zoneId + " in FireStation: "+zone)
             if zoneId.equals(zone)
             then
               println("Station" + zone + ": Alarm Received")
@@ -56,7 +53,6 @@ object FireStationActor:
 
           case StartAssistance() =>
             println("Station" + zone + ": Assistance Started")
-            status = Status.Busy
             viewActor.get ! StationBusy(position)
             busyBehavior(position, zone, ctx)
 
@@ -68,10 +64,11 @@ object FireStationActor:
                    zone: String,
                    context: ActorContext[FireStationCommand]): Behavior[FireStationCommand] = Behaviors.receive((_, msg) => {
     msg match
+      
       case EndAssistance() =>
-        status = Status.Normal
         viewActor.get ! StationFree(position)
         standardBehavior(position, zone, context)
+        
       case _ => throw IllegalStateException()
   })
 
