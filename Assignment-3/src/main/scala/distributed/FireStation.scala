@@ -44,7 +44,7 @@ object FireStationActor:
 
           case GetStationInfo(ctx) =>
             viewActor = Some(ctx)
-            ctx ! StationInfo(position)
+            viewActor.get ! StationInfo(position)
             Behaviors.same
 
           case Alarm(zoneId) =>

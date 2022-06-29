@@ -64,11 +64,12 @@ object SensorActor:
               timer.startSingleTimer(Update(), 10000.millis)
               Behaviors.same
             case _ =>
-              println("Sensor" + zone + " - FAILED")
+              println("Sensor" + zone + " - DISCONNECTED")
               viewActor.get ! SensorDisconnected(position)
               timer.startSingleTimer(ReconnectToGUI(), 20000.millis)
               Behaviors.same
         case ReconnectToGUI() =>
+          println("Sensor" + zone + " - RECONNECTED")
           viewActor.get ! SensorReconnected(position)
           Behaviors.same
         case GetSensorInfo(context) =>

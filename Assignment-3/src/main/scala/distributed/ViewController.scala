@@ -54,7 +54,7 @@ object ViewActor:
             Behaviors.same
 
           case StationInfo(position) =>
-            if city.get.fireStations.contains(position)
+            if !city.get.fireStations.contains(position)
             then
               city.get.fireStations = city.get.fireStations + (position -> false)
               refreshGUI()
