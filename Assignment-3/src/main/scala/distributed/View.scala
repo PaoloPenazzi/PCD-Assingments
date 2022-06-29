@@ -81,6 +81,7 @@ class ControlPanel(actor: ActorRef[ViewCommand]) extends JPanel:
   var buttons: ListBuffer[JButton] = ListBuffer.empty
 
   def setupView(zones: List[Zone]): Unit =
+    setBackground(Color.WHITE)
     zones.foreach(z => {
       val button = new JButton(z.id)
       buttons += button

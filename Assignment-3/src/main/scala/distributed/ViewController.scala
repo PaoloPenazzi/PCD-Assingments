@@ -40,7 +40,7 @@ object ViewActor:
                 Behaviors.same
 
           case StartGUI(cityGrid) =>
-            view = Some(View(cityGrid.width + 100, cityGrid.height + 100, ctx.self))
+            view = Some(View(cityGrid.width + 600, cityGrid.height + 200, ctx.self))
             city = Some(cityGrid)
             view.get.start(cityGrid.zones)
             ctx.system.receptionist ! Receptionist.Subscribe(SensorActor.sensorKey, ctx.self)

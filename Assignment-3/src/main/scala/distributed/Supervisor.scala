@@ -35,8 +35,8 @@ object Supervisor :
 
 
 @main def demo(): Unit =
-  val cityGrid = CityGrid(400, 400)
-  cityGrid.createCityGrid(2, 2)
+  val cityGrid = CityGrid(300, 300)
+  cityGrid.createCityGrid(3, 3)
   startupWithRole("GUI", 2570)(Supervisor(cityGrid))
   var port = 2551
   for
