@@ -90,7 +90,7 @@ object ViewActor:
 
           case ResetAlarm(zoneID) =>
             city.get.zonesAlarmed -= city.get.zones.find(z => z.id == zoneID).get
-            // TODO Send to firestation the end assistance
+            fireStations(zoneID) ! EndAssistance()
             refreshGUI()
             Behaviors.same
 
