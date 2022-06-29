@@ -42,9 +42,9 @@ object FireStationActor:
               reply ! MyStationResponse(ctx.self)
             Behaviors.same
 
-          case GetStationInfo(ctx) =>
-            viewActor = Some(ctx)
-            viewActor.get ! StationInfo(position)
+          case GetStationInfo(viewActorRef) =>
+            viewActor = Some(viewActorRef)
+            viewActor.get ! StationInfo(position, ctx.self, zone)
             Behaviors.same
 
           case Alarm(zoneId) =>

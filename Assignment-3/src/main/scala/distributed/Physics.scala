@@ -17,7 +17,7 @@ object Zone:
 
 class CityGrid(var width: Int, var height: Int):
   var zones: List[Zone] = List.empty
-  var zonesAlarmed: List[Zone] = List.empty
+  var zonesAlarmed: ListBuffer[Zone] = ListBuffer.empty
   var bounds: Boundary = Boundary(0, 0, width, height)
   var sensors: Map[(Int,Int), Boolean] = Map.empty
   var sensorsDisconnected: ListBuffer[(Int, Int)] = ListBuffer.empty

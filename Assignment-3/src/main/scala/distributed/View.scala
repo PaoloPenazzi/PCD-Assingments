@@ -1,8 +1,12 @@
 package distributed
 
-import java.awt.event.{WindowAdapter, WindowEvent}
+import akka.actor.typed.ActorRef
+import it.unibo.pcd.assignment.Message
+
+import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Color, Graphics, Graphics2D, RenderingHints}
-import javax.swing.{JFrame, JPanel}
+import javax.swing.{JButton, JFrame, JPanel}
+import scala.collection.mutable.ListBuffer
 
 trait View:
   def display(city: CityGrid): Unit
@@ -32,7 +36,6 @@ object View:
       repaint()
 
 class CityPanel(width: Int, height: Int) extends JPanel:
-  var iteration: Int = 0
   var city: Option[CityGrid] = None
 
   override def paint(g: Graphics): Unit =
@@ -57,7 +60,6 @@ class CityPanel(width: Int, height: Int) extends JPanel:
               x.bounds.y0.toInt + 51,
               x.bounds.x1.toInt - x.bounds.x0.toInt - 1,
               x.bounds.y1.toInt - x.bounds.y0.toInt - 1)
-
       for x <- city.get.sensors
         do
           if city.get.sensors(x._1) then g2.setColor(Color.RED) else g2.setColor(Color.BLUE)
@@ -68,8 +70,22 @@ class CityPanel(width: Int, height: Int) extends JPanel:
           if city.get.fireStations(x._1) then g2.setColor(Color.GRAY) else g2.setColor(Color.GREEN)
           g2.drawRect(x._1._1 + 50, x._1._2 + 50, 8, 8)
 
-
   def setup(): Unit =
     setSize(width + 100, height + 100)
     setVisible(true)
 
+class ControlPanel(actor: ActorRef[ViewCommand]) extends JPanel:
+  var buttons: ListBuffer[JButton] = ListBuffer.empty
+
+  def setupView(zones: List[Zone]): Unit =
+    zones.foreach(z => {
+      val button = new JButton(z.id)
+      buttons += button
+      add(button)
+      button.addActionListener(actionPerformed(_))
+    })
+    setVisible(true)
+
+  def actionPerformed(event: ActionEvent): Unit =
+    val id: String = event.getSource.asInstanceOf[JButton].getText
+    actor ! ResetAlarm(id)

@@ -11,15 +11,17 @@ case class StartGUI(cityGrid: CityGrid) extends ViewCommand
 case class SensorDisconnected(position: (Int, Int)) extends ViewCommand
 case class SensorReconnected(position: (Int, Int)) extends ViewCommand
 case class SensorInfo(position: (Int, Int)) extends ViewCommand
-case class StationInfo(position: (Int, Int)) extends ViewCommand
+case class StationInfo(position: (Int, Int), actorRef: ActorRef[FireStationCommand], zoneID: String) extends ViewCommand
 case class StationBusy(position: (Int, Int)) extends ViewCommand
 case class StationFree(position: (Int, Int)) extends ViewCommand
 case class AlarmView(id: String) extends ViewCommand
+case class ResetAlarm(id: String) extends ViewCommand
 case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCommand
 
 object ViewActor:
   var view: Option[View] = None
   var city: Option[CityGrid] = None
+  var fireStations: Map[String, ActorRef[FireStationCommand]] = Map.empty
 
   def refreshGUI(): Unit = view.get.display(city.get)
 
@@ -53,9 +55,10 @@ object ViewActor:
               refreshGUI()
             Behaviors.same
 
-          case StationInfo(position) =>
+          case StationInfo(position, actorRef, zoneID) =>
             if !city.get.fireStations.contains(position)
             then
+              fireStations = fireStations + (zoneID -> actorRef)
               city.get.fireStations = city.get.fireStations + (position -> false)
               refreshGUI()
             Behaviors.same
@@ -80,9 +83,14 @@ object ViewActor:
             refreshGUI()
             Behaviors.same
 
-          case AlarmView(zone) =>
-            val zoneAlarmed = city.get.zones.find(z => z.id == zone)
-            city.get.zonesAlarmed = city.get.zonesAlarmed :+ zoneAlarmed.get
+          case AlarmView(zoneID) =>
+            city.get.zonesAlarmed += city.get.zones.find(z => z.id == zoneID).get
+            refreshGUI()
+            Behaviors.same
+
+          case ResetAlarm(zoneID) =>
+            city.get.zonesAlarmed -= city.get.zones.find(z => z.id == zoneID).get
+            // TODO Send to firestation the end assistance
             refreshGUI()
             Behaviors.same
 
