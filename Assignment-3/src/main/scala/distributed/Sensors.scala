@@ -15,6 +15,7 @@ import concurrent.duration.DurationInt
 
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
+case class ReconnectToGUI() extends SensorCommand
 case class MyZoneResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
 case class GetInfoSensor(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
@@ -23,7 +24,7 @@ object SensorActor:
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
   var fireStation: Option[ActorRef[FireStationCommand]] = None
 
-  def sensorRead: Double = Random.between(0.0, 10)
+  def sensorRead: Double = Random.between(0.0, 12)
 
   def apply(position: (Int, Int), zone: String): Behavior[SensorCommand | Receptionist.Listing] =
     Behaviors.setup(ctx => {
@@ -42,9 +43,9 @@ object SensorActor:
         case MyZoneResponse(ref) =>
           fireStation = Some(ref)
           Behaviors.same
-        case msg: Receptionist.Listing =>
-          println(msg.serviceInstances(FireStationActor.fireStationKey).toList.size)
-          msg.serviceInstances(FireStationActor.fireStationKey).toList.foreach(act => act ! MyZoneRequest(ctx.self, zone))
+        case message: Receptionist.Listing =>
+          println(message.serviceInstances(FireStationActor.fireStationKey).toList.size)
+          message.serviceInstances(FireStationActor.fireStationKey).toList.foreach(act => act ! MyZoneRequest(ctx.self, zone))
           Behaviors.same
         case Update() =>
           val level: Double = sensorRead
@@ -64,8 +65,12 @@ object SensorActor:
               Behaviors.same
             case _ =>
               println("Sensor" + zone + " - FAILED")
-              timer.startSingleTimer(Update(), 30000.millis)
+              viewActor.get ! SensorDisconnected(position)
+              timer.startSingleTimer(ReconnectToGUI(), 20000.millis)
               Behaviors.same
+        case ReconnectToGUI() =>
+          viewActor.get ! SensorReconnected(position)
+          Behaviors.same
         case GetInfoSensor(context) =>
           viewActor = Some(context)
           context ! SensorInfo(position)

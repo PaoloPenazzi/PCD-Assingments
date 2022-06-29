@@ -3,6 +3,8 @@ package distributed
 import scala.util.Random
 import it.unibo.pcd.assignment.Boundary
 
+import scala.collection.mutable.ListBuffer
+
 trait Zone:
   def bounds: Boundary
   def id: String
@@ -18,6 +20,7 @@ class CityGrid(var width: Int, var height: Int):
   var zonesAlarmed: List[Zone] = List.empty
   var bounds: Boundary = Boundary(0, 0, width, height)
   var sensors: Map[(Int,Int), Boolean] = Map.empty
+  var sensorsDisconnected: ListBuffer[(Int, Int)] = ListBuffer.empty
   var fireStations: Map[(Int,Int), Boolean] = Map.empty
 
   def createCityGrid(rows: Int, cols: Int): Unit =

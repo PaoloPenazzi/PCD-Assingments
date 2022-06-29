@@ -61,6 +61,7 @@ class CityPanel(width: Int, height: Int) extends JPanel:
       for x <- city.get.sensors
         do
           if city.get.sensors(x._1) then g2.setColor(Color.RED) else g2.setColor(Color.BLUE)
+          if city.get.sensorsDisconnected.contains(x._1) then g2.setColor(Color.WHITE)
           g2.drawOval(x._1._1 + 50, x._1._2 + 50, 8, 8)
       for x <- city.get.fireStations
         do

@@ -8,6 +8,8 @@ import distributed.Zone
 
 trait ViewCommand extends Message
 case class StartGUI(cityGrid: CityGrid) extends ViewCommand
+case class SensorDisconnected(position: (Int, Int)) extends ViewCommand
+case class SensorReconnected(position: (Int, Int)) extends ViewCommand
 case class SensorInfo(position: (Int, Int)) extends ViewCommand
 case class StationInfo(position: (Int, Int)) extends ViewCommand
 case class StationOccupied(position: (Int, Int)) extends ViewCommand
@@ -17,6 +19,8 @@ case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCo
 object ViewActor:
   var view: Option[View] = None
   var city: Option[CityGrid] = None
+
+  def refreshGUI(): Unit = view.get.display(city.get)
 
   def apply(): Behavior[ViewCommand | Receptionist.Listing] =
     Behaviors.setup(ctx => {
@@ -38,7 +42,7 @@ object ViewActor:
             view = Some(View(cityGrid.width + 100, cityGrid.height + 100))
             city = Some(cityGrid)
             view.get.start()
-            view.get.display(city.get)
+            refreshGUI()
             ctx.system.receptionist ! Receptionist.Subscribe(SensorActor.sensorKey, ctx.self)
             ctx.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, ctx.self)
             Behaviors.same
@@ -48,8 +52,8 @@ object ViewActor:
             then
               Behaviors.same
             else
-              city.get.sensors = city.get.sensors.+(position -> false)
-              view.get.display(city.get)
+              city.get.sensors = city.get.sensors + (position -> false)
+              refreshGUI()
               Behaviors.same
 
           case StationInfo(position) =>
@@ -57,9 +61,19 @@ object ViewActor:
             then
               Behaviors.same
             else
-              city.get.fireStations = city.get.fireStations.+(position -> false)
-              view.get.display(city.get)
+              city.get.fireStations = city.get.fireStations + (position -> false)
+              refreshGUI()
               Behaviors.same
+
+          case SensorDisconnected(position) =>
+            city.get.sensorsDisconnected += position
+            refreshGUI()
+            Behaviors.same
+
+          case SensorReconnected(position) =>
+            city.get.sensorsDisconnected -= position
+            refreshGUI()
+            Behaviors.same
 
           case StationOccupied(position) =>
             ???
@@ -68,8 +82,8 @@ object ViewActor:
           case AlarmView(id) =>
             println("Alarm Received")
             val zoneAlarmed = city.get.zones.find(z => z.id == id)
-            city.get.zonesAlarmed = city.get.zonesAlarmed.::(zoneAlarmed.get)
-            view.get.display(city.get)
+            city.get.zonesAlarmed = city.get.zonesAlarmed :+ (zoneAlarmed.get)
+            refreshGUI()
             Behaviors.same
 
           case SensorUpdate(position, overLevel) =>
@@ -77,8 +91,7 @@ object ViewActor:
             then city.get.sensors = city.get.sensors + (position -> true)
             else 
               city.get.sensors = city.get.sensors + (position -> false)
-            // TODO check if updates the map correctly
-            view.get.display(city.get)
+            refreshGUI()
             Behaviors.same
 
           case _ => throw IllegalStateException()
