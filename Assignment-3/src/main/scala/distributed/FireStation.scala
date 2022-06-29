@@ -12,7 +12,7 @@ case class Alarm(zone: String) extends FireStationCommand
 case class StartAssistance() extends FireStationCommand
 case class EndAssistance() extends FireStationCommand
 case class MyZoneRequest(replyTo: ActorRef[SensorCommand], zone: String) extends FireStationCommand
-case class GetInfoStation(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends FireStationCommand
+case class GetStationInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends FireStationCommand
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
@@ -39,10 +39,10 @@ object FireStationActor:
           case MyZoneRequest(reply, zn) =>
             println("my zone req received")
             if zone == zn then
-              reply ! MyZoneResponse(ctx.self)
+              reply ! MyStationResponse(ctx.self)
             Behaviors.same
 
-          case GetInfoStation(ctx) =>
+          case GetStationInfo(ctx) =>
             viewActor = Some(ctx)
             ctx ! StationInfo(position)
             Behaviors.same
@@ -57,7 +57,7 @@ object FireStationActor:
           case StartAssistance() =>
             println("Station" + zone + ": Assistance Started")
             status = Status.Busy
-            viewActor.get ! StationOccupied(position)
+            viewActor.get ! StationBusy(position)
             busyBehavior(position, zone, ctx)
 
           case _ => throw IllegalStateException()

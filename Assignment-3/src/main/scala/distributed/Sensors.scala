@@ -16,8 +16,8 @@ import concurrent.duration.DurationInt
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
 case class ReconnectToGUI() extends SensorCommand
-case class MyZoneResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
-case class GetInfoSensor(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
+case class MyStationResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
+case class GetSensorInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
 object SensorActor:
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
@@ -29,7 +29,7 @@ object SensorActor:
   def apply(position: (Int, Int), zone: String): Behavior[SensorCommand | Receptionist.Listing] =
     Behaviors.setup(context => {
       context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
-      context.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, context.self)
+      // context.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, context.self)
       Behaviors.withTimers(timer => {
         sensorLogic(position, zone, context, timer)
       })
@@ -41,12 +41,12 @@ object SensorActor:
                   timer: TimerScheduler[SensorCommand | Receptionist.Listing]): Behavior[SensorCommand | Receptionist.Listing] =
     Behaviors.receiveMessage(msg => {
       msg match
-        case MyZoneResponse(ref) =>
-          fireStation = Some(ref)
-          Behaviors.same
         case message: Receptionist.Listing =>
           message.serviceInstances(FireStationActor.fireStationKey).toList.foreach(act => act ! MyZoneRequest(ctx.self, zone))
           Behaviors.same
+        case MyStationResponse(fireStationRef) =>
+          fireStation = Some(fireStationRef)
+          Behaviors.same  
         case Update() =>
           val level: Double = sensorRead
           level match
@@ -71,7 +71,7 @@ object SensorActor:
         case ReconnectToGUI() =>
           viewActor.get ! SensorReconnected(position)
           Behaviors.same
-        case GetInfoSensor(context) =>
+        case GetSensorInfo(context) =>
           viewActor = Some(context)
           context ! SensorInfo(position)
           ctx.self ! Update()
