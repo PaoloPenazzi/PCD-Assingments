@@ -13,6 +13,7 @@ case class SensorReconnected(position: (Int, Int)) extends ViewCommand
 case class SensorInfo(position: (Int, Int)) extends ViewCommand
 case class StationInfo(position: (Int, Int)) extends ViewCommand
 case class StationOccupied(position: (Int, Int)) extends ViewCommand
+case class StationFree(position: (Int, Int)) extends ViewCommand
 case class AlarmView(id: String) extends ViewCommand
 case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCommand
 
@@ -76,7 +77,13 @@ object ViewActor:
             Behaviors.same
 
           case StationOccupied(position) =>
-            ???
+            city.get.fireStations = city.get.fireStations + (position -> true)
+            refreshGUI()
+            Behaviors.same
+
+          case StationFree(position) =>
+            city.get.fireStations = city.get.fireStations + (position -> false)
+            refreshGUI()
             Behaviors.same
 
           case AlarmView(id) =>
@@ -89,8 +96,7 @@ object ViewActor:
           case SensorUpdate(position, overLevel) =>
             if overLevel 
             then city.get.sensors = city.get.sensors + (position -> true)
-            else 
-              city.get.sensors = city.get.sensors + (position -> false)
+            else city.get.sensors = city.get.sensors + (position -> false)
             refreshGUI()
             Behaviors.same
 

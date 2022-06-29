@@ -50,12 +50,12 @@ object FireStationActor:
           case Alarm(zoneId) =>
             if zoneId.equals(zone)
             then
-              println(zone + ": Alarm Received")
+              println("Station" + zone + ": Alarm Received")
               timers.startSingleTimer(StartAssistance(), 3000.millis)
             Behaviors.same
 
           case StartAssistance() =>
-            println(zone + ": Assistance Started")
+            println("Station" + zone + ": Assistance Started")
             status = Status.Busy
             viewActor.get ! StationOccupied(position)
             busyBehavior(position, zone, ctx)
@@ -66,11 +66,12 @@ object FireStationActor:
 
   def busyBehavior(position: (Int, Int),
                    zone: String,
-                   ctx: ActorContext[FireStationCommand]): Behavior[FireStationCommand] = Behaviors.receive((ctx, msg) => {
+                   context: ActorContext[FireStationCommand]): Behavior[FireStationCommand] = Behaviors.receive((_, msg) => {
     msg match
       case EndAssistance() =>
         status = Status.Normal
-        standardBehavior(position, zone, ctx)
+        viewActor.get ! StationFree(position)
+        standardBehavior(position, zone, context)
       case _ => throw IllegalStateException()
   })
 

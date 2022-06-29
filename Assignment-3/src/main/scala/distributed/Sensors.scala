@@ -24,13 +24,14 @@ object SensorActor:
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
   var fireStation: Option[ActorRef[FireStationCommand]] = None
 
-  def sensorRead: Double = Random.between(0.0, 12)
+  def sensorRead: Double = Random.between(0.0, 10.5)
 
   def apply(position: (Int, Int), zone: String): Behavior[SensorCommand | Receptionist.Listing] =
-    Behaviors.setup(ctx => {
-      ctx.system.receptionist ! Receptionist.Register(sensorKey, ctx.self)
+    Behaviors.setup(context => {
+      context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
+      context.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, context.self)
       Behaviors.withTimers(timer => {
-        sensorLogic(position, zone, ctx, timer)
+        sensorLogic(position, zone, context, timer)
       })
     })
 
@@ -44,7 +45,6 @@ object SensorActor:
           fireStation = Some(ref)
           Behaviors.same
         case message: Receptionist.Listing =>
-          println(message.serviceInstances(FireStationActor.fireStationKey).toList.size)
           message.serviceInstances(FireStationActor.fireStationKey).toList.foreach(act => act ! MyZoneRequest(ctx.self, zone))
           Behaviors.same
         case Update() =>
@@ -59,7 +59,7 @@ object SensorActor:
               println("Sensor" + zone + " - WARNING(" + level + ")")
               viewActor.get ! SensorUpdate(position, true)
               // TODO avvisare gli altri sensori
-              //fireStation.get ! Alarm(zone)
+              // fireStation.get ! Alarm(zone)
               viewActor.get ! AlarmView(zone)
               timer.startSingleTimer(Update(), 10000.millis)
               Behaviors.same
@@ -75,6 +75,5 @@ object SensorActor:
           viewActor = Some(context)
           context ! SensorInfo(position)
           ctx.self ! Update()
-          // ctx.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, ctx.self)
           Behaviors.same
     })
