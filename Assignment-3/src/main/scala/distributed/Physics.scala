@@ -33,10 +33,3 @@ class CityGrid(var width: Int, var height: Int):
       val newZone = Zone((y + x.toString), (sizeX * y).toInt, (sizeX * (y + 1)).toInt, (sizeY * x).toInt, (sizeY * (x + 1)).toInt)
       zones = zones :+ newZone
 
-@main
-def testGrid(): Unit =
-  val city = new CityGrid(300, 300)
-  city.createCityGrid(3, 3)
-  val view: View = View(600, 650)
-  view.start()
-  view.display(city)

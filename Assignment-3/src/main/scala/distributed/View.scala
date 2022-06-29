@@ -10,21 +10,24 @@ import scala.collection.mutable.ListBuffer
 
 trait View:
   def display(city: CityGrid): Unit
-  def start(): Unit
+  def start(zones: List[Zone]): Unit
 
 object View:
-  def apply(width: Int, height: Int): View = new ViewFrame(width, height)
+  def apply(width: Int, height: Int, viewActor: ActorRef[ViewCommand]): View = new ViewFrame(width, height, viewActor)
 
-  private class ViewFrame(width: Int, height: Int) extends JFrame, View :
+  private class ViewFrame(width: Int, height: Int, viewActor: ActorRef[ViewCommand]) extends JFrame, View :
     val cityPanel = new CityPanel(width, height)
+    val controlPanel = new ControlPanel(viewActor)
 
-    override def start(): Unit =
+    override def start(zones: List[Zone]): Unit =
       setSize(width, height)
       setLayout(new BorderLayout())
       setTitle("Smart City Simulation")
       setLocationRelativeTo(null)
+      controlPanel.setupView(zones)
       cityPanel.setup()
-      add(cityPanel)
+      getContentPane.add(cityPanel)
+      getContentPane.add(controlPanel, BorderLayout.NORTH)
       addWindowListener(new WindowAdapter() {
         override def windowClosing(ev: WindowEvent): Unit = System.exit(-1)
         override def windowClosed(ev: WindowEvent): Unit = System.exit(-1)

@@ -40,9 +40,9 @@ object ViewActor:
                 Behaviors.same
 
           case StartGUI(cityGrid) =>
-            view = Some(View(cityGrid.width + 100, cityGrid.height + 100))
+            view = Some(View(cityGrid.width + 100, cityGrid.height + 100, ctx.self))
             city = Some(cityGrid)
-            view.get.start()
+            view.get.start(cityGrid.zones)
             ctx.system.receptionist ! Receptionist.Subscribe(SensorActor.sensorKey, ctx.self)
             ctx.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, ctx.self)
             refreshGUI()
