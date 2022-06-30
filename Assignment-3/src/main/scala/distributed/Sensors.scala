@@ -17,6 +17,9 @@ sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
 case class ReconnectToGUI() extends SensorCommand
 case class FireStationRegistered(fireStation: List[ActorRef[FireStationCommand]]) extends SensorCommand
+case class OtherSensorRegistered(otherSensors: List[ActorRef[SensorCommand]]) extends SensorCommand
+case class MyZoneSensorRequest(sensorToReply: ActorRef[SensorCommand], zone: String) extends SensorCommand
+case class MyZoneSensorResponse(sensorRef: ActorRef[SensorCommand]) extends SensorCommand
 case class MyStationResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
 case class GetSensorInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
@@ -25,14 +28,33 @@ object SensorActor:
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
 
+  // in una prima fase il sensore non sa nulla sugli altri sensori e quindi in fase di istanziazione dovrà
+  // farsi dare il riferimento (in questa fase supponiamo che i sensori non muoiano)
+
+  // update avviene ogni 15/20 secondi così il sensore ha il tempo ricevere tutti i messaggi e non rischia nel frattempo
+  // di morire
+  // una volta che i sensori di una zona hanno il riferimento di tutti gli altri i casi sono:
+  // -> sensore OK non fa nulla
+  // -> sensore WARNING invia messaggio di warning ai sensori della stessa zona chiedendogli come sono messi loro e
+  //    quando arrivano i messaggi controlla se sono in warning o no:
+  //      -> se più della metà in warning invia allarme alla caserma
+  //      -> se non sono più di metà in warning non fa nulla
+  //      -> se non riceve risposta da qualcuno entro 5 secondi lo da per morto e fa i conti in base ai sensori di cui ha risposta
+  // -> sensore DISCONNECTED non fa nulla e non risponde a nessuno
+  //
+
   def sensorRead: Double = Random.between(0.0, 10.5)
 
-  def apply(position: (Int, Int), zone: String, fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand] =
+  def apply(position: (Int, Int),
+            zone: String,
+            fireStation: Option[ActorRef[FireStationCommand]] = None,
+            otherSensor: List[ActorRef[SensorCommand]] = List.empty): Behavior[SensorCommand] =
     Behaviors.setup (context => {
       context.spawnAnonymous(manageFireStation(context.self))
+      context.spawnAnonymous(manageOtherSensor(context.self))
       context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
       Behaviors.withTimers(timer => {
-        sensorLogic(position, zone, context, timer, fireStation)
+        sensorLogic(position, zone, context, timer, fireStation, otherSensor :+ context.self)
       })
     })
 
@@ -46,13 +68,38 @@ object SensorActor:
       }
     })
 
+  def manageOtherSensor(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
+    Behaviors.setup (context => {
+      context.system.receptionist ! Receptionist.Subscribe(SensorActor.sensorKey, context.self)
+      Behaviors.receiveMessage {
+        case msg: Receptionist.Listing =>
+          sendReplyTo ! OtherSensorRegistered(msg.serviceInstances(SensorActor.sensorKey).toList)
+          Behaviors.same
+      }
+    })
+
   def sensorLogic(position: (Int, Int),
                   zone: String,
                   ctx: ActorContext[SensorCommand],
                   timer: TimerScheduler[SensorCommand],
-                  fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand] =
+                  fireStation: Option[ActorRef[FireStationCommand]] = None,
+                  otherSensor: List[ActorRef[SensorCommand]] = List.empty): Behavior[SensorCommand] =
     Behaviors.receiveMessage(msg => {
       msg match
+
+        case OtherSensorRegistered(otherSensors) =>
+          otherSensors.filter(!otherSensor.contains(_)).foreach( _ ! MyZoneSensorRequest(ctx.self, zone))
+          Behaviors.same
+
+        case MyZoneSensorRequest(sensorToReply, zn) =>
+          if (zone == zn) {
+            sensorToReply ! MyZoneSensorResponse(ctx.self)
+          }
+          Behaviors.same
+
+        case MyZoneSensorResponse(sensorRef) =>
+          sensorLogic(position, zone, ctx, timer, fireStation, otherSensor :+ sensorRef)
+          Behaviors.same
 
         case FireStationRegistered(listings) =>
           if fireStation.isEmpty then listings.foreach(_ ! MyZoneRequest(ctx.self, zone))

@@ -26,7 +26,9 @@ object FireStationActor:
       standardBehavior(position, zone, ctx)
   })
 
-  def standardBehavior(position: (Int, Int), zone: String, ctx: ActorContext[FireStationCommand]): Behavior[FireStationCommand] =
+  def standardBehavior(position: (Int, Int),
+                       zone: String,
+                       ctx: ActorContext[FireStationCommand]): Behavior[FireStationCommand] =
     Behaviors.withTimers(timers => {
       Behaviors.receiveMessage(msg => {
         msg match
