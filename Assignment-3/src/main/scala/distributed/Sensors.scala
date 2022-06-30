@@ -10,14 +10,16 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, Su
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.receptionist.ServiceKey
-
-import scala.util.Random
+import akka.util.Timeout
+import scala.util.{Random, Success}
 import concurrent.duration.DurationInt
 import scala.collection.mutable.ListBuffer
 
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
 case class ReconnectToGUI() extends SensorCommand
+case class IsSensorInAlarmRequest(replyTo: ActorRef[SensorCommand]) extends SensorCommand
+case class IsSensorInAlarmResponse(sensorState: SensorState) extends SensorCommand
 case class FireStationRegistered(fireStation: List[ActorRef[FireStationCommand]]) extends SensorCommand
 case class OtherSensorRegistered(otherSensors: List[ActorRef[SensorCommand]]) extends SensorCommand
 case class MyZoneSensorRequest(sensorToReply: ActorRef[SensorCommand], zone: String) extends SensorCommand
@@ -25,7 +27,14 @@ case class MyZoneSensorResponse(sensorRef: ActorRef[SensorCommand]) extends Sens
 case class MyStationResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
 case class GetSensorInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
+enum SensorState {
+  case OK
+  case Warning
+  case Disconnected
+}
+
 object SensorActor:
+
   // qua ci vanno le variabile che sono UNICHE per tutti i sensori
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
@@ -86,6 +95,9 @@ object SensorActor:
                   timer: TimerScheduler[SensorCommand],
                   fireStation: Option[ActorRef[FireStationCommand]] = None,
                   otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
+    implicit val timeout: Timeout = 10.seconds
+    var level = 0.0
+    var sensorResponse = ListBuffer.empty[SensorState]
     Behaviors.receiveMessage(msg => {
       msg match
 
@@ -101,7 +113,6 @@ object SensorActor:
 
         case MyZoneSensorResponse(sensorRef) =>
           otherSensor += sensorRef
-          println("I'm sensor "+ctx.self+" and I'm connected to "+otherSensor)
           sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
           Behaviors.same
 
@@ -113,27 +124,54 @@ object SensorActor:
           sensorLogic(position, zone, ctx, timer, Some(fireStationRef), otherSensor)
 
         case Update() =>
-          val level: Double = sensorRead
+          level = sensorRead
           level match
+
             case level if level <= 8 =>
-              println("Sensor" + zone + " - OK")
+              println("Sensor" + zone + " - OK " + level)
               viewActor.get ! SensorUpdate(position, false)
-              timer.startSingleTimer(Update(), 10000.millis)
-              Behaviors.same
-            case level if level <= 10 =>
-              println("Sensor" + zone + " - WARNING(" + level + ")")
-              viewActor.get ! SensorUpdate(position, true)
-              // TODO avvisare gli altri sensori
-              fireStation.get ! Alarm(zone)
-              viewActor.get ! AlarmView(zone)
               timer.startSingleTimer(Update(), 15000.millis)
               Behaviors.same
+
+            case level if level <= 10 =>
+              println("Sensor" + zone + " - WARNING(" + level + ")" + ctx.self)
+              viewActor.get ! SensorUpdate(position, true)
+              timer.startSingleTimer(Update(), 15000.millis)
+              otherSensor.foreach( sens =>
+                if sens != ctx.self
+                then
+                  ctx.ask(sens,  _ => IsSensorInAlarmRequest(ctx.self)){
+                    case Success(IsSensorInAlarmResponse(sensorState)) => IsSensorInAlarmResponse(sensorState)
+                    case _ => IsSensorInAlarmResponse(SensorState.Disconnected)
+                  }
+              )
+
+              Behaviors.same
+
             case _ =>
               println("Sensor" + zone + " - DISCONNECTED")
               viewActor.get ! SensorDisconnected(position)
-              Thread.sleep(20000)
+              Thread.sleep(15000)
               ctx.self ! ReconnectToGUI()
               Behaviors.same
+
+        case IsSensorInAlarmRequest(replyTo) =>
+          println("I'm sensor: "+ctx.self +" I must reply to: " + replyTo + " and this is my level" + level)
+          replyTo ! IsSensorInAlarmResponse(if level <= 8 then SensorState.OK else SensorState.Warning)
+          Behaviors.same
+
+        case IsSensorInAlarmResponse(sensorState) =>
+          println("I'm sensor: "+ctx.self +" and i have this reply: " + sensorState)
+          sensorResponse += sensorState
+          if sensorResponse.size == otherSensor.size - 1
+          then
+            println("Ho tutte le risposte: " + sensorResponse)
+            if sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size > 0.5
+            then
+              fireStation.get ! Alarm(zone)
+              viewActor.get ! AlarmView(zone)
+            sensorResponse = ListBuffer.empty
+          Behaviors.same
 
         case ReconnectToGUI() =>
           println("Sensor" + zone + " - RECONNECTED")
