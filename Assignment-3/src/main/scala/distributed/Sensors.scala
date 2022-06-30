@@ -65,7 +65,7 @@ object SensorActor:
           level match
             case level if level <= 8 =>
               viewActor.get ! SensorUpdate(position, false)
-              timer.startSingleTimer(Update(), 10000.millis)
+              timer.startTimerAtFixedRate(Update(), 10000.millis)
               Behaviors.same
             case level if level <= 10 =>
               println("Sensor" + zone + " - WARNING(" + level + ")")
@@ -73,16 +73,19 @@ object SensorActor:
               // TODO avvisare gli altri sensori
               fireStation.get ! Alarm(zone)
               viewActor.get ! AlarmView(zone)
-              timer.startSingleTimer(Update(), 10000.millis)
+              timer.startTimerAtFixedRate(Update(), 10000.millis)
               Behaviors.same
             case _ =>
               println("Sensor" + zone + " - DISCONNECTED")
               viewActor.get ! SensorDisconnected(position)
-              timer.startSingleTimer(ReconnectToGUI(), 20000.millis)
+              Thread.sleep(20000)
+              ctx.self ! ReconnectToGUI()
+              //timer.startSingleTimer(ReconnectToGUI(), 20000.millis)
               Behaviors.same
         case ReconnectToGUI() =>
           println("Sensor" + zone + " - RECONNECTED")
           viewActor.get ! SensorReconnected(position)
+          ctx.self ! Update()
           Behaviors.same
         case GetSensorInfo(context) =>
           viewActor = Some(context)

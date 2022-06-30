@@ -6,6 +6,8 @@ import akka.actor.typed.scaladsl.Behaviors
 import distributed.Message
 import distributed.Zone
 
+import javax.swing.SwingUtilities
+
 trait ViewCommand extends Message
 case class StartGUI(cityGrid: CityGrid) extends ViewCommand
 case class SensorDisconnected(position: (Int, Int)) extends ViewCommand
@@ -21,9 +23,13 @@ case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCo
 object ViewActor:
   var view: Option[View] = None
   var city: Option[CityGrid] = None
-  var fireStations: Map[String, ActorRef[FireStationCommand]] = Map.empty
+  var fireStationActors: Map[String, ActorRef[FireStationCommand]] = Map.empty
 
-  def refreshGUI(): Unit = view.get.display(city.get)
+
+  def refreshGUI(): Unit =
+    SwingUtilities.invokeLater(() => {
+      view.get.display(city.get)
+    })
 
   def apply(): Behavior[ViewCommand | Receptionist.Listing] =
     Behaviors.setup(ctx => {
@@ -58,7 +64,7 @@ object ViewActor:
           case StationInfo(position, actorRef, zoneID) =>
             if !city.get.fireStations.contains(position)
             then
-              fireStations = fireStations + (zoneID -> actorRef)
+              fireStationActors = fireStationActors + (zoneID -> actorRef)
               city.get.fireStations = city.get.fireStations + (position -> false)
               refreshGUI()
             Behaviors.same
@@ -90,8 +96,8 @@ object ViewActor:
 
           case ResetAlarm(zoneID) =>
             city.get.zonesAlarmed -= city.get.zones.find(z => z.id == zoneID).get
-            fireStations(zoneID) ! EndAssistance()
             refreshGUI()
+            fireStationActors(zoneID) ! EndAssistance()
             Behaviors.same
 
           case SensorUpdate(position, overLevel) =>
