@@ -10,8 +10,10 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, Su
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.receptionist.ServiceKey
+
 import scala.util.Random
 import concurrent.duration.DurationInt
+import scala.collection.mutable.ListBuffer
 
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
@@ -48,17 +50,17 @@ object SensorActor:
   def apply(position: (Int, Int),
             zone: String,
             fireStation: Option[ActorRef[FireStationCommand]] = None,
-            otherSensor: List[ActorRef[SensorCommand]] = List.empty): Behavior[SensorCommand] =
+            otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
     Behaviors.setup (context => {
+      context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
       context.spawnAnonymous(manageFireStation(context.self))
       context.spawnAnonymous(manageOtherSensor(context.self))
-      context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
       Behaviors.withTimers(timer => {
-        sensorLogic(position, zone, context, timer, fireStation, otherSensor :+ context.self)
+        sensorLogic(position, zone, context, timer, fireStation)
       })
     })
 
-  def manageFireStation(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
+  private def manageFireStation(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
     Behaviors.setup (context => {
       context.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, context.self)
       Behaviors.receiveMessage {
@@ -68,7 +70,7 @@ object SensorActor:
       }
     })
 
-  def manageOtherSensor(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
+  private def manageOtherSensor(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
     Behaviors.setup (context => {
       context.system.receptionist ! Receptionist.Subscribe(SensorActor.sensorKey, context.self)
       Behaviors.receiveMessage {
@@ -78,17 +80,17 @@ object SensorActor:
       }
     })
 
-  def sensorLogic(position: (Int, Int),
+  private def sensorLogic(position: (Int, Int),
                   zone: String,
                   ctx: ActorContext[SensorCommand],
                   timer: TimerScheduler[SensorCommand],
                   fireStation: Option[ActorRef[FireStationCommand]] = None,
-                  otherSensor: List[ActorRef[SensorCommand]] = List.empty): Behavior[SensorCommand] =
+                  otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
     Behaviors.receiveMessage(msg => {
       msg match
 
-        case OtherSensorRegistered(otherSensors) =>
-          otherSensors.filter(!otherSensor.contains(_)).foreach( _ ! MyZoneSensorRequest(ctx.self, zone))
+        case OtherSensorRegistered(other) =>
+          other.filter(!otherSensor.contains(_)).foreach( _ ! MyZoneSensorRequest(ctx.self, zone))
           Behaviors.same
 
         case MyZoneSensorRequest(sensorToReply, zn) =>
@@ -98,7 +100,9 @@ object SensorActor:
           Behaviors.same
 
         case MyZoneSensorResponse(sensorRef) =>
-          sensorLogic(position, zone, ctx, timer, fireStation, otherSensor :+ sensorRef)
+          otherSensor += sensorRef
+          println("I'm sensor "+ctx.self+" and I'm connected to "+otherSensor)
+          sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
           Behaviors.same
 
         case FireStationRegistered(listings) =>
@@ -106,7 +110,7 @@ object SensorActor:
           Behaviors.same
 
         case MyStationResponse(fireStationRef) =>
-          sensorLogic(position, zone, ctx, timer, Some(fireStationRef))
+          sensorLogic(position, zone, ctx, timer, Some(fireStationRef), otherSensor)
 
         case Update() =>
           val level: Double = sensorRead
@@ -122,7 +126,7 @@ object SensorActor:
               // TODO avvisare gli altri sensori
               fireStation.get ! Alarm(zone)
               viewActor.get ! AlarmView(zone)
-              timer.startSingleTimer(Update(), 10000.millis)
+              timer.startSingleTimer(Update(), 15000.millis)
               Behaviors.same
             case _ =>
               println("Sensor" + zone + " - DISCONNECTED")
@@ -140,6 +144,6 @@ object SensorActor:
         case GetSensorInfo(context) =>
           viewActor = Some(context)
           context ! SensorInfo(position)
-          timer.startSingleTimer(Update(), 10000.millis)
+          timer.startSingleTimer(Update(), 15000.millis)
           Behaviors.same
     })
