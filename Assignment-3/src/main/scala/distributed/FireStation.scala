@@ -32,9 +32,7 @@ object FireStationActor:
         msg match
 
           case MyZoneRequest(reply, zn) =>
-            println("My zone req received")
             if zone == zn then
-              println("Sensor with zone: "+ zn + " in FireStation: "+zone)
               reply ! MyStationResponse(ctx.self)
             Behaviors.same
 
@@ -44,7 +42,7 @@ object FireStationActor:
             Behaviors.same
 
           case Alarm(zoneId) =>
-            println("Alarm form Sensor: "+ zoneId + " in FireStation: "+zone)
+            println("Alarm from Sensor: "+ zoneId + " in FireStation: "+zone)
             if zoneId.equals(zone)
             then
               println("Station" + zone + ": Alarm Received")
@@ -56,6 +54,9 @@ object FireStationActor:
             viewActor.get ! StationBusy(position)
             busyBehavior(position, zone, ctx)
 
+          case EndAssistance() =>
+            Behaviors.same
+
           case _ => throw IllegalStateException()
       })
   })
@@ -66,7 +67,7 @@ object FireStationActor:
     msg match
       
       case EndAssistance() =>
-        viewActor.get ! StationFree(position)
+        println("Station" + zone + ": Assistance Ended")
         standardBehavior(position, zone, context)
         
       case _ => throw IllegalStateException()

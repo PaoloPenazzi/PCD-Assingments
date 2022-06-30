@@ -5,7 +5,7 @@ import it.unibo.pcd.assignment.Message
 
 import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Color, Graphics, Graphics2D, RenderingHints}
-import javax.swing.{JButton, JFrame, JPanel}
+import javax.swing.{JButton, JFrame, JPanel, SwingUtilities}
 import scala.collection.mutable.ListBuffer
 
 trait View:
@@ -35,8 +35,11 @@ object View:
       setVisible(true)
 
     override def display(city: CityGrid): Unit =
-      cityPanel.city = Option(city)
-      repaint()
+      SwingUtilities.invokeLater(() =>
+        cityPanel.city = Option(city)
+        repaint()
+      )
+
 
 class CityPanel(width: Int, height: Int) extends JPanel:
   var city: Option[CityGrid] = None
