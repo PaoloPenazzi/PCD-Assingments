@@ -24,6 +24,7 @@ object ViewActor:
   var view: Option[View] = None
   var city: Option[CityGrid] = None
   var fireStationActors: Map[String, ActorRef[FireStationCommand]] = Map.empty
+  var fireStationZone: Map[String, (Int, Int)] = Map.empty
 
 
   def refreshGUI(): Unit =
@@ -35,14 +36,15 @@ object ViewActor:
     Behaviors.setup(ctx => {
       Behaviors.receiveMessage { message =>
         message match
+
           case message: Receptionist.Listing =>
             val id = message.getKey.id
             id match
               case id if id.contains("sensor") =>
-                message.serviceInstances(SensorActor.sensorKey).toList.foreach(z => z ! GetSensorInfo(ctx.self))
+                message.serviceInstances(SensorActor.sensorKey).toList.foreach(_ ! GetSensorInfo(ctx.self))
                 Behaviors.same
               case id if id.contains("fire") =>
-                message.serviceInstances(FireStationActor.fireStationKey).toList.foreach(z => z ! GetStationInfo(ctx.self))
+                message.serviceInstances(FireStationActor.fireStationKey).toList.foreach(_ ! GetStationInfo(ctx.self))
                 Behaviors.same
 
           case StartGUI(cityGrid) =>
@@ -64,6 +66,7 @@ object ViewActor:
           case StationInfo(position, actorRef, zoneID) =>
             if !city.get.fireStations.contains(position)
             then
+              fireStationZone = fireStationZone + (zoneID -> position)
               fireStationActors = fireStationActors + (zoneID -> actorRef)
               city.get.fireStations = city.get.fireStations + (position -> false)
               refreshGUI()
@@ -84,26 +87,24 @@ object ViewActor:
             refreshGUI()
             Behaviors.same
 
-          case StationFree(position) =>
-            city.get.fireStations = city.get.fireStations + (position -> false)
-            refreshGUI()
-            Behaviors.same
-
           case AlarmView(zoneID) =>
-            city.get.zonesAlarmed += city.get.zones.find(z => z.id == zoneID).get
+            city.get.zonesAlarmed += city.get.zones.find(_.id == zoneID).get
             refreshGUI()
             Behaviors.same
 
           case ResetAlarm(zoneID) =>
-            city.get.zonesAlarmed -= city.get.zones.find(z => z.id == zoneID).get
+            city.get.zonesAlarmed -= city.get.zones.find(_.id == zoneID).get
+            city.get.fireStations = city.get.fireStations + (fireStationZone(zoneID) -> false)
             refreshGUI()
             fireStationActors(zoneID) ! EndAssistance()
             Behaviors.same
 
           case SensorUpdate(position, overLevel) =>
             if overLevel 
-            then city.get.sensors = city.get.sensors + (position -> true)
-            else city.get.sensors = city.get.sensors + (position -> false)
+            then
+              city.get.sensors = city.get.sensors + (position -> true)
+            else
+              city.get.sensors = city.get.sensors + (position -> false)
             refreshGUI()
             Behaviors.same
 
