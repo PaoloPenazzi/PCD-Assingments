@@ -44,9 +44,10 @@ object Supervisor :
   do
     startupWithRole("STATION", port)(Supervisor(z.id, Supervisor.randomPosition(z)))
     port = port + 1
-  for
-    z <- cityGrid.zones
-  do
-    startupWithRole("SENSOR", port)(Supervisor(z.id, Supervisor.randomPosition(z)))
-    port = port + 1
+  for _ <- 1 to 3
+    do
+      for z <- cityGrid.zones
+      do
+        startupWithRole("SENSOR", port)(Supervisor(z.id, Supervisor.randomPosition(z)))
+        port = port + 1
 
