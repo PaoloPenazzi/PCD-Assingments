@@ -16,7 +16,6 @@ case class GetStationInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) ext
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
-  // qua ci vanno le variabile che sono UNICHE per tutti le firestation
   val fireStationKey: ServiceKey[FireStationCommand] = ServiceKey[FireStationCommand]("fireStation")
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
 

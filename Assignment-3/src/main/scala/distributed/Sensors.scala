@@ -39,7 +39,6 @@ object SensorState extends Enumeration {
 }
 
 object SensorActor:
-
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
 
