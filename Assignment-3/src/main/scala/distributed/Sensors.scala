@@ -83,7 +83,7 @@ object SensorActor:
                   timer: TimerScheduler[SensorCommand],
                   fireStation: Option[ActorRef[FireStationCommand]] = None,
                   otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
-    implicit val timeout: Timeout = 5.seconds
+    implicit val timeout: Timeout = 2.seconds
     var level = 0.0
     var sensorResponse = ListBuffer.empty[SensorState]
     Behaviors.receiveMessage(msg => {
@@ -100,8 +100,10 @@ object SensorActor:
           Behaviors.same
 
         case MyZoneSensorResponse(sensorRef) =>
-          otherSensor += sensorRef
-          sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
+          if !otherSensor.contains(sensorRef)
+          then
+            otherSensor += sensorRef
+            sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
           Behaviors.same
 
         case FireStationRegistered(listings) =>
@@ -116,15 +118,15 @@ object SensorActor:
           level match
 
             case level if level <= 7 =>
-              //println("Sensor" + zone + " - OK " + level)
+              println("Sensor" + zone + " - OK " + level)
               viewActor.get ! SensorUpdate(position, false)
-              timer.startSingleTimer(Update(), 15000.millis)
+              timer.startSingleTimer(Update(), 10000.millis)
               Behaviors.same
 
             case level if level <= 10 =>
-              //println("Sensor" + zone + " - WARNING(" + level + ")" + ctx.self)
               viewActor.get ! SensorUpdate(position, true)
-              timer.startSingleTimer(Update(), 15000.millis)
+              println("Sensor" + zone + " - WARNING")
+              timer.startSingleTimer(Update(), 10000.millis)
               otherSensor.foreach(actor => ctx.ask(actor, IsSensorInAlarmRequest.apply) {
                 case Success(IsSensorInAlarmResponse(sensorState)) => IsSensorInAlarmResponse(sensorState)
                 case _ => IsSensorInAlarmResponse(SensorState.Disconnected)
@@ -132,9 +134,9 @@ object SensorActor:
               Behaviors.same
 
             case _ =>
-              println("Sensor" + zone + " - DISCONNECTED")
               viewActor.get ! SensorDisconnected(position)
-              Thread.sleep(15000)
+              println("Sensor" + zone + " - DISCONNECTED")
+              Thread.sleep(20000)
               ctx.self ! ReconnectToGUI()
               Behaviors.same
 
@@ -148,7 +150,7 @@ object SensorActor:
           if sensorResponse.size == otherSensor.size
           then
             val quorum: Double = sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size.toDouble
-            println("Ho tutte le risposte: " + sensorResponse + "   QUORUM: " + quorum)
+            println("Zone " + zone + " Ho tutte le risposte: " + sensorResponse + " QUORUM: " + quorum)
             if quorum > 0.5
             then
               fireStation.get ! Alarm(zone)

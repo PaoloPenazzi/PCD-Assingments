@@ -103,11 +103,7 @@ object ViewActor:
             Behaviors.same
 
           case SensorUpdate(position, overLevel) =>
-            if overLevel 
-            then
-              city.get.sensors = city.get.sensors + (position -> true)
-            else
-              city.get.sensors = city.get.sensors + (position -> false)
+            city.get.sensors = city.get.sensors + (position -> overLevel)
             refreshGUI()
             Behaviors.same
 
