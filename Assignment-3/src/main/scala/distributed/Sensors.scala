@@ -6,14 +6,20 @@ import distributed.ViewCommand
 import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.scaladsl.*
 import akka.actor.typed.scaladsl.adapter.*
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, SupervisorStrategy, Terminated}
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, Scheduler, SupervisorStrategy, Terminated}
 import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.receptionist.ServiceKey
 import akka.util.Timeout
-import scala.util.{Random, Success}
+
+import scala.util.{Failure, Random, Success}
+import akka.pattern.ask
+import distributed.SensorState.SensorState
+
 import concurrent.duration.DurationInt
 import scala.collection.mutable.ListBuffer
+import scala.concurrent.ExecutionContextExecutor
+import scala.language.postfixOps
 
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
@@ -27,32 +33,15 @@ case class MyZoneSensorResponse(sensorRef: ActorRef[SensorCommand]) extends Sens
 case class MyStationResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
 case class GetSensorInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
 
-enum SensorState {
-  case OK
-  case Warning
-  case Disconnected
+object SensorState extends Enumeration {
+  type SensorState = Value
+  val OK, Warning, Disconnected = Value
 }
 
 object SensorActor:
 
-  // qua ci vanno le variabile che sono UNICHE per tutti i sensori
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
   var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
-
-  // in una prima fase il sensore non sa nulla sugli altri sensori e quindi in fase di istanziazione dovrà
-  // farsi dare il riferimento (in questa fase supponiamo che i sensori non muoiano)
-
-  // update avviene ogni 15/20 secondi così il sensore ha il tempo ricevere tutti i messaggi e non rischia nel frattempo
-  // di morire
-  // una volta che i sensori di una zona hanno il riferimento di tutti gli altri i casi sono:
-  // -> sensore OK non fa nulla
-  // -> sensore WARNING invia messaggio di warning ai sensori della stessa zona chiedendogli come sono messi loro e
-  //    quando arrivano i messaggi controlla se sono in warning o no:
-  //      -> se più della metà in warning invia allarme alla caserma
-  //      -> se non sono più di metà in warning non fa nulla
-  //      -> se non riceve risposta da qualcuno entro 5 secondi lo da per morto e fa i conti in base ai sensori di cui ha risposta
-  // -> sensore DISCONNECTED non fa nulla e non risponde a nessuno
-  //
 
   def sensorRead: Double = Random.between(0.0, 10.5)
 
@@ -95,7 +84,7 @@ object SensorActor:
                   timer: TimerScheduler[SensorCommand],
                   fireStation: Option[ActorRef[FireStationCommand]] = None,
                   otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
-    implicit val timeout: Timeout = 10.seconds
+    implicit val timeout: Timeout = 5.seconds
     var level = 0.0
     var sensorResponse = ListBuffer.empty[SensorState]
     Behaviors.receiveMessage(msg => {
@@ -127,7 +116,7 @@ object SensorActor:
           level = sensorRead
           level match
 
-            case level if level <= 8 =>
+            case level if level <= 6 =>
               println("Sensor" + zone + " - OK " + level)
               viewActor.get ! SensorUpdate(position, false)
               timer.startSingleTimer(Update(), 15000.millis)
@@ -137,15 +126,10 @@ object SensorActor:
               println("Sensor" + zone + " - WARNING(" + level + ")" + ctx.self)
               viewActor.get ! SensorUpdate(position, true)
               timer.startSingleTimer(Update(), 15000.millis)
-              otherSensor.foreach( sens =>
-                if sens != ctx.self
-                then
-                  ctx.ask(sens,  _ => IsSensorInAlarmRequest(ctx.self)){
-                    case Success(IsSensorInAlarmResponse(sensorState)) => IsSensorInAlarmResponse(sensorState)
-                    case _ => IsSensorInAlarmResponse(SensorState.Disconnected)
-                  }
-              )
-
+              otherSensor.foreach(actor => ctx.ask(actor, IsSensorInAlarmRequest.apply) {
+                case Success(IsSensorInAlarmResponse(sensorState)) => IsSensorInAlarmResponse(sensorState)
+                case _ => IsSensorInAlarmResponse(SensorState.Disconnected)
+              })
               Behaviors.same
 
             case _ =>
@@ -157,16 +141,20 @@ object SensorActor:
 
         case IsSensorInAlarmRequest(replyTo) =>
           println("I'm sensor: "+ctx.self +" I must reply to: " + replyTo + " and this is my level" + level)
-          replyTo ! IsSensorInAlarmResponse(if level <= 8 then SensorState.OK else SensorState.Warning)
+          val myLevel: SensorState = if level <= 8 then SensorState.OK else SensorState.Warning
+          replyTo ! IsSensorInAlarmResponse(myLevel)
           Behaviors.same
 
         case IsSensorInAlarmResponse(sensorState) =>
           println("I'm sensor: "+ctx.self +" and i have this reply: " + sensorState)
           sensorResponse += sensorState
-          if sensorResponse.size == otherSensor.size - 1
+          if sensorResponse.size == otherSensor.size
           then
+            println("Count: "+sensorResponse.count(_ == SensorState.Warning))
+            println("Response: "+sensorResponse.size)
+
             println("Ho tutte le risposte: " + sensorResponse)
-            if sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size > 0.5
+            if (sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size) > 0.5
             then
               fireStation.get ! Alarm(zone)
               viewActor.get ! AlarmView(zone)
