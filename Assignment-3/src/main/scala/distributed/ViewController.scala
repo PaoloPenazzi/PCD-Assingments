@@ -94,6 +94,7 @@ object ViewActor:
 
           case ResetAlarm(zoneID) =>
             city.get.zonesAlarmed -= city.get.zones.find(_.id == zoneID).get
+            println(city.get.zonesAlarmed.toString() + "   -    " + zoneID)
             city.get.fireStations = city.get.fireStations + (fireStationZone(zoneID) -> false)
             refreshGUI()
             fireStationActors(zoneID) ! EndAssistance()

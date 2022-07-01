@@ -117,13 +117,13 @@ object SensorActor:
           level match
 
             case level if level <= 7 =>
-              println("Sensor" + zone + " - OK " + level)
+              //println("Sensor" + zone + " - OK " + level)
               viewActor.get ! SensorUpdate(position, false)
               timer.startSingleTimer(Update(), 15000.millis)
               Behaviors.same
 
             case level if level <= 10 =>
-              println("Sensor" + zone + " - WARNING(" + level + ")" + ctx.self)
+              //println("Sensor" + zone + " - WARNING(" + level + ")" + ctx.self)
               viewActor.get ! SensorUpdate(position, true)
               timer.startSingleTimer(Update(), 15000.millis)
               otherSensor.foreach(actor => ctx.ask(actor, IsSensorInAlarmRequest.apply) {
@@ -140,22 +140,17 @@ object SensorActor:
               Behaviors.same
 
         case IsSensorInAlarmRequest(replyTo) =>
-          println("I'm sensor: "+ctx.self +" I must reply to: " + replyTo + " and this is my level" + level)
           val myLevel: SensorState = if level <= 7 then SensorState.OK else SensorState.Warning
           replyTo ! IsSensorInAlarmResponse(myLevel)
           Behaviors.same
 
         case IsSensorInAlarmResponse(sensorState) =>
-          println("I'm sensor: "+ctx.self +" and i have this reply: " + sensorState)
           sensorResponse += sensorState
           if sensorResponse.size == otherSensor.size
           then
-            println("Count: "+sensorResponse.count(_ == SensorState.Warning))
-            println("Response: "+sensorResponse.size)
-
-            println("Ho tutte le risposte: " + sensorResponse)
-            println(sensorResponse.count(_ == SensorState.Warning))
-            if (sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size) > 0.5
+            val quorum: Double = sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size.toDouble
+            println("Ho tutte le risposte: " + sensorResponse + "   QUORUM: " + quorum)
+            if quorum > 0.5
             then
               fireStation.get ! Alarm(zone)
               viewActor.get ! AlarmView(zone)
