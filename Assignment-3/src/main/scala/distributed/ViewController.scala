@@ -88,13 +88,15 @@ object ViewActor:
             Behaviors.same
 
           case AlarmView(zoneID) =>
-            city.get.zonesAlarmed += city.get.zones.find(_.id == zoneID).get
-            refreshGUI()
+            val zoneAlarmed = city.get.zones.find(_.id == zoneID).get
+            if !city.get.zonesAlarmed.contains(zoneAlarmed)
+            then
+              city.get.zonesAlarmed += zoneAlarmed
+              refreshGUI()
             Behaviors.same
 
           case ResetAlarm(zoneID) =>
             city.get.zonesAlarmed -= city.get.zones.find(_.id == zoneID).get
-            println(city.get.zonesAlarmed.toString() + "   -    " + zoneID)
             city.get.fireStations = city.get.fireStations + (fireStationZone(zoneID) -> false)
             refreshGUI()
             fireStationActors(zoneID) ! EndAssistance()
