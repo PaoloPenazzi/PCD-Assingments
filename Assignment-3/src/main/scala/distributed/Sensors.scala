@@ -23,6 +23,7 @@ import scala.language.postfixOps
 
 sealed trait SensorCommand extends Message
 case class Update() extends SensorCommand
+case class EndDisconnection() extends SensorCommand
 case class ReconnectToGUI() extends SensorCommand
 case class IsSensorInAlarmRequest(replyTo: ActorRef[SensorCommand]) extends SensorCommand
 case class IsSensorInAlarmResponse(sensorState: SensorState) extends SensorCommand
@@ -46,8 +47,7 @@ object SensorActor:
 
   def apply(position: (Int, Int),
             zone: String,
-            fireStation: Option[ActorRef[FireStationCommand]] = None,
-            otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
+            fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand] =
     Behaviors.setup (context => {
       context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
       context.spawnAnonymous(manageFireStation(context.self))
@@ -117,16 +117,16 @@ object SensorActor:
           level = sensorRead
           level match
 
-            case level if level <= 7 =>
+            case level if level <= 8 =>
               println("Sensor" + zone + " - OK " + level)
               viewActor.get ! SensorUpdate(position, false)
-              timer.startSingleTimer(Update(), 10000.millis)
+              timer.startSingleTimer(Update(), 20.seconds)
               Behaviors.same
 
             case level if level <= 10 =>
               viewActor.get ! SensorUpdate(position, true)
               println("Sensor" + zone + " - WARNING")
-              timer.startSingleTimer(Update(), 10000.millis)
+              timer.startSingleTimer(Update(), 15.seconds)
               otherSensor.foreach(actor => ctx.ask(actor, IsSensorInAlarmRequest.apply) {
                 case Success(IsSensorInAlarmResponse(sensorState)) => IsSensorInAlarmResponse(sensorState)
                 case _ => IsSensorInAlarmResponse(SensorState.Disconnected)
@@ -136,9 +136,7 @@ object SensorActor:
             case _ =>
               viewActor.get ! SensorDisconnected(position)
               println("Sensor" + zone + " - DISCONNECTED")
-              Thread.sleep(20000)
-              ctx.self ! ReconnectToGUI()
-              Behaviors.same
+              disconnectedSensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
 
         case IsSensorInAlarmRequest(replyTo) =>
           val myLevel: SensorState = if level <= 7 then SensorState.OK else SensorState.Warning
@@ -167,6 +165,22 @@ object SensorActor:
         case GetSensorInfo(context) =>
           viewActor = Some(context)
           context ! SensorInfo(position)
-          timer.startSingleTimer(Update(), 10000.millis)
+          timer.startSingleTimer(Update(), 10.seconds)
           Behaviors.same
+    })
+
+  private def disconnectedSensorLogic(position: (Int, Int),
+                                      zone: String,
+                                      ctx: ActorContext[SensorCommand],
+                                      timer: TimerScheduler[SensorCommand],
+                                      fireStation: Option[ActorRef[FireStationCommand]] = None,
+                                      otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
+      timer.startSingleTimer(EndDisconnection(), 30.seconds)
+      Behaviors.receiveMessage(msg => {
+        msg match
+          case EndDisconnection() =>
+            ctx.self ! ReconnectToGUI()
+            sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
+
+          case _ => Behaviors.same
     })
