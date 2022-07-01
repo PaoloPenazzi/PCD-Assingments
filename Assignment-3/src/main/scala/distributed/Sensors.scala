@@ -116,7 +116,7 @@ object SensorActor:
           level = sensorRead
           level match
 
-            case level if level <= 6 =>
+            case level if level <= 7 =>
               println("Sensor" + zone + " - OK " + level)
               viewActor.get ! SensorUpdate(position, false)
               timer.startSingleTimer(Update(), 15000.millis)
@@ -141,7 +141,7 @@ object SensorActor:
 
         case IsSensorInAlarmRequest(replyTo) =>
           println("I'm sensor: "+ctx.self +" I must reply to: " + replyTo + " and this is my level" + level)
-          val myLevel: SensorState = if level <= 8 then SensorState.OK else SensorState.Warning
+          val myLevel: SensorState = if level <= 7 then SensorState.OK else SensorState.Warning
           replyTo ! IsSensorInAlarmResponse(myLevel)
           Behaviors.same
 
@@ -154,6 +154,7 @@ object SensorActor:
             println("Response: "+sensorResponse.size)
 
             println("Ho tutte le risposte: " + sensorResponse)
+            println(sensorResponse.count(_ == SensorState.Warning))
             if (sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size) > 0.5
             then
               fireStation.get ! Alarm(zone)
@@ -170,6 +171,6 @@ object SensorActor:
         case GetSensorInfo(context) =>
           viewActor = Some(context)
           context ! SensorInfo(position)
-          timer.startSingleTimer(Update(), 15000.millis)
+          timer.startSingleTimer(Update(), 10000.millis)
           Behaviors.same
     })
