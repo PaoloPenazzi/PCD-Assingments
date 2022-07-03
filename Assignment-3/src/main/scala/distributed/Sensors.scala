@@ -27,6 +27,7 @@ case class EndDisconnection() extends SensorCommand
 case class ReconnectToGUI() extends SensorCommand
 case class IsSensorInAlarmRequest(replyTo: ActorRef[SensorCommand]) extends SensorCommand
 case class IsSensorInAlarmResponse(sensorState: SensorState) extends SensorCommand
+case class ViewRegistered(views: List[ActorRef[ViewCommand | Receptionist.Listing]]) extends SensorCommand
 case class FireStationRegistered(fireStation: List[ActorRef[FireStationCommand]]) extends SensorCommand
 case class OtherSensorRegistered(otherSensors: List[ActorRef[SensorCommand]]) extends SensorCommand
 case class MyZoneSensorRequest(sensorToReply: ActorRef[SensorCommand], zone: String) extends SensorCommand
@@ -41,7 +42,7 @@ object SensorState extends Enumeration {
 
 object SensorActor:
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
-  var viewActor: Option[ActorRef[ViewCommand | Receptionist.Listing]] = None
+  var viewActors: ListBuffer[ActorRef[ViewCommand | Receptionist.Listing]] = ListBuffer.empty
 
   def sensorRead: Double = Random.between(0.0, 10.5)
 
@@ -50,11 +51,22 @@ object SensorActor:
             fireStation: Option[ActorRef[FireStationCommand]] = None): Behavior[SensorCommand] =
     Behaviors.setup (context => {
       context.system.receptionist ! Receptionist.Register(sensorKey, context.self)
+      context.spawnAnonymous(manageViewActor(context.self))
       context.spawnAnonymous(manageFireStation(context.self))
       context.spawnAnonymous(manageOtherSensor(context.self))
       Behaviors.withTimers(timer => {
         sensorLogic(position, zone, context, timer, fireStation)
       })
+    })
+
+  private def manageViewActor(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
+    Behaviors.setup (context => {
+      context.system.receptionist ! Receptionist.Subscribe(ViewActor.sensorKey, context.self)
+      Behaviors.receiveMessage {
+        case msg: Receptionist.Listing =>
+          sendReplyTo ! ViewRegistered(msg.serviceInstances(ViewActor.sensorKey).toList)
+          Behaviors.same
+      }
     })
 
   private def manageFireStation(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
@@ -89,6 +101,10 @@ object SensorActor:
     Behaviors.receiveMessage(msg => {
       msg match
 
+        case ViewRegistered(views) =>
+          views.filter(!viewActors.contains(_)).foreach(viewActors += _)
+          Behaviors.same
+
         case OtherSensorRegistered(other) =>
           other.filter(!otherSensor.contains(_)).foreach( _ ! MyZoneSensorRequest(ctx.self, zone))
           Behaviors.same
@@ -119,12 +135,14 @@ object SensorActor:
 
             case level if level <= 8 =>
               println("Sensor" + zone + " - OK " + level)
-              viewActor.get ! SensorUpdate(position, false)
+              viewActors.foreach(_ ! SensorUpdate(position, false))
+              // viewActors.get ! SensorUpdate(position, false)
               timer.startSingleTimer(Update(), 20.seconds)
               Behaviors.same
 
             case level if level <= 10 =>
-              viewActor.get ! SensorUpdate(position, true)
+              viewActors.foreach(_ ! SensorUpdate(position, true))
+              // viewActors.get ! SensorUpdate(position, true)
               println("Sensor" + zone + " - WARNING")
               timer.startSingleTimer(Update(), 15.seconds)
               otherSensor.foreach(actor => ctx.ask(actor, IsSensorInAlarmRequest.apply) {
@@ -134,7 +152,8 @@ object SensorActor:
               Behaviors.same
 
             case _ =>
-              viewActor.get ! SensorDisconnected(position)
+              viewActors.foreach(_ ! SensorDisconnected(position))
+              //viewActors.get ! SensorDisconnected(position)
               println("Sensor" + zone + " - DISCONNECTED")
               disconnectedSensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
 
@@ -152,18 +171,21 @@ object SensorActor:
             if quorum > 0.5
             then
               fireStation.get ! Alarm(zone)
-              viewActor.get ! AlarmView(zone)
+              viewActors.foreach(_ ! AlarmView(zone))
+              //viewActors.get ! AlarmView(zone)
             sensorResponse = ListBuffer.empty
           Behaviors.same
 
         case ReconnectToGUI() =>
           println("Sensor" + zone + " - RECONNECTED")
-          viewActor.get ! SensorReconnected(position)
+          viewActors.foreach(_ ! SensorUpdate(position, false))
+          // viewActors.get ! SensorReconnected(position)
           ctx.self ! Update()
           Behaviors.same
 
         case GetSensorInfo(context) =>
-          viewActor = Some(context)
+          viewActors += context
+          //viewActors = Some(List(context))
           context ! SensorInfo(position)
           timer.startSingleTimer(Update(), 10.seconds)
           Behaviors.same

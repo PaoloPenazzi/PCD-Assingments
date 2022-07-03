@@ -32,6 +32,11 @@ object Supervisor :
     (Random.between(zone.bounds.x0.toInt + 10, zone.bounds.x1.toInt - 10),
       Random.between(zone.bounds.y0.toInt + 10, zone.bounds.y1.toInt - 10))
   }
+  
+@main def demo2(): Unit =
+  val cityGrid = CityGrid(300, 300)
+  cityGrid.createCityGrid(3, 3)
+  startupWithRole("GUI", 2850)(Supervisor(cityGrid))
 
 
 @main def demo(): Unit =

@@ -5,6 +5,17 @@ import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, Su
 import akka.actor.typed.scaladsl.Behaviors
 import distributed.Message
 import distributed.Zone
+import distributed.CityGrid
+import distributed.Message
+import distributed.ViewCommand
+import akka.actor.typed.receptionist.Receptionist
+import akka.actor.typed.scaladsl.*
+import akka.actor.typed.scaladsl.adapter.*
+import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, Scheduler, SupervisorStrategy, Terminated}
+import akka.actor.typed.scaladsl.Behaviors
+import akka.actor.typed.receptionist.Receptionist
+import akka.actor.typed.receptionist.ServiceKey
+import akka.util.Timeout
 
 import javax.swing.SwingUtilities
 
@@ -21,6 +32,7 @@ case class ResetAlarm(id: String) extends ViewCommand
 case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCommand
 
 object ViewActor:
+  val sensorKey: ServiceKey[ViewCommand | Receptionist.Listing] = ServiceKey[ViewCommand | Receptionist.Listing]("view")
   var view: Option[View] = None
   var city: Option[CityGrid] = None
   var fireStationActors: Map[String, ActorRef[FireStationCommand]] = Map.empty
