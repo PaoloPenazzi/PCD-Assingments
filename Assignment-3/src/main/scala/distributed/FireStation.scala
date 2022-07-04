@@ -13,14 +13,14 @@ sealed trait FireStationCommand extends Message
 case class Alarm(zone: String) extends FireStationCommand
 case class StartAssistance() extends FireStationCommand
 case class EndAssistance() extends FireStationCommand
-case class NewViewRegistered(views: List[ActorRef[ViewCommand | Receptionist.Listing]]) extends FireStationCommand
+case class NewViewRegistered(views: List[ActorRef[ViewCommand]]) extends FireStationCommand
 case class MyZoneRequest(replyTo: ActorRef[SensorCommand], zone: String) extends FireStationCommand
-case class GetStationInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends FireStationCommand
+case class GetStationInfo(ctx: ActorRef[ViewCommand]) extends FireStationCommand
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
   val fireStationKey: ServiceKey[FireStationCommand] = ServiceKey[FireStationCommand]("fireStation")
-  var viewActors: ListBuffer[ActorRef[ViewCommand | Receptionist.Listing]] = ListBuffer.empty
+  var viewActors: ListBuffer[ActorRef[ViewCommand]] = ListBuffer.empty
 
   def apply(position: (Int, Int), zone: String): Behavior[FireStationCommand] =
     Behaviors.setup(ctx => {
@@ -31,10 +31,10 @@ object FireStationActor:
 
   private def manageViewActor(sendReplyTo: ActorRef[FireStationCommand]): Behavior[Receptionist.Listing] =
     Behaviors.setup (context => {
-      context.system.receptionist ! Receptionist.Subscribe(ViewActor.sensorKey, context.self)
+      context.system.receptionist ! Receptionist.Subscribe(ViewActor.viewKey, context.self)
       Behaviors.receiveMessage {
         case msg: Receptionist.Listing =>
-          sendReplyTo ! NewViewRegistered(msg.serviceInstances(ViewActor.sensorKey).toList)
+          sendReplyTo ! NewViewRegistered(msg.serviceInstances(ViewActor.viewKey).toList)
           Behaviors.same
       }
     })

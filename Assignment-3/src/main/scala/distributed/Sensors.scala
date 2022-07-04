@@ -27,13 +27,13 @@ case class EndDisconnection() extends SensorCommand
 case class ReconnectToGUI() extends SensorCommand
 case class IsSensorInAlarmRequest(replyTo: ActorRef[SensorCommand]) extends SensorCommand
 case class IsSensorInAlarmResponse(sensorState: SensorState) extends SensorCommand
-case class ViewRegistered(views: List[ActorRef[ViewCommand | Receptionist.Listing]]) extends SensorCommand
+case class ViewRegistered(views: List[ActorRef[ViewCommand]]) extends SensorCommand
 case class FireStationRegistered(fireStation: List[ActorRef[FireStationCommand]]) extends SensorCommand
 case class OtherSensorRegistered(otherSensors: List[ActorRef[SensorCommand]]) extends SensorCommand
 case class MyZoneSensorRequest(sensorToReply: ActorRef[SensorCommand], zone: String) extends SensorCommand
 case class MyZoneSensorResponse(sensorRef: ActorRef[SensorCommand]) extends SensorCommand
 case class MyStationResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
-case class GetSensorInfo(ctx: ActorRef[ViewCommand | Receptionist.Listing]) extends SensorCommand
+case class GetSensorInfo(ctx: ActorRef[ViewCommand]) extends SensorCommand
 
 object SensorState extends Enumeration {
   type SensorState = Value
@@ -42,7 +42,7 @@ object SensorState extends Enumeration {
 
 object SensorActor:
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
-  var viewActors: ListBuffer[ActorRef[ViewCommand | Receptionist.Listing]] = ListBuffer.empty
+  var viewActors: ListBuffer[ActorRef[ViewCommand]] = ListBuffer.empty
 
   def sensorRead: Double = Random.between(0.0, 10.5)
 
@@ -61,10 +61,10 @@ object SensorActor:
 
   private def manageViewActor(sendReplyTo: ActorRef[SensorCommand]): Behavior[Receptionist.Listing] =
     Behaviors.setup (context => {
-      context.system.receptionist ! Receptionist.Subscribe(ViewActor.sensorKey, context.self)
+      context.system.receptionist ! Receptionist.Subscribe(ViewActor.viewKey, context.self)
       Behaviors.receiveMessage {
         case msg: Receptionist.Listing =>
-          sendReplyTo ! ViewRegistered(msg.serviceInstances(ViewActor.sensorKey).toList)
+          sendReplyTo ! ViewRegistered(msg.serviceInstances(ViewActor.viewKey).toList)
           Behaviors.same
       }
     })
