@@ -144,7 +144,7 @@ object SensorActor:
               viewActors.foreach(_ ! SensorUpdate(position, true))
               // viewActors.get ! SensorUpdate(position, true)
               println("Sensor" + zone + " - WARNING")
-              timer.startSingleTimer(Update(), 15.seconds)
+              timer.startSingleTimer(Update(), 20.seconds)
               otherSensor.foreach(actor => ctx.ask(actor, IsSensorInAlarmRequest.apply) {
                 case Success(IsSensorInAlarmResponse(sensorState)) => IsSensorInAlarmResponse(sensorState)
                 case _ => IsSensorInAlarmResponse(SensorState.Disconnected)
@@ -158,7 +158,7 @@ object SensorActor:
               disconnectedSensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
 
         case IsSensorInAlarmRequest(replyTo) =>
-          val myLevel: SensorState = if level <= 7 then SensorState.OK else SensorState.Warning
+          val myLevel: SensorState = if level <= 8 then SensorState.OK else SensorState.Warning
           replyTo ! IsSensorInAlarmResponse(myLevel)
           Behaviors.same
 
@@ -187,8 +187,10 @@ object SensorActor:
           viewActors += context
           //viewActors = Some(List(context))
           context ! SensorInfo(position)
-          timer.startSingleTimer(Update(), 10.seconds)
+          timer.startSingleTimer(Update(), 20.seconds)
           Behaviors.same
+
+        case EndDisconnection() => Behaviors.same
     })
 
   private def disconnectedSensorLogic(position: (Int, Int),
