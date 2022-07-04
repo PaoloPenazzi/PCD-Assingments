@@ -178,7 +178,7 @@ object SensorActor:
 
         case ReconnectToGUI() =>
           println("Sensor" + zone + " - RECONNECTED")
-          viewActors.foreach(_ ! SensorUpdate(position, false))
+          viewActors.foreach(_ ! SensorReconnected(position))
           // viewActors.get ! SensorReconnected(position)
           ctx.self ! Update()
           Behaviors.same
@@ -187,7 +187,7 @@ object SensorActor:
           viewActors += context
           //viewActors = Some(List(context))
           context ! SensorInfo(position)
-          timer.startSingleTimer(Update(), 20.seconds)
+          timer.startSingleTimer(Update(), 10.seconds)
           Behaviors.same
 
         case EndDisconnection() => Behaviors.same
@@ -199,12 +199,13 @@ object SensorActor:
                                       timer: TimerScheduler[SensorCommand],
                                       fireStation: Option[ActorRef[FireStationCommand]] = None,
                                       otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
-      timer.startSingleTimer(EndDisconnection(), 30.seconds)
+      timer.startSingleTimer(EndDisconnection(), 15.seconds)
       Behaviors.receiveMessage(msg => {
         msg match
           case EndDisconnection() =>
+            println("SUUUUUUUUUUUUUUUUUUU")
             ctx.self ! ReconnectToGUI()
             sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
 
-          case _ => Behaviors.same
+          case _ => println("AAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBCCCCCCCCCCC");Behaviors.same
     })
