@@ -38,6 +38,11 @@ object Supervisor :
   cityGrid.createCityGrid(3, 3)
   startupWithRole("GUI", 2850)(Supervisor(cityGrid))
 
+@main def demo3(): Unit =
+  val cityGrid = CityGrid(300, 300)
+  cityGrid.createCityGrid(3, 3)
+  startupWithRole("GUI", 2851)(Supervisor(cityGrid))
+
 
 @main def demo(): Unit =
   val cityGrid = CityGrid(300, 300)

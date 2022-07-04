@@ -35,10 +35,10 @@ object View:
       setVisible(true)
 
     override def display(city: CityGrid): Unit =
-      SwingUtilities.invokeLater(() =>
+      SwingUtilities.invokeLater(() => {
         cityPanel.city = Option(city)
         repaint()
-      )
+      })
 
 
 class CityPanel(width: Int, height: Int) extends JPanel:
@@ -79,6 +79,7 @@ class CityPanel(width: Int, height: Int) extends JPanel:
         do
           if city.get.fireStations(x._1) then g2.setColor(Color.GRAY) else g2.setColor(Color.GREEN)
           g2.fillRect(x._1._1 + 50, x._1._2 + 50, 8, 8)
+
 
   def setup(): Unit =
     setSize(width + 100, height + 100)

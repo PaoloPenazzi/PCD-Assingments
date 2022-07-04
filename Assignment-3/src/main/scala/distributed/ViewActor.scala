@@ -38,18 +38,15 @@ case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCo
 
 object ViewActor:
   val viewKey: ServiceKey[ViewCommand] = ServiceKey[ViewCommand]("view")
-  var view: Option[View] = None
-  var city: Option[CityGrid] = None
   var fireStationActors: Map[String, ActorRef[FireStationCommand]] = Map.empty
   var fireStationZone: Map[String, (Int, Int)] = Map.empty
   var viewActors: ListBuffer[ActorRef[ViewCommand]] = ListBuffer.empty
 
 
-  def refreshGUI(): Unit =
+  def refreshGUI(view: View, city: CityGrid): Unit =
     SwingUtilities.invokeLater(() => {
-      view.get.display(city.get)
+      view.display(city)
     })
-
 
   private def manageFireStation(sendReplyTo: ActorRef[ViewCommand]): Behavior[Receptionist.Listing] =
     Behaviors.setup (context => {
@@ -71,7 +68,6 @@ object ViewActor:
       }
     })
 
-
   private def manageViewActor(sendReplyTo: ActorRef[ViewCommand]): Behavior[Receptionist.Listing] =
     Behaviors.setup (context => {
       context.system.receptionist ! Receptionist.Subscribe(viewKey, context.self)
@@ -82,7 +78,8 @@ object ViewActor:
       }
     })
 
-  def apply(): Behavior[ViewCommand] =
+  def apply(view: Option[View] = None,
+            city: Option[CityGrid] = None): Behavior[ViewCommand] =
     Behaviors.setup(ctx => {
       ctx.system.receptionist ! Receptionist.Register(viewKey, ctx.self)
       ctx.spawnAnonymous(manageViewActor(ctx.self))
@@ -104,17 +101,17 @@ object ViewActor:
             Behaviors.same
 
           case StartGUI(cityGrid) =>
-            view = Some(View(cityGrid.width + 600, cityGrid.height + 200, ctx.self))
-            city = Some(cityGrid)
-            view.get.start(cityGrid.zones)
-            refreshGUI()
-            Behaviors.same
+            val myView = Some(View(cityGrid.width + 600, cityGrid.height + 200, ctx.self))
+            val myCity = Some(cityGrid)
+            myView.get.start(myCity.get.zones)
+            refreshGUI(myView.get, myCity.get)
+            ViewActor(myView, myCity)
 
           case SensorInfo(position) =>
             if !city.get.sensors.contains(position)
             then
               city.get.sensors = city.get.sensors + (position -> false)
-              refreshGUI()
+              refreshGUI(view.get, city.get)
             Behaviors.same
 
           case StationInfo(position, actorRef, zoneID) =>
@@ -123,22 +120,22 @@ object ViewActor:
               fireStationZone = fireStationZone + (zoneID -> position)
               fireStationActors = fireStationActors + (zoneID -> actorRef)
               city.get.fireStations = city.get.fireStations + (position -> false)
-              refreshGUI()
+              refreshGUI(view.get, city.get)
             Behaviors.same
 
           case SensorDisconnected(position) =>
             city.get.sensorsDisconnected += position
-            refreshGUI()
+            refreshGUI(view.get, city.get)
             Behaviors.same
 
           case SensorReconnected(position) =>
             city.get.sensorsDisconnected -= position
-            refreshGUI()
+            refreshGUI(view.get, city.get)
             Behaviors.same
 
           case StationBusy(position) =>
             city.get.fireStations = city.get.fireStations + (position -> true)
-            refreshGUI()
+            refreshGUI(view.get, city.get)
             Behaviors.same
 
           case AlarmView(zoneID) =>
@@ -146,7 +143,7 @@ object ViewActor:
             if !city.get.zonesAlarmed.contains(zoneAlarmed)
             then
               city.get.zonesAlarmed += zoneAlarmed
-              refreshGUI()
+              refreshGUI(view.get, city.get)
             Behaviors.same
 
           case NotifyAlarm(zoneID) =>
@@ -156,13 +153,13 @@ object ViewActor:
           case ResetAlarm(zoneID) =>
             city.get.zonesAlarmed -= city.get.zones.find(_.id == zoneID).get
             city.get.fireStations = city.get.fireStations + (fireStationZone(zoneID) -> false)
-            refreshGUI()
+            refreshGUI(view.get, city.get)
             fireStationActors(zoneID) ! EndAssistance()
             Behaviors.same
 
           case SensorUpdate(position, overLevel) =>
             city.get.sensors = city.get.sensors + (position -> overLevel)
-            refreshGUI()
+            refreshGUI(view.get, city.get)
             Behaviors.same
 
           case _ => throw IllegalStateException()

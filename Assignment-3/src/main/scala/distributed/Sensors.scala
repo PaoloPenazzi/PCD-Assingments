@@ -203,9 +203,8 @@ object SensorActor:
       Behaviors.receiveMessage(msg => {
         msg match
           case EndDisconnection() =>
-            println("SUUUUUUUUUUUUUUUUUUU")
             ctx.self ! ReconnectToGUI()
             sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
 
-          case _ => println("AAAAAAAAAAAAAAAAAAAABBBBBBBBBBBBBBBBBBCCCCCCCCCCC");Behaviors.same
+          case _ => Behaviors.same
     })
