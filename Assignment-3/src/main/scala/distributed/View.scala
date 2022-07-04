@@ -99,4 +99,4 @@ class ControlPanel(actor: ActorRef[ViewCommand]) extends JPanel:
 
   def actionPerformed(event: ActionEvent): Unit =
     val id: String = event.getSource.asInstanceOf[JButton].getText
-    actor ! ResetAlarm(id)
+    actor ! NotifyAlarm(id)
