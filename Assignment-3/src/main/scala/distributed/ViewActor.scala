@@ -145,7 +145,7 @@ object ViewActor:
             Behaviors.same
 
           case NotifyAlarm(zoneID) =>
-            viewActors.foreach( _ ! ResetAlarm(zoneID))
+            if city.get.fireStations(fireStationZone(zoneID)) then viewActors.foreach( _ ! ResetAlarm(zoneID))
             Behaviors.same
 
           case ResetAlarm(zoneID) =>
