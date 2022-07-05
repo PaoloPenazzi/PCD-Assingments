@@ -199,7 +199,7 @@ object SensorActor:
                                       timer: TimerScheduler[SensorCommand],
                                       fireStation: Option[ActorRef[FireStationCommand]] = None,
                                       otherSensor: ListBuffer[ActorRef[SensorCommand]] = ListBuffer.empty): Behavior[SensorCommand] =
-      timer.startSingleTimer(EndDisconnection(), 15.seconds)
+      timer.startSingleTimer(EndDisconnection(), Random.between(10, 30).seconds)
       Behaviors.receiveMessage(msg => {
         msg match
           case EndDisconnection() =>
