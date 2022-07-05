@@ -47,37 +47,38 @@ class CityPanel(width: Int, height: Int) extends JPanel:
   override def paint(g: Graphics): Unit =
     if city.isDefined
     then
+      val tmpCity = city.get
       val g2: Graphics2D = g.asInstanceOf
       g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
       g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
       g2.clearRect(0, 0, 2 * width, 2 * height)
-      g2.drawRect(50, 50, city.get.bounds.x1.toInt, city.get.bounds.y1.toInt)
-      for x <- city.get.zones
+      g2.drawRect(50, 50, tmpCity.bounds.x1.toInt, tmpCity.bounds.y1.toInt)
+      for x <- tmpCity.zones
         do
           g2.setColor(Color.BLACK)
           g2.drawRect(x.bounds.x0.toInt + 50,
             x.bounds.y0.toInt + 50,
             x.bounds.x1.toInt - x.bounds.x0.toInt,
             x.bounds.y1.toInt - x.bounds.y0.toInt)
-          if city.get.zonesAlarmed.contains(x)
+          if tmpCity.zonesAlarmed.contains(x)
           then
             g2.setColor(Color.YELLOW)
             g2.fillRect(x.bounds.x0.toInt + 51,
               x.bounds.y0.toInt + 51,
               x.bounds.x1.toInt - x.bounds.x0.toInt - 1,
               x.bounds.y1.toInt - x.bounds.y0.toInt - 1)
-      for x <- city.get.sensors
+      for x <- tmpCity.sensors
         do
-          if city.get.sensors(x._1) then g2.setColor(Color.RED) else g2.setColor(Color.BLUE)
-          if city.get.sensorsDisconnected.contains(x._1)
+          if tmpCity.sensors(x._1) then g2.setColor(Color.RED) else g2.setColor(Color.BLUE)
+          if tmpCity.sensorsDisconnected.contains(x._1)
           then
             g2.setColor(Color.WHITE)
             g2.drawOval(x._1._1 + 50, x._1._2 + 50, 8, 8)
           else
             g2.fillOval(x._1._1 + 50, x._1._2 + 50, 8, 8)
-      for x <- city.get.fireStations
+      for x <- tmpCity.fireStations
         do
-          if city.get.fireStations(x._1) then g2.setColor(Color.GRAY) else g2.setColor(Color.GREEN)
+          if tmpCity.fireStations(x._1) then g2.setColor(Color.GRAY) else g2.setColor(Color.GREEN)
           g2.fillRect(x._1._1 + 50, x._1._2 + 50, 8, 8)
 
 

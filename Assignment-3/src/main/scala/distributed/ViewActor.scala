@@ -44,9 +44,7 @@ object ViewActor:
 
 
   def refreshGUI(view: View, city: CityGrid): Unit =
-    SwingUtilities.invokeLater(() => {
-      view.display(city)
-    })
+    view.display(city)
 
   private def manageFireStation(sendReplyTo: ActorRef[ViewCommand]): Behavior[Receptionist.Listing] =
     Behaviors.setup (context => {

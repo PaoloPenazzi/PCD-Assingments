@@ -184,7 +184,7 @@ object SensorActor:
           Behaviors.same
 
         case GetSensorInfo(context) =>
-          viewActors += context
+          if !viewActors.contains(context) then viewActors += context
           //viewActors = Some(List(context))
           context ! SensorInfo(position)
           timer.startSingleTimer(Update(), 10.seconds)
