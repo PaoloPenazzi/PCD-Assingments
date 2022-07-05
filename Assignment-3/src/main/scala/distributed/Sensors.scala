@@ -202,6 +202,11 @@ object SensorActor:
       timer.startSingleTimer(EndDisconnection(), Random.between(10, 30).seconds)
       Behaviors.receiveMessage(msg => {
         msg match
+
+          case ViewRegistered(views) =>
+            views.filter(!viewActors.contains(_)).foreach(viewActors += _)
+            Behaviors.same
+
           case EndDisconnection() =>
             ctx.self ! ReconnectToGUI()
             sensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
