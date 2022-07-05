@@ -203,6 +203,11 @@ object SensorActor:
       Behaviors.receiveMessage(msg => {
         msg match
 
+          case GetSensorInfo(context) =>
+            if !viewActors.contains(context) then viewActors += context
+            context ! SensorInfo(position)
+            Behaviors.same
+
           case ViewRegistered(views) =>
             views.filter(!viewActors.contains(_)).foreach(viewActors += _)
             Behaviors.same
