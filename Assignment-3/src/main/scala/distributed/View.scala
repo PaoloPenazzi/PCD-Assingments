@@ -10,6 +10,7 @@ import scala.collection.mutable.ListBuffer
 
 trait View:
   def display(city: CityGrid): Unit
+
   def start(zones: List[Zone]): Unit
 
 object View:
@@ -30,6 +31,7 @@ object View:
       getContentPane.add(controlPanel, BorderLayout.NORTH)
       addWindowListener(new WindowAdapter() {
         override def windowClosing(ev: WindowEvent): Unit = System.exit(-1)
+
         override def windowClosed(ev: WindowEvent): Unit = System.exit(-1)
       })
       setVisible(true)
@@ -41,7 +43,7 @@ object View:
       })
 
 
-class CityPanel(width: Int, height: Int) extends JPanel:
+class CityPanel(width: Int, height: Int) extends JPanel :
   var city: Option[CityGrid] = None
 
   override def paint(g: Graphics): Unit =
@@ -86,7 +88,7 @@ class CityPanel(width: Int, height: Int) extends JPanel:
     setSize(width + 100, height + 100)
     setVisible(true)
 
-class ControlPanel(actor: ActorRef[ViewCommand]) extends JPanel:
+class ControlPanel(actor: ActorRef[ViewCommand]) extends JPanel :
   var buttons: ListBuffer[JButton] = ListBuffer.empty
 
   def setupView(zones: List[Zone]): Unit =

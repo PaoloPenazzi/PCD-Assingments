@@ -1,39 +1,43 @@
 package distributed
 
+import akka.actor.typed.*
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, SupervisorStrategy, Terminated}
-import akka.actor.typed.scaladsl.Behaviors
-import distributed.Message
-import distributed.Zone
-import distributed.CityGrid
-import distributed.Message
-import distributed.ViewCommand
-import akka.actor.typed.receptionist.Receptionist
 import akka.actor.typed.scaladsl.*
 import akka.actor.typed.scaladsl.adapter.*
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, Scheduler, SupervisorStrategy, Terminated}
-import akka.actor.typed.scaladsl.Behaviors
-import akka.actor.typed.receptionist.Receptionist
-import akka.actor.typed.receptionist.ServiceKey
 import akka.util.Timeout
+import distributed.{CityGrid, Message, ViewCommand, Zone}
 
 import javax.swing.SwingUtilities
 import scala.collection.mutable.ListBuffer
 
 trait ViewCommand extends Message
+
 case class StartGUI(cityGrid: CityGrid) extends ViewCommand
+
 case class SensorDisconnected(position: (Int, Int)) extends ViewCommand
+
 case class SensorReconnected(position: (Int, Int)) extends ViewCommand
+
 case class SensorInfo(position: (Int, Int)) extends ViewCommand
+
 case class StartNewSensor(sensors: List[ActorRef[SensorCommand]]) extends ViewCommand
+
 case class StartNewFireStation(firestations: List[ActorRef[FireStationCommand]]) extends ViewCommand
+
 case class StartNewView(views: List[ActorRef[ViewCommand]]) extends ViewCommand
+
 case class StationInfo(position: (Int, Int), actorRef: ActorRef[FireStationCommand], zoneID: String) extends ViewCommand
+
 case class StationBusy(position: (Int, Int)) extends ViewCommand
+
 case class StationFree(position: (Int, Int)) extends ViewCommand
+
 case class AlarmView(id: String) extends ViewCommand
+
 case class NotifyAlarm(id: String) extends ViewCommand
+
 case class ResetAlarm(id: String) extends ViewCommand
+
 case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCommand
 
 object ViewActor:
@@ -47,7 +51,7 @@ object ViewActor:
     view.display(city)
 
   private def manageFireStation(sendReplyTo: ActorRef[ViewCommand]): Behavior[Receptionist.Listing] =
-    Behaviors.setup (context => {
+    Behaviors.setup(context => {
       context.system.receptionist ! Receptionist.Subscribe(FireStationActor.fireStationKey, context.self)
       Behaviors.receiveMessage {
         case msg: Receptionist.Listing =>
@@ -57,7 +61,7 @@ object ViewActor:
     })
 
   private def manageOtherSensor(sendReplyTo: ActorRef[ViewCommand]): Behavior[Receptionist.Listing] =
-    Behaviors.setup (context => {
+    Behaviors.setup(context => {
       context.system.receptionist ! Receptionist.Subscribe(SensorActor.sensorKey, context.self)
       Behaviors.receiveMessage {
         case msg: Receptionist.Listing =>
@@ -67,7 +71,7 @@ object ViewActor:
     })
 
   private def manageViewActor(sendReplyTo: ActorRef[ViewCommand]): Behavior[Receptionist.Listing] =
-    Behaviors.setup (context => {
+    Behaviors.setup(context => {
       context.system.receptionist ! Receptionist.Subscribe(viewKey, context.self)
       Behaviors.receiveMessage {
         case message: Receptionist.Listing =>
@@ -145,7 +149,7 @@ object ViewActor:
             Behaviors.same
 
           case NotifyAlarm(zoneID) =>
-            if city.get.fireStations(fireStationZone(zoneID)) then viewActors.foreach( _ ! ResetAlarm(zoneID))
+            if city.get.fireStations(fireStationZone(zoneID)) then viewActors.foreach(_ ! ResetAlarm(zoneID))
             Behaviors.same
 
           case ResetAlarm(zoneID) =>

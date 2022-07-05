@@ -1,15 +1,15 @@
 package distributed
 
-import akka.actor.typed.{ActorSystem, Behavior}
 import akka.actor.typed.scaladsl.*
+import akka.actor.typed.{ActorSystem, Behavior}
 import akka.cluster.typed.Cluster
 import com.typesafe.config.ConfigFactory
 
-import concurrent.duration.DurationInt
+import scala.concurrent.duration.DurationInt
 import scala.language.postfixOps
 import scala.util.Random
 
-object Supervisor :
+object Supervisor:
 
   def apply(zone: String,
             position: (Int, Int)): Behavior[Nothing] = Behaviors.setup { ctx =>
@@ -32,7 +32,7 @@ object Supervisor :
     (Random.between(zone.bounds.x0.toInt + 10, zone.bounds.x1.toInt - 10),
       Random.between(zone.bounds.y0.toInt + 10, zone.bounds.y1.toInt - 10))
   }
-  
+
 @main def demo2(): Unit =
   val cityGrid = CityGrid(300, 300)
   cityGrid.createCityGrid(3, 3)
@@ -57,7 +57,7 @@ object Supervisor :
   for _ <- 1 to 3
     do
       for z <- cityGrid.zones
-      do
-        startupWithRole("SENSOR", port)(Supervisor(z.id, Supervisor.randomPosition(z)))
-        port = port + 1
+        do
+          startupWithRole("SENSOR", port)(Supervisor(z.id, Supervisor.randomPosition(z)))
+          port = port + 1
 

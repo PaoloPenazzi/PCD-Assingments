@@ -1,7 +1,8 @@
 package it.unibo.pcd.assignment
 
-import akka.actor.typed.scaladsl.Behaviors
 import akka.actor.typed.*
+import akka.actor.typed.scaladsl.Behaviors
+
 import java.awt.event.{ActionEvent, WindowAdapter, WindowEvent}
 import java.awt.{BorderLayout, Graphics, Graphics2D, RenderingHints}
 import javax.swing.{JButton, JFrame, JPanel, SwingUtilities}
@@ -9,7 +10,9 @@ import scala.collection.mutable
 
 trait View:
   def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit
+
   def updateScale(k: Double): Unit
+
   def start(): Unit
 
 object View:
@@ -30,32 +33,32 @@ object View:
       getContentPane.add(controlPanel)
       addWindowListener(new WindowAdapter() {
         override def windowClosing(ev: WindowEvent): Unit = System.exit(-1)
+
         override def windowClosed(ev: WindowEvent): Unit = System.exit(-1)
       })
       setVisible(true)
 
     override def display(bodies: mutable.Seq[Body], virtualTime: Double, iteration: Int, bounds: Boundary): Unit =
-        simulationPanel.bodies = bodies
-        simulationPanel.virtualTime = virtualTime
-        simulationPanel.iteration = iteration
-        simulationPanel.boundary = bounds
-        repaint()
+      simulationPanel.bodies = bodies
+      simulationPanel.virtualTime = virtualTime
+      simulationPanel.iteration = iteration
+      simulationPanel.boundary = bounds
+      repaint()
 
     override def updateScale(k: Double): Unit = simulationPanel.updateScale(k)
 
 class SimulationPanel(width: Int, height: Int) extends JPanel :
+  val dx: Int = width / 2 - 20
+  val dy: Int = height / 2 - 20
   var bodies: mutable.Seq[Body] = mutable.Seq.empty
   var virtualTime: Double = 0
   var iteration: Int = 0
   var boundary: Boundary = Boundary(0, 0, 0, 0)
   var scale: Double = 1
-  val dx: Int = width / 2 - 20
-  val dy: Int = height / 2 - 20
 
   def setup(): Unit = setSize(width, height)
+
   def updateScale(k: Double): Unit = scale = scale * k
-  private def getYCoordinate(y: Double): Int = (dy - y * dy * scale).toInt
-  private def getXCoordinate(x: Double): Int = (dx + x * dx * scale).toInt
 
   override def paint(g: Graphics): Unit =
     if (bodies.nonEmpty)
@@ -74,6 +77,10 @@ class SimulationPanel(width: Int, height: Int) extends JPanel :
       val time: String = String.format("%.2f", virtualTime)
       g2.drawString("Bodies: " + bodies.size + " - virtualTime: " + time
         + " - iteration: " + iteration + " (+ for zoom in, - for zoom out)", 2, 45)
+
+  private def getYCoordinate(y: Double): Int = (dy - y * dy * scale).toInt
+
+  private def getXCoordinate(x: Double): Int = (dx + x * dx * scale).toInt
 
 class ControlPanel(width: Int, height: Int, controller: ViewController) extends JPanel :
   var buttonsList: List[JButton] = List.empty

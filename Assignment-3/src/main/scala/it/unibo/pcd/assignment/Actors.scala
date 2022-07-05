@@ -1,6 +1,6 @@
 package it.unibo.pcd.assignment
 
-import akka.actor.typed.{ActorRef, ActorSystem, Behavior, DispatcherSelector, SupervisorStrategy, Terminated}
+import akka.actor.typed.*
 import akka.actor.typed.scaladsl.Behaviors
 
 import scala.collection.mutable
@@ -20,9 +20,11 @@ object SimulationActor:
           onPause(simulation, gui)
         case StartSimulation() =>
           // initialTime = System.currentTimeMillis()
-          if gui then {view = Some(context.spawn(ViewActor(context.self), "view-actor")); view.get ! StartGUI()}
+          if gui then {
+            view = Some(context.spawn(ViewActor(context.self), "view-actor")); view.get ! StartGUI()
+          }
           for (n <- 0 until simulation.numBodies)
-            val newActor = context.spawn(BodyActor(simulation.bodies(n)), "actor-number-"+ n.toString)
+            val newActor = context.spawn(BodyActor(simulation.bodies(n)), "actor-number-" + n.toString)
             actorsList = actorsList :+ newActor
             newActor ! ComputeVelocityRequest(simulation.bodies, context.self)
           Behaviors.same
@@ -45,24 +47,24 @@ object SimulationActor:
               actorsList.foreach(y => y ! ComputeVelocityRequest(simulation.bodies, context.self))
               Behaviors.same
             else
-              // val finalTime: Long = System.currentTimeMillis()
-              // println("Tempo: " + (finalTime - initialTime) + " ms")
+            // val finalTime: Long = System.currentTimeMillis()
+            // println("Tempo: " + (finalTime - initialTime) + " ms")
               Behaviors.stopped
           else Behaviors.same
         case _ => Behaviors.same
     }
 
   def onPause(simulation: Simulation, gui: Boolean): Behavior[Message] =
-    Behaviors.setup( ctx => {
-      Behaviors.withStash[Message](10000){ stash =>
-      Behaviors.receiveMessage{
-            case ResumeSimulation() =>
-              stash.unstashAll(SimulationActor(simulation, gui))
-            case StopSimulation() =>
-              Behaviors.same
-            case other =>
-              stash.stash(other)
-              Behaviors.same
+    Behaviors.setup(ctx => {
+      Behaviors.withStash[Message](10000) { stash =>
+        Behaviors.receiveMessage {
+          case ResumeSimulation() =>
+            stash.unstashAll(SimulationActor(simulation, gui))
+          case StopSimulation() =>
+            Behaviors.same
+          case other =>
+            stash.stash(other)
+            Behaviors.same
         }
       }
     })
