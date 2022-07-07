@@ -4,24 +4,16 @@ import akka.actor.typed.*
 import akka.actor.typed.receptionist.{Receptionist, ServiceKey}
 import akka.actor.typed.scaladsl.{ActorContext, Behaviors}
 import distributed.{Message, ViewCommand}
-
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.DurationInt
 
 sealed trait FireStationCommand extends Message
-
 case class Alarm(zone: String) extends FireStationCommand
-
 case class StartAssistance() extends FireStationCommand
-
 case class EndAssistance() extends FireStationCommand
-
 case class NewViewRegistered(views: List[ActorRef[ViewCommand]]) extends FireStationCommand
-
 case class MyZoneRequest(replyTo: ActorRef[SensorCommand], zone: String) extends FireStationCommand
-
 case class GetStationInfo(ctx: ActorRef[ViewCommand]) extends FireStationCommand
-
 case class sensorInAlarm() extends FireStationCommand
 
 object FireStationActor:
@@ -49,11 +41,9 @@ object FireStationActor:
                        zone: String,
                        ctx: ActorContext[FireStationCommand]): Behavior[FireStationCommand] =
     var alarmReceived = false
-
     Behaviors.withTimers(timers => {
       Behaviors.receiveMessage(msg => {
         msg match
-
           case GetStationInfo(viewActorRef) =>
             viewActors += viewActorRef
             viewActorRef ! StationInfo(position, ctx.self, zone)
@@ -92,7 +82,6 @@ object FireStationActor:
                    zone: String,
                    context: ActorContext[FireStationCommand]): Behavior[FireStationCommand] = Behaviors.receive((_, msg) => {
     msg match
-
       case GetStationInfo(viewActorRef) =>
         viewActors += viewActorRef
         viewActorRef ! StationInfo(position, context.self, zone)

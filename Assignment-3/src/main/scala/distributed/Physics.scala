@@ -7,7 +7,6 @@ import scala.util.Random
 
 trait Zone:
   def bounds: Boundary
-
   def id: String
 
 object Zone:

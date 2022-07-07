@@ -18,27 +18,16 @@ import scala.util.{Failure, Random, Success}
 sealed trait SensorCommand extends Message
 
 case class Update() extends SensorCommand
-
 case class EndDisconnection() extends SensorCommand
-
 case class ReconnectToGUI() extends SensorCommand
-
 case class IsSensorInAlarmRequest(replyTo: ActorRef[SensorCommand]) extends SensorCommand
-
 case class IsSensorInAlarmResponse(sensorState: SensorState) extends SensorCommand
-
 case class ViewRegistered(views: List[ActorRef[ViewCommand]]) extends SensorCommand
-
 case class FireStationRegistered(fireStation: List[ActorRef[FireStationCommand]]) extends SensorCommand
-
 case class OtherSensorRegistered(otherSensors: List[ActorRef[SensorCommand]]) extends SensorCommand
-
 case class MyZoneSensorRequest(sensorToReply: ActorRef[SensorCommand], zone: String) extends SensorCommand
-
 case class MyZoneSensorResponse(sensorRef: ActorRef[SensorCommand]) extends SensorCommand
-
 case class MyStationResponse(ref: ActorRef[FireStationCommand]) extends SensorCommand
-
 case class GetSensorInfo(ctx: ActorRef[ViewCommand]) extends SensorCommand
 
 object SensorState extends Enumeration {
@@ -49,7 +38,7 @@ object SensorState extends Enumeration {
 object SensorActor:
   val sensorKey: ServiceKey[SensorCommand] = ServiceKey[SensorCommand]("sensor")
   var viewActors: ListBuffer[ActorRef[ViewCommand]] = ListBuffer.empty
-
+  
   def sensorRead: Double = Random.between(0.0, 10.5)
 
   def apply(position: (Int, Int),
@@ -106,7 +95,6 @@ object SensorActor:
     var sensorResponse = ListBuffer.empty[SensorState]
     Behaviors.receiveMessage(msg => {
       msg match
-
         case ViewRegistered(views) =>
           views.filter(!viewActors.contains(_)).foreach(viewActors += _)
           Behaviors.same
@@ -142,13 +130,11 @@ object SensorActor:
             case level if level <= 8 =>
               println("Sensor" + zone + " - OK " + level)
               viewActors.foreach(_ ! SensorUpdate(position, false))
-              // viewActors.get ! SensorUpdate(position, false)
               timer.startSingleTimer(Update(), 20.seconds)
               Behaviors.same
 
             case level if level <= 10 =>
               viewActors.foreach(_ ! SensorUpdate(position, true))
-              // viewActors.get ! SensorUpdate(position, true)
               println("Sensor" + zone + " - WARNING")
               timer.startSingleTimer(Update(), 20.seconds)
               otherSensor.foreach(actor => ctx.ask(actor, IsSensorInAlarmRequest.apply) {
@@ -159,7 +145,6 @@ object SensorActor:
 
             case _ =>
               viewActors.foreach(_ ! SensorDisconnected(position))
-              //viewActors.get ! SensorDisconnected(position)
               println("Sensor" + zone + " - DISCONNECTED")
               disconnectedSensorLogic(position, zone, ctx, timer, fireStation, otherSensor)
 
@@ -173,25 +158,21 @@ object SensorActor:
           if sensorResponse.size == otherSensor.size
           then
             val quorum: Double = sensorResponse.count(_ == SensorState.Warning) / sensorResponse.size.toDouble
-            println("Zone " + zone + " Ho tutte le risposte: " + sensorResponse + " QUORUM: " + quorum)
             if quorum > 0.5
             then
               fireStation.get ! Alarm(zone)
               viewActors.foreach(_ ! AlarmView(zone))
-            //viewActors.get ! AlarmView(zone)
             sensorResponse = ListBuffer.empty
           Behaviors.same
 
         case ReconnectToGUI() =>
           println("Sensor" + zone + " - RECONNECTED")
           viewActors.foreach(_ ! SensorReconnected(position))
-          // viewActors.get ! SensorReconnected(position)
           ctx.self ! Update()
           Behaviors.same
 
         case GetSensorInfo(context) =>
           if !viewActors.contains(context) then viewActors += context
-          //viewActors = Some(List(context))
           context ! SensorInfo(position)
           timer.startSingleTimer(Update(), 10.seconds)
           Behaviors.same

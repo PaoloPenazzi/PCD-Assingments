@@ -11,33 +11,19 @@ import javax.swing.SwingUtilities
 import scala.collection.mutable.ListBuffer
 
 trait ViewCommand extends Message
-
 case class StartGUI(cityGrid: CityGrid) extends ViewCommand
-
 case class SensorDisconnected(position: (Int, Int)) extends ViewCommand
-
 case class SensorReconnected(position: (Int, Int)) extends ViewCommand
-
 case class SensorInfo(position: (Int, Int)) extends ViewCommand
-
 case class StartNewSensor(sensors: List[ActorRef[SensorCommand]]) extends ViewCommand
-
 case class StartNewFireStation(firestations: List[ActorRef[FireStationCommand]]) extends ViewCommand
-
 case class StartNewView(views: List[ActorRef[ViewCommand]]) extends ViewCommand
-
 case class StationInfo(position: (Int, Int), actorRef: ActorRef[FireStationCommand], zoneID: String) extends ViewCommand
-
 case class StationBusy(position: (Int, Int)) extends ViewCommand
-
 case class StationFree(position: (Int, Int)) extends ViewCommand
-
 case class AlarmView(id: String) extends ViewCommand
-
 case class NotifyAlarm(id: String) extends ViewCommand
-
 case class ResetAlarm(id: String) extends ViewCommand
-
 case class SensorUpdate(position: (Int, Int), overLevel: Boolean) extends ViewCommand
 
 object ViewActor:
@@ -45,7 +31,6 @@ object ViewActor:
   var fireStationActors: Map[String, ActorRef[FireStationCommand]] = Map.empty
   var fireStationZone: Map[String, (Int, Int)] = Map.empty
   var viewActors: ListBuffer[ActorRef[ViewCommand]] = ListBuffer.empty
-
 
   def refreshGUI(view: View, city: CityGrid): Unit =
     view.display(city)
@@ -89,7 +74,6 @@ object ViewActor:
       ctx.spawnAnonymous(manageFireStation(ctx.self))
       Behaviors.receiveMessage { message =>
         message match
-
           case StartNewSensor(sensors) =>
             sensors.foreach(_ ! GetSensorInfo(ctx.self))
             Behaviors.same
