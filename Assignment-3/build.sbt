@@ -7,7 +7,7 @@ lazy val root = (project in file("."))
     name := "Assignment-3"
   )
 
-lazy val akkaVersion = "2.6.19"
+lazy val akkaVersion = "2.7.0"
 lazy val akkaGroup = "com.typesafe.akka"
 libraryDependencies ++= Seq(
   akkaGroup %% "akka-actor-typed" % akkaVersion, // For standard log configuration
