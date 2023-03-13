@@ -11,9 +11,15 @@ For more information you can check the assignment report (only available in ital
 
 ## 2nd Assignment ##
 This assignment is divided in three points:
-- Realise a task-based version of the first assignment.
+- Implement a task-based version of the first assignment.
 - Event-driven Asynchronous Programming.
 - Reactive Programming.
 
 ## 3rd Assignment ##
+Implement an application to monitor rain level in a city.
+The city is divided in a NxM grid: in each zone there are multiple sensors and an Emergency Station.
+Each sensor monitor the rain level: if it exceed a treshold the sensor change its state to 'Alarm'. if the majority of sensors in a zone are in alarm, the local Emergency station will be notified. A sensor can also randomly fail.
+Once the emergency is handled by the station, the zone return in a normal state.
+
+The application is developed using Akka and Scala.
 
