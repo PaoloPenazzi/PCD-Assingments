@@ -15,6 +15,6 @@ libraryDependencies ++= Seq(
   akkaGroup %% "akka-cluster-typed" % akkaVersion, // For cluster configuration (akka cluster module)
   akkaGroup %% "akka-remote" % akkaVersion, // For remote configuration (akka remote module)
   akkaGroup %% "akka-serialization-jackson" % akkaVersion, // For serialization configuration (akka serialization module)
-  "ch.qos.logback" % "logback-classic" % "1.4.5",
+  "ch.qos.logback" % "logback-classic" % "1.4.6",
   "org.scalatest" %% "scalatest" % "3.2.15" % Test
 )
